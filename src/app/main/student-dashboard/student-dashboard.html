@@ -1,0 +1,131 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+  <!-- Left Side: Profile & Stepper timeline -->
+  <div class="lg:col-span-1 space-y-6">
+    <!-- Student Profile Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h3 class="text-base font-bold text-slate-900 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+        <i class="pi pi-user text-blue-600 text-lg"></i>
+        <span>Academic Profile</span>
+      </h3>
+      <div class="space-y-4">
+        <div>
+          <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Registration Number</span>
+          <span class="text-sm font-semibold text-slate-800">{{ portalService.userMetadata?.regNo }}</span>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Institution / University</span>
+          <span class="text-sm font-semibold text-slate-800">{{ portalService.userMetadata?.college }}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Category</span>
+            <span class="text-sm font-semibold text-slate-800">{{ portalService.userMetadata?.category }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Academic Score</span>
+            <span class="text-sm font-semibold text-slate-800">{{ portalService.userMetadata?.gpa }} GPA / 88%</span>
+          </div>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Family Income</span>
+          <span class="text-sm font-semibold text-slate-800">₹{{ portalService.userMetadata?.income?.toLocaleString('en-IN') }} / Annum</span>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center gap-2.5">
+          <i class="pi pi-check-circle text-emerald-600 text-lg shrink-0"></i>
+          <div>
+            <span class="text-[11px] font-bold text-emerald-800 block leading-tight">Account Verified</span>
+            <span class="text-[10px] text-emerald-600">Authenticated via Email OTP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Application Stepper -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+        <i class="pi pi-sliders-h text-indigo-600 text-lg"></i>
+        <span>Verification Pipeline</span>
+      </h3>
+      <div class="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-200">
+        <div *ngFor="let step of portalService.studentTimeline" class="relative">
+          <div [ngClass]="{
+            'bg-blue-600 border-blue-600 ring-4 ring-blue-50': step.status === 'completed',
+            'bg-amber-500 border-amber-500 animate-pulse ring-4 ring-amber-50': step.status === 'pending',
+            'bg-white border-slate-300': step.status !== 'completed' && step.status !== 'pending'
+          }" class="absolute -left-[21px] top-1 w-[12px] h-[12px] rounded-full border-2"></div>
+          <div>
+            <h4 class="text-xs font-bold text-slate-800">{{ step.label }}</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">{{ step.date }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Available/Applied Scholarships -->
+  <div class="lg:col-span-2 space-y-6">
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">National Funding Schemes</h2>
+          <p class="text-xs text-slate-500">Based on your verified academic profile credentials and social category</p>
+        </div>
+        <div class="px-3 py-1.5 bg-slate-100 rounded-xl border border-slate-200 flex items-center gap-2">
+          <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Matched:</span>
+          <span class="text-xs font-extrabold text-blue-600">{{ getMatchedCount() }} Schemes</span>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div 
+          *ngFor="let scheme of portalService.scholarshipSchemes" 
+          [ngClass]="{
+            'bg-blue-50/40 border-blue-200': isSchemeApplied(scheme.id),
+            'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md': !isSchemeApplied(scheme.id) && isSchemeEligible(scheme),
+            'bg-slate-50/80 border-slate-200 opacity-60': !isSchemeApplied(scheme.id) && !isSchemeEligible(scheme)
+          }"
+          class="p-5 rounded-xl border transition-all"
+        >
+          <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                {{ scheme.ministry }}
+              </span>
+              <h4 class="text-sm font-bold text-slate-900 pt-1.5">{{ scheme.name }}</h4>
+              <div class="flex flex-wrap gap-4 text-xs text-slate-500 pt-2">
+                <span class="flex items-center gap-1">
+                  <i class="pi pi-indian-rupee text-slate-400"></i>
+                  <strong class="text-slate-800">{{ scheme.amount }}</strong>
+                </span>
+                <span>Income Limit: Under ₹{{ scheme.maxIncome.toLocaleString('en-IN') }}</span>
+                <span>Minimum Marks: {{ scheme.minGPA }}%</span>
+              </div>
+            </div>
+
+            <div class="shrink-0 w-full sm:w-auto">
+              <div *ngIf="isSchemeApplied(scheme.id); else notApplied" class="w-full text-center px-4 py-2 bg-emerald-100 text-emerald-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1 border border-emerald-200">
+                <i class="pi pi-check text-xs"></i>
+                <span>Applied</span>
+              </div>
+              <ng-template #notApplied>
+                <button 
+                  *ngIf="isSchemeEligible(scheme); else notEligible"
+                  (click)="portalService.applyScholarship(scheme.id)"
+                  class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1 cursor-pointer border-0"
+                >
+                  <span>Apply Scheme</span>
+                  <i class="pi pi-arrow-right text-xs"></i>
+                </button>
+                <ng-template #notEligible>
+                  <div class="w-full text-center px-4 py-2 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs border border-slate-200">
+                    Not Eligible
+                  </div>
+                </ng-template>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

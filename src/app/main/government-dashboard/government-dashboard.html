@@ -1,0 +1,104 @@
+<div class="space-y-6 animate-fadeIn">
+  <!-- Statistics Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Total Allocation</span>
+      <span class="text-2xl font-extrabold text-slate-800 mt-2 block">₹120.00 Cr</span>
+      <div class="text-[10px] text-slate-500 mt-1">Union Budget Allocation 2026</div>
+    </div>
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Amount Disbursed</span>
+      <span class="text-2xl font-extrabold text-emerald-600 mt-2 block">₹84.60 Cr</span>
+      <div class="text-[10px] text-slate-500 mt-1">Direct Bank Transfer</div>
+    </div>
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Verified Applications</span>
+      <span class="text-2xl font-extrabold text-blue-600 mt-2 block">512,940</span>
+      <div class="text-[10px] text-slate-500 mt-1">OTP verified matches</div>
+    </div>
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">System Integrity</span>
+      <span class="text-2xl font-extrabold text-slate-800 mt-2 block flex items-center justify-center gap-1">
+        <i class="pi pi-shield text-emerald-600 text-lg mr-1"></i>
+        <span>99.9%</span>
+      </span>
+      <div class="text-[10px] text-slate-500 mt-1">Zero leak audit status</div>
+    </div>
+  </div>
+
+  <!-- Disbursal Controls & Ministry Overview -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Ledger selection -->
+    <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h3 class="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
+        <i class="pi pi-building text-indigo-600"></i>
+        <span>Ministry Allotment</span>
+      </h3>
+      <div class="space-y-2">
+        <button
+          *ngFor="let scheme of ministryList"
+          (click)="selectScheme(scheme)"
+          [ngClass]="{
+            'bg-slate-900 text-white': portalService.selectedDeptScheme === scheme,
+            'bg-slate-50 text-slate-600 hover:bg-slate-100': portalService.selectedDeptScheme !== scheme
+          }"
+          class="w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer border-0"
+        >
+          {{ scheme }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Disbursal Controls & System Announcements -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+      <div>
+        <h3 class="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
+          <i class="pi pi-chart-line text-blue-600"></i>
+          <span>Direct Bank Transfer Action Room</span>
+        </h3>
+
+        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 mt-4">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Central Release Lever</span>
+            <span
+              [ngClass]="{
+                'bg-emerald-100 text-emerald-800': portalService.disbursalApprovedStatus,
+                'bg-red-100 text-red-800': !portalService.disbursalApprovedStatus
+              }"
+              class="px-2 py-0.5 rounded-full text-[10px] font-extrabold"
+            >
+              {{ portalService.disbursalApprovedStatus ? "ACTIVE" : "PAUSED" }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mb-4">
+            When active, the portal automatically schedules institutional payouts to verified student bank accounts.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <button
+              (click)="toggleDisbursal()"
+              [ngClass]="{
+                'bg-red-600 hover:bg-red-700': portalService.disbursalApprovedStatus,
+                'bg-emerald-600 hover:bg-emerald-700': !portalService.disbursalApprovedStatus
+              }"
+              class="px-5 py-2.5 rounded-xl text-white font-bold text-xs transition-all flex items-center gap-1 cursor-pointer border-0"
+            >
+              <span>{{ portalService.disbursalApprovedStatus ? "Pause Disbursal Release" : "Release Scheduled Payments" }}</span>
+            </button>
+            <span *ngIf="portalService.systemAlertMessage" class="text-[11px] font-bold text-blue-600 leading-tight">
+              {{ portalService.systemAlertMessage }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <span>Audit Trail: Direct Audit Complete (2026 cycle)</span>
+        <a href="#" class="text-blue-600 hover:underline flex items-center gap-1 no-underline">
+          <span>Download compliance report</span>
+          <i class="pi pi-external-link text-[10px]"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

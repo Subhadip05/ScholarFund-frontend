@@ -1,0 +1,112 @@
+<footer
+  class="w-full pt-16 pb-12 px-4 sm:px-8 bg-slate-950 text-slate-400 border-t border-slate-800"
+>
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8">
+    <div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8 order-1 md:order-2">
+      <div class="space-y-3">
+        <h4 class="text-xs font-extrabold text-white uppercase tracking-wider">Gateways</h4>
+        <ul class="space-y-2 text-xs list-none p-0 m-0">
+          <li>
+            <button
+              (click)="portalService.openModal('student-login')"
+              class="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-0 text-slate-400 p-0"
+            >
+              Student Login
+            </button>
+          </li>
+          <li>
+            <button
+              (click)="portalService.openModal('register')"
+              class="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-0 text-slate-400 p-0"
+            >
+              New Scholar Sign-up
+            </button>
+          </li>
+          <li>
+            <button
+              (click)="portalService.openModal('college-login')"
+              class="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-0 text-slate-400 p-0"
+            >
+              Institutional Desk
+            </button>
+          </li>
+          <li>
+            <button
+              (click)="portalService.openModal('govt-login')"
+              class="hover:text-white transition-colors cursor-pointer text-left bg-transparent border-0 text-slate-400 p-0"
+            >
+              Government Center
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-extrabold text-white uppercase tracking-wider">Legal</h4>
+        <ul class="space-y-2 text-xs list-none p-0 m-0">
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >Privacy Charter</a
+            >
+          </li>
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >Direct Payout Policy</a
+            >
+          </li>
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >Audit Disclosures</a
+            >
+          </li>
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >Security & Verification Terms</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-extrabold text-white uppercase tracking-wider">Contact</h4>
+        <ul class="space-y-2 text-xs list-none p-0 m-0">
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >Nodal Support Centre</a
+            >
+          </li>
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >NIC Central Helpdesk</a
+            >
+          </li>
+          <li>
+            <a href="#" class="hover:text-white transition-colors text-slate-400 no-underline"
+              >Lodge Grievance Portal</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="md:col-span-5 space-y-4 order-2 md:order-1 border-t border-slate-800/60 pt-6 md:border-t-0 md:pt-0"
+    >
+      <div class="flex items-center gap-2 text-white font-bold text-lg font-display">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <i class="pi pi-graduation-cap text-white text-sm"></i>
+        </div>
+        <span>ScholarFund Portal</span>
+      </div>
+      <p class="text-xs leading-relaxed max-w-sm">
+        An official central clearing gateway for national academic funding schemes. Monitored
+        directly by the National Scholarship Directorate and verified via secure email
+        authentication.
+      </p>
+      <p class="text-[10px] opacity-60">
+        © 2026 ScholarFund Portal. Managed by the National Informatics Centre (NIC). All Rights
+        Reserved.
+      </p>
+    </div>
+  </div>
+</footer>

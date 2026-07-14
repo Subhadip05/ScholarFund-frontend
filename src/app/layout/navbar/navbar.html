@@ -1,0 +1,110 @@
+<nav
+  [ngClass]="portalService.isScrolled 
+    ? 'bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200/80' 
+    : 'bg-white border-b border-slate-100'"
+  class="fixed top-0 left-0 w-full z-40 transition-all duration-300 h-20 flex items-center"
+>
+  <div class="flex justify-between items-center w-full px-4 sm:px-8 max-w-7xl mx-auto h-20">
+    <!-- Logo Brand -->
+    <div
+      (click)="!portalService.userRole ? portalService.scrollToSection('hero') : null"
+      class="flex items-center gap-2 text-xl sm:text-2xl font-bold font-display text-slate-900 hover:text-blue-600 cursor-pointer transition-colors"
+    >
+      <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-700 text-white rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/10">
+        <i class="pi pi-graduation-cap text-xl"></i>
+      </div>
+      <div class="flex flex-col leading-none">
+        <span class="text-lg font-extrabold tracking-tight">ScholarFund</span>
+        <span class="text-[10px] font-semibold text-slate-500 tracking-wider uppercase">Govt. of India Portal</span>
+      </div>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div *ngIf="!portalService.userRole" class="hidden md:flex items-center gap-8">
+      <button
+        (click)="portalService.scrollToSection('how-it-works')"
+        class="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0"
+      >
+        How It Works
+      </button>
+      <button
+        (click)="portalService.scrollToSection('stats')"
+        class="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0"
+      >
+        Platform Stats
+      </button>
+    </div>
+
+    <!-- User Auth Buttons / Welcome state -->
+    <div class="flex items-center gap-3">
+      <div *ngIf="portalService.currentUser; else guestButtons" class="flex items-center gap-3">
+        <div class="hidden sm:flex flex-col text-right">
+          <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest leading-none mb-0.5">
+            {{ portalService.userRole === "student" ? "Student" : portalService.userRole === "college-admin" ? "College Nodal" : "Govt Director" }}
+          </span>
+          <span class="text-sm font-bold text-slate-800 max-w-[150px] truncate leading-tight">
+            {{ portalService.userMetadata?.name }}
+          </span>
+        </div>
+        <button
+          (click)="portalService.logout()"
+          class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 transition-all font-semibold text-xs cursor-pointer border border-slate-200"
+        >
+          <i class="pi pi-sign-out text-xs"></i>
+          <span>Log Out</span>
+        </button>
+      </div>
+
+      <ng-template #guestButtons>
+        <div class="flex items-center gap-2">
+          <button
+            (click)="portalService.openModal('student-login')"
+            class="hidden sm:block px-5 py-2.5 rounded-full border border-slate-200 text-slate-700 bg-white font-semibold text-xs hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
+          >
+            Student Login
+          </button>
+          <button
+            (click)="portalService.openModal('register')"
+            class="px-5 py-2.5 rounded-full bg-blue-600 text-white font-semibold text-xs shadow-md shadow-blue-600/10 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-600/20 active:scale-95 transition-all cursor-pointer border-0"
+          >
+            Register
+          </button>
+
+          <!-- Mobile Menu Icon -->
+          <button
+            (click)="portalService.mobileMenuOpen = !portalService.mobileMenuOpen"
+            class="p-2 text-slate-600 md:hidden hover:bg-slate-100 rounded-lg transition-colors cursor-pointer border-0 bg-transparent"
+          >
+            <i class="pi pi-bars text-lg"></i>
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Mobile Dropdown Navigation -->
+  <div 
+    *ngIf="portalService.mobileMenuOpen && !portalService.userRole" 
+    class="absolute top-20 left-0 w-full bg-white border-b border-slate-200 shadow-xl flex flex-col p-4 gap-3 md:hidden z-30"
+  >
+    <button
+      (click)="portalService.scrollToSection('how-it-works')"
+      class="text-left py-2 px-3 hover:bg-slate-50 rounded-lg text-sm font-medium text-slate-700 transition-all cursor-pointer border-0 bg-transparent"
+    >
+      How It Works
+    </button>
+    <button
+      (click)="portalService.scrollToSection('stats')"
+      class="text-left py-2 px-3 hover:bg-slate-50 rounded-lg text-sm font-medium text-slate-700 transition-all cursor-pointer border-0 bg-transparent"
+    >
+      Platform Stats
+    </button>
+    <div class="h-[1px] bg-slate-100 my-1"></div>
+    <button
+      (click)="portalService.openModal('student-login')"
+      class="w-full text-center py-2.5 bg-slate-100 text-slate-800 rounded-lg text-sm font-semibold hover:bg-slate-200 transition-all cursor-pointer border-0"
+    >
+      Student Login
+    </button>
+  </div>
+</nav>

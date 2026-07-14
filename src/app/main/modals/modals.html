@@ -1,0 +1,740 @@
+<div
+  *ngIf="portalService.activeModal() !== null"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4"
+>
+  <!-- Backdrop Blur overlay -->
+  <div (click)="closeModal()" class="absolute inset-0 bg-slate-950/70 backdrop-blur-md"></div>
+
+  <!-- Modal Body Card -->
+  <div
+    class="relative w-full max-w-lg bg-white rounded-3xl border border-slate-200 shadow-2xl shadow-slate-900/40 overflow-hidden flex flex-col z-10 animate-scaleUp"
+  >
+    <!-- Premium Header with dynamic configuration values -->
+    <div
+      class="px-6 py-5 flex justify-between items-center relative text-white"
+      [class]="getHeaderConfig().bg"
+    >
+      <!-- Background soft geometric patterns -->
+      <div
+        class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_50%)]"
+      ></div>
+
+      <div class="flex items-center gap-3 relative z-10">
+        <!-- Dynamic Icon -->
+        <div
+          class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20"
+        >
+          <i [class]="getHeaderConfig().icon + ' text-lg text-white'"></i>
+        </div>
+
+        <!-- Dynamic Titles & Descriptions -->
+        <div>
+          <h3 class="font-display font-extrabold text-base tracking-tight m-0 text-white">
+            {{ getHeaderConfig().title }}
+          </h3>
+          <p class="text-[10px] text-white/80 font-medium m-0 pt-0.5">
+            {{ getHeaderConfig().desc }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <div class="flex items-center gap-2 relative z-10">
+        <button
+          (click)="portalService.closeModal()"
+          class="p-1.5 rounded-xl bg-black/10 hover:bg-black/20 text-white transition-colors cursor-pointer border-0"
+        >
+          <i class="pi pi-times text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Body Container -->
+    <div class="p-6 max-h-[72vh] overflow-y-auto">
+      <!-- 1. STUDENT LOGIN FORM -->
+      <form
+        *ngIf="portalService.activeModal() === 'student-login'"
+        (submit)="onStudentLoginSubmit($event)"
+        class="space-y-4"
+      >
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            Student Email Address
+          </label>
+          <div class="flex gap-2">
+            <div class="relative flex-1">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <i class="pi pi-envelope text-sm"></i>
+              </span>
+              <input
+                type="email"
+                required
+                [formControl]="loginEmail"
+                name="loginEmail"
+                placeholder="name@college.edu"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:bg-white transition-all"
+              />
+            </div>
+            <button
+              type="button"
+              (click)="sendStudentLoginOtp()"
+              class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all whitespace-nowrap active:scale-95 cursor-pointer border-0"
+            >
+              {{ loginOtpSent ? 'Resend OTP' : 'Send OTP' }}
+            </button>
+          </div>
+          <span class="text-[10px] text-slate-400 block font-medium"
+            >Use the email verified on your academic records.</span
+          >
+        </div>
+
+        <div
+          *ngIf="loginOtpSent"
+          class="space-y-1.5 p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100/60 animate-fadeIn"
+        >
+          <span class="text-[10px] font-extrabold text-blue-800 block uppercase tracking-wider">
+            OTP Sent!
+          </span>
+          <p class="text-[11px] text-blue-700 mb-2 leading-relaxed">
+            We have simulated sending an OTP code. For this demo, use:
+            <strong class="font-extrabold">{{ loginOtpCode }}</strong>
+          </p>
+
+          <label
+            class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest mt-3"
+          >
+            Enter 6-Digit OTP
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-lock text-sm"></i>
+            </span>
+            <input
+              type="text"
+              required
+              maxLength="6"
+              [formControl]="loginOtpInput"
+              name="loginOtpInput"
+              placeholder="e.g. 123456"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        <div
+          *ngIf="loginOtpError"
+          class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
+        >
+          {{ loginOtpError }}
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] font-bold pt-1">
+          <label class="flex items-center gap-2 text-slate-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked
+              class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-50 focus:ring-offset-0 transition-colors"
+            />
+            <span>Remember session</span>
+          </label>
+          <a href="#" class="text-blue-600 hover:underline no-underline">Trouble logging in?</a>
+        </div>
+
+        <div
+          class="bg-blue-50 border border-blue-200/70 rounded-2xl p-3.5 flex gap-2.5 text-blue-800 text-[11px] leading-relaxed"
+        >
+          <i class="pi pi-shield text-blue-600 text-lg shrink-0 mt-0.5"></i>
+          <p class="m-0">
+            Authenticated login authorizes ScholarFund to execute real-time matching routines via
+            official scholarship directories.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer mt-4 border-0"
+        >
+          Authenticate and Enter Portal
+        </button>
+
+        <div
+          class="text-center text-[11px] font-bold text-slate-400 pt-3 border-t border-slate-100"
+        >
+          <span>New Scholar? </span>
+          <button
+            type="button"
+            (click)="portalService.openModal('register')"
+            class="text-blue-600 hover:underline cursor-pointer font-bold border-0 bg-transparent p-0"
+          >
+            Register Secure Account
+          </button>
+        </div>
+      </form>
+
+      <!-- 2. STUDENT REGISTRATION FORM -->
+      <form
+        *ngIf="portalService.activeModal() === 'register'"
+        (submit)="onRegisterSubmit($event)"
+        class="space-y-4"
+      >
+        <!-- Full Legal Name -->
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            Full Legal Name
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-user text-sm"></i>
+            </span>
+            <input
+              type="text"
+              required
+              [disabled]="registerOtpSent"
+              [formControl]="registerName"
+              name="registerName"
+              placeholder="Amit Kumar Patel"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Contact Email -->
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            Contact Email
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-envelope text-sm"></i>
+            </span>
+            <input
+              type="email"
+              required
+              [disabled]="registerOtpSent"
+              [formControl]="registerEmail"
+              name="registerEmail"
+              placeholder="amit.patel@outlook.com"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- Mobile Number -->
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            Mobile Phone Number
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-phone text-sm"></i>
+            </span>
+            <input
+              type="tel"
+              required
+              [disabled]="registerOtpSent"
+              [formControl]="registerMobile"
+              name="registerMobile"
+              placeholder="+91 94523 11842"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
+            />
+          </div>
+        </div>
+
+        <!-- 6-Digit OTP field (only shown after clicking "Register") -->
+        <div
+          *ngIf="registerOtpSent"
+          class="space-y-1.5 p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100/60 animate-fadeIn"
+        >
+          <span class="text-[10px] font-extrabold text-indigo-800 block uppercase tracking-wider">
+            OTP Sent!
+          </span>
+          <p class="text-[11px] text-indigo-700 mb-2 leading-relaxed">
+            We have simulated sending an OTP code. For this demo, use:
+            <strong class="font-extrabold">{{ registerOtpCode }}</strong>
+          </p>
+
+          <label
+            class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest mt-3"
+          >
+            Enter 6-Digit OTP
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-lock text-sm"></i>
+            </span>
+            <input
+              type="text"
+              required
+              maxLength="6"
+              [formControl]="registerOtpInput"
+              name="registerOtpInput"
+              placeholder="e.g. 123456"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        <div
+          *ngIf="registerOtpError"
+          class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
+        >
+          {{ registerOtpError }}
+        </div>
+
+        <div
+          class="bg-indigo-50 border border-indigo-200/70 rounded-2xl p-3.5 flex gap-2.5 text-indigo-900 text-[11px] leading-relaxed"
+        >
+          <i class="pi pi-check-circle text-indigo-750 text-lg shrink-0 mt-0.5"></i>
+          <p class="m-0">
+            Registering will create your verified scholar profile using your email credentials.
+            Secure OTP authentication required.
+          </p>
+        </div>
+
+        <button
+          *ngIf="!registerOtpSent"
+          type="button"
+          (click)="sendRegisterOtp()"
+          class="w-full py-3.5 bg-gradient-to-r from-indigo-700 to-slate-900 hover:from-indigo-800 hover:to-slate-950 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-indigo-700/10 hover:shadow-xl hover:shadow-indigo-700/20 active:scale-[0.98] transition-all cursor-pointer mt-2 border-0"
+        >
+          Register
+        </button>
+        <button
+          *ngIf="registerOtpSent"
+          type="submit"
+          class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-emerald-700/10 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer mt-2 border-0"
+        >
+          Submit Registration
+        </button>
+
+        <div
+          class="text-center text-[11px] font-bold text-slate-400 pt-3 border-t border-slate-100"
+        >
+          <span>Already registered? </span>
+          <button
+            type="button"
+            (click)="portalService.openModal('student-login')"
+            class="text-blue-600 hover:underline cursor-pointer font-bold border-0 bg-transparent p-0"
+          >
+            Sign In Here
+          </button>
+        </div>
+      </form>
+
+      <!-- 3. COLLEGE ADMIN LOGIN FORM -->
+      <form
+        *ngIf="portalService.activeModal() === 'college-login'"
+        (submit)="onCollegeLoginSubmit($event)"
+        class="space-y-4"
+      >
+        <div *ngIf="!collegeShowRegisterForm; else registerCollegeFlow" class="space-y-4">
+          <div class="space-y-1.5">
+            <label
+              class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest"
+            >
+              Nodal Officer Official Email
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <i class="pi pi-envelope text-sm"></i>
+              </span>
+              <input
+                type="email"
+                required
+                [disabled]="collegeOtpSent"
+                [formControl]="collegeNodalId"
+                name="collegeNodalId"
+                placeholder="nodal.officer@iitd.ac.in"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
+              />
+            </div>
+          </div>
+
+          <div
+            *ngIf="collegeOtpSent"
+            class="space-y-1.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 animate-fadeIn"
+          >
+            <span class="text-[10px] font-extrabold text-slate-600 block uppercase tracking-wider">
+              OTP Verification Sent!
+            </span>
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              A 6-digit OTP has been dispatched to
+              <strong class="font-semibold text-slate-700">{{ collegeNodalId }}</strong
+              >. (Simulated OTP:
+              <strong class="font-mono text-xs text-blue-600 bg-blue-50 px-1 py-0.5 rounded">{{
+                collegeOtpCode
+              }}</strong
+              >)
+            </p>
+
+            <label
+              class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest mt-3"
+            >
+              Enter 6-Digit OTP
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <i class="pi pi-lock text-sm"></i>
+              </span>
+              <input
+                type="text"
+                required
+                maxLength="6"
+                [formControl]="collegeOtpInput"
+                name="collegeOtpInput"
+                placeholder="e.g. 123456"
+                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all"
+              />
+            </div>
+          </div>
+
+          <div
+            *ngIf="collegeOtpError"
+            class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
+          >
+            {{ collegeOtpError }}
+          </div>
+
+          <div
+            class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 flex gap-2.5 text-slate-700 text-[11px] leading-relaxed"
+          >
+            <i class="pi pi-shield text-slate-500 text-lg shrink-0 mt-0.5"></i>
+            <p class="m-0">
+              Secure Institutional login. If your official email coordinates are not registered, we
+              will automatically set up your nodal officer workspace profile.
+            </p>
+          </div>
+
+          <button
+            *ngIf="!collegeOtpSent"
+            type="button"
+            (click)="verifyCollegeEmail()"
+            class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-slate-900/10 active:scale-[0.98] transition-all cursor-pointer border-0"
+          >
+            Proceed / Verify Email
+          </button>
+          <button
+            *ngIf="collegeOtpSent"
+            type="submit"
+            class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg active:scale-[0.98] transition-all cursor-pointer border-0"
+          >
+            Submit Login OTP
+          </button>
+        </div>
+
+        <!-- College Register Flow -->
+        <ng-template #registerCollegeFlow>
+          <div class="space-y-4">
+            <div
+              class="p-3 bg-violet-50 text-violet-800 rounded-2xl border border-violet-100 text-xs leading-relaxed font-semibold"
+            >
+              Institutional email not found in our ledger. Please register your College Nodal
+              Officer Profile below to instantly create your gateway.
+            </div>
+
+            <div class="space-y-1.5">
+              <label
+                class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest"
+              >
+                Nodal Officer Official Email
+              </label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <i class="pi pi-envelope text-sm"></i>
+                </span>
+                <input
+                  type="email"
+                  disabled
+                  [value]="collegeNodalId"
+                  class="w-full pl-10 pr-4 py-3 bg-slate-100 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-500 cursor-not-allowed transition-all border-0"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label
+                class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest"
+              >
+                Contact Person Name
+              </label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <i class="pi pi-user text-sm"></i>
+                </span>
+                <input
+                  type="text"
+                  required
+                  [disabled]="collegeOtpSent"
+                  [formControl]="collegeContactName"
+                  name="collegeContactName"
+                  placeholder="e.g. Dr. Rajesh Sharma"
+                  class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
+                />
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label
+                class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest"
+              >
+                Phone Number
+              </label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <i class="pi pi-phone text-sm"></i>
+                </span>
+                <input
+                  type="tel"
+                  required
+                  [disabled]="collegeOtpSent"
+                  [formControl]="collegePhone"
+                  name="collegePhone"
+                  placeholder="e.g. +91 94567 12345"
+                  class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
+                />
+              </div>
+            </div>
+
+            <div
+              *ngIf="collegeOtpSent"
+              class="space-y-1.5 p-3.5 bg-violet-50/50 rounded-2xl border border-violet-100/60 animate-fadeIn"
+            >
+              <span
+                class="text-[10px] font-extrabold text-violet-800 block uppercase tracking-wider"
+              >
+                Registration OTP Sent!
+              </span>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                A 6-digit OTP verification code has been dispatched. (Simulated OTP:
+                <strong
+                  class="font-mono text-xs text-violet-700 bg-violet-50 px-1 py-0.5 rounded"
+                  >{{ collegeOtpCode }}</strong
+                >)
+              </p>
+
+              <label
+                class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest mt-3"
+              >
+                Enter 6-Digit OTP
+              </label>
+              <div class="relative">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                  <i class="pi pi-lock text-sm"></i>
+                </span>
+                <input
+                  type="text"
+                  required
+                  maxLength="6"
+                  [formControl]="collegeOtpInput"
+                  name="collegeOtpInput"
+                  placeholder="e.g. 123456"
+                  class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all"
+                />
+              </div>
+            </div>
+
+            <div
+              *ngIf="collegeOtpError"
+              class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
+            >
+              {{ collegeOtpError }}
+            </div>
+
+            <div class="flex gap-3">
+              <button
+                type="button"
+                (click)="
+                  collegeShowRegisterForm = false; collegeOtpSent = false; collegeOtpError = ''
+                "
+                class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs transition-all cursor-pointer text-center border-0"
+              >
+                Go Back
+              </button>
+
+              <button
+                *ngIf="!collegeOtpSent"
+                type="button"
+                (click)="sendCollegeRegisterOtp()"
+                class="flex-1 py-3 bg-violet-700 hover:bg-violet-800 text-white rounded-xl font-bold text-xs transition-all cursor-pointer border-0"
+              >
+                Register & Send OTP
+              </button>
+              <button
+                *ngIf="collegeOtpSent"
+                type="submit"
+                class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-bold text-xs transition-all cursor-pointer border-0"
+              >
+                Submit Registration
+              </button>
+            </div>
+          </div>
+        </ng-template>
+      </form>
+
+      <!-- 4. GOVERNMENT ADMIN LOGIN FORM -->
+      <form
+        *ngIf="portalService.activeModal() === 'govt-login'"
+        (submit)="onGovtLoginSubmit($event)"
+        class="space-y-4"
+      >
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            Department / Ministry Selection
+          </label>
+          <select
+            [formControl]="govtDept"
+            name="govtDept"
+            class="w-full px-3.5 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-100 focus:bg-white"
+          >
+            <option>Ministry of Education (MoE)</option>
+            <option>Ministry of Minority Affairs (MoMA)</option>
+            <option>Ministry of Social Justice & Empowerment</option>
+            <option>Ministry of Tribal Affairs</option>
+          </select>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            NIC Government Email
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-envelope text-sm"></i>
+            </span>
+            <input
+              type="email"
+              required
+              [formControl]="govtEmail"
+              name="govtEmail"
+              placeholder="director-scholarship@nic.in"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50 focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
+            Government Account Password
+          </label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+              <i class="pi pi-lock text-sm"></i>
+            </span>
+            <input
+              type="password"
+              required
+              [formControl]="govtPassphrase"
+              name="govtPassphrase"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/95 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50 focus:bg-white transition-all"
+            />
+          </div>
+        </div>
+
+        <div
+          class="bg-emerald-50 border border-emerald-200/70 rounded-2xl p-3.5 flex gap-2.5 text-emerald-900 text-[11px] leading-relaxed"
+        >
+          <i class="pi pi-shield text-emerald-700 text-lg shrink-0 mt-0.5"></i>
+          <p class="m-0">
+            Secure government credential authentication. Access is strictly logged and audited by
+            central systems.
+          </p>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-800 hover:from-emerald-700 hover:to-teal-900 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-emerald-600/10 active:scale-[0.98] transition-all cursor-pointer border-0"
+        >
+          Enter Central Government Repository
+        </button>
+      </form>
+
+      <!-- 5. ELIGIBILITY INSTRUCTIONS -->
+      <div *ngIf="portalService.activeModal() === 'eligibility-checker'" class="space-y-6">
+        <div class="text-slate-800 text-xs leading-relaxed space-y-4">
+          <p class="font-bold text-slate-700">
+            To match the national and state-authorized academic scholarship directories, candidates
+            must satisfy the following official eligibility instructions:
+          </p>
+
+          <div class="space-y-3.5">
+            <div
+              class="flex gap-3 p-4 bg-violet-50/50 rounded-2xl border border-violet-100/60 items-start"
+            >
+              <div
+                class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center shrink-0 border border-violet-200"
+              >
+                <span class="text-xs font-bold text-violet-700 font-mono">1</span>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-slate-900 block">Board Qualification</span>
+                <span class="text-[11px] text-slate-600 block mt-0.5 leading-relaxed font-medium">
+                  Recently qualify the
+                  <strong class="font-bold text-slate-900"
+                    >10th or 12th West Bengal Board Exam</strong
+                  >.
+                </span>
+              </div>
+            </div>
+
+            <div
+              class="flex gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100/60 items-start"
+            >
+              <div
+                class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0 border border-indigo-200"
+              >
+                <span class="text-xs font-bold text-indigo-700 font-mono">2</span>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-slate-900 block">Academic Score Criteria</span>
+                <span class="text-[11px] text-slate-600 block mt-0.5 leading-relaxed font-medium">
+                  Have secured
+                  <strong class="font-bold text-slate-900">more than or equal to 70% marks</strong>
+                  in the last qualification exam result.
+                </span>
+              </div>
+            </div>
+
+            <div
+              class="flex gap-3 p-4 bg-rose-50/50 rounded-2xl border border-rose-100/60 items-start"
+            >
+              <div
+                class="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200"
+              >
+                <span class="text-xs font-bold text-rose-700 font-mono">3</span>
+              </div>
+              <div>
+                <span class="text-xs font-bold text-slate-900 block"
+                  >Family Annual Income limit</span
+                >
+                <span class="text-[11px] text-slate-600 block mt-0.5 leading-relaxed font-medium">
+                  Family annual income must be
+                  <strong class="font-bold text-slate-900">less than ₹2,00,000</strong>.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="p-3 bg-slate-50 rounded-xl border border-slate-200/50 flex gap-2 text-slate-500 text-[10px] font-medium"
+          >
+            <i class="pi pi-info-circle text-slate-400 mt-0.5"></i>
+            <span
+              >Ensure you possess official marksheets and income certificates issued by verified
+              regional state units during submission.</span
+            >
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            (click)="closeModal()"
+            class="w-full py-3.5 bg-gradient-to-r from-violet-600 to-indigo-700 hover:from-violet-700 hover:to-indigo-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-violet-500/10 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer text-center border-0"
+          >
+            Close Instructions
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
