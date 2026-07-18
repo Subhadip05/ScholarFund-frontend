@@ -3,9 +3,9 @@
   <app-navbar></app-navbar>
 
   <div class="pt-20">
-    <div *ngIf="portalService.userRole" class="max-w-7xl mx-auto px-4 sm:px-8 py-8">
+    <!-- Show Dashboard Header Banner ONLY if logged in -->
+    <div *ngIf="portalService.userRole" class="max-w-7xl mx-auto px-4 sm:px-8 py-8 pb-0">
       
-      <!-- Dashboard Header Banner -->
       <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
         <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-12 translate-y-12">
           <i class="pi pi-graduation-cap text-9xl text-slate-50" style="font-size: 8rem;"></i>
@@ -30,15 +30,12 @@
           </p>
         </div>
       </div>
-
-      <!-- Render matched standalone dashboards -->
-      <app-student-dashboard *ngIf="portalService.userRole === 'student'"></app-student-dashboard>
-      <app-collage-dashboard *ngIf="portalService.userRole === 'college-admin'"></app-collage-dashboard>
-      <app-government-dashboard *ngIf="portalService.userRole === 'govt-admin'"></app-government-dashboard>
-
+      
     </div>
 
-    <app-landing *ngIf="!portalService.userRole"></app-landing>
+    <div [class]="portalService.userRole ? 'max-w-7xl mx-auto px-4 sm:px-8 pb-8' : ''">
+      <router-outlet></router-outlet>
+    </div>
 
   </div>
 

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import {
   ModalType,
   UserRole,
@@ -7,11 +7,13 @@ import {
   CollegeApplication,
   RegisteredCollege,
 } from './types';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortalService {
+  private router = inject(Router);
   isScrolled = false;
   mobileMenuOpen = false;
   activeModal = signal<ModalType>(null);
@@ -154,6 +156,7 @@ export class PortalService {
     this.userMetadata = null;
     this.appliedScholarships = [];
     this.hasCalculated = false;
+    this.router.navigate(['/']);
   }
 
   // Apply for scholarship

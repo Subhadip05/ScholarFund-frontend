@@ -97,8 +97,7 @@
             OTP Sent!
           </span>
           <p class="text-[11px] text-blue-700 mb-2 leading-relaxed">
-            We have simulated sending an OTP code. For this demo, use:
-            <strong class="font-extrabold">{{ loginOtpCode }}</strong>
+            An OTP has been sent to your email. Please enter it below to authenticate.
           </p>
 
           <label
@@ -114,7 +113,7 @@
               type="text"
               required
               maxLength="6"
-              formControlName="otpInput"
+              formControlName="otpCode"
               name="loginOtpInput"
               placeholder="e.g. 123456"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:bg-white transition-all"
@@ -141,15 +140,6 @@
           <a href="#" class="text-blue-600 hover:underline no-underline">Trouble logging in?</a>
         </div>
 
-        <div
-          class="bg-blue-50 border border-blue-200/70 rounded-2xl p-3.5 flex gap-2.5 text-blue-800 text-[11px] leading-relaxed"
-        >
-          <i class="pi pi-shield text-blue-600 text-lg shrink-0 mt-0.5"></i>
-          <p class="m-0">
-            Authenticated login authorizes ScholarFund to execute real-time matching routines via
-            official scholarship directories.
-          </p>
-        </div>
 
         <button
           type="submit"
@@ -191,7 +181,7 @@
             <input
               type="text"
               required
-              formControlName="name"
+              formControlName="fullName"
               name="registerName"
               placeholder="Amit Kumar Patel"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
@@ -199,7 +189,7 @@
           </div>
 
           <span
-            *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched"
+            *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched"
             class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
           >
             <i class="pi pi-exclamation-circle text-[10px]"></i>
@@ -247,7 +237,7 @@
             <input
               type="tel"
               required
-              formControlName="mobile"
+              formControlName="phoneNumber"
               name="registerMobile"
               placeholder="+91 94523 11842"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
@@ -256,7 +246,9 @@
         </div>
 
         <span
-          *ngIf="registerForm.get('mobile')?.invalid && registerForm.get('mobile')?.touched"
+          *ngIf="
+            registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched
+          "
           class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
         >
           <i class="pi pi-exclamation-circle text-[10px]"></i>
@@ -288,7 +280,7 @@
               type="text"
               required
               maxLength="6"
-              formControlName="otpInput"
+              formControlName="otpCode"
               name="registerOtpInput"
               placeholder="e.g. 123456"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white transition-all"
@@ -296,12 +288,12 @@
           </div>
         </div>
 
-        <!-- <div
+        <div
           *ngIf="registerOtpError"
           class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
         >
           {{ registerOtpError }}
-        </div> -->
+        </div>
 
         <div
           class="bg-indigo-50 border border-indigo-200/70 rounded-2xl p-3.5 flex gap-2.5 text-indigo-900 text-[11px] leading-relaxed"
@@ -433,7 +425,7 @@
             (click)="verifyCollegeEmail()"
             class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-slate-900/10 active:scale-[0.98] transition-all cursor-pointer border-0"
           >
-            Proceed / Verify Email
+            Proceed
           </button>
           <button
             *ngIf="collegeOtpSent"

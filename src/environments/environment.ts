@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
-  baseUrl: 'http://localhost:8080/api',
+  production: true,
+  baseUrl: 'https://api.scholarfund.com/api'
 };

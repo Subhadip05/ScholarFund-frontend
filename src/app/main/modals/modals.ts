@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormControl,
@@ -8,6 +8,9 @@ import {
   Validators,
 } from '@angular/forms';
 import { PortalService } from '../../../shared/portal.service';
+import { Router } from '@angular/router';
+import Notiflix from 'notiflix';
+import { Authservice } from '../../../shared/auth/authservice';
 
 @Component({
   selector: 'app-modals',
@@ -17,14 +20,16 @@ import { PortalService } from '../../../shared/portal.service';
 })
 export class Modals {
   public portalService = inject(PortalService);
+  private authService = inject(Authservice);
   private _fb = inject(FormBuilder);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm!: FormGroup;
   registerForm!: FormGroup;
 
   // Student Login States
   loginOtpSent = false;
-  loginOtpCode = '';
   loginOtpError = '';
 
   // Student Register States
@@ -48,20 +53,20 @@ export class Modals {
   govtPassphrase = new FormControl('official-token-nic');
 
   ngOnInit() {
-    this.initForms();
+    this.initStudentForms();
   }
 
-  initForms() {
+  initStudentForms() {
     this.loginForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
-      otpInput: [''],
+      otpCode: [''],
     });
 
     this.registerForm = this._fb.group({
-      name: ['', Validators.required],
+      fullName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      mobile: ['', Validators.required],
-      otpInput: [''],
+      phoneNumber: ['', Validators.required],
+      otpCode: [''],
     });
   }
 
@@ -72,14 +77,13 @@ export class Modals {
 
   resetOtpStates() {
     this.loginOtpSent = false;
-    this.loginOtpCode = '';
     this.loginOtpError = '';
-    this.loginForm.get('otpInput')?.reset();
+    this.loginForm.get('otpCode')?.reset();
 
     this.registerOtpSent = false;
     this.registerOtpCode = '';
     this.registerOtpError = '';
-    this.registerForm.get('otpInput')?.reset();
+    this.registerForm.get('otpCode')?.reset();
 
     this.registerForm.get('name')?.enable();
     this.registerForm.get('email')?.enable();
@@ -94,42 +98,82 @@ export class Modals {
 
   sendStudentLoginOtp() {
     const email = this.loginForm.get('email')?.value;
-    if (!email) {
-      this.loginOtpError = 'Please enter your email first.';
+
+    if (!email || this.loginForm.get('email')?.invalid) {
+      this.loginOtpError = 'Please enter a valid email first.';
       return;
     }
-    this.loginOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    this.loginOtpSent = true;
+
     this.loginOtpError = '';
+
+    Notiflix.Loading.hourglass('Loading...', {});
+    this.authService.requestOtp({ email: email }).subscribe({
+      next: (res) => {
+        console.log('Reqest otp response', res.message);
+
+        this.loginOtpSent = true;
+        Notiflix.Loading.remove();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.loginOtpSent = false;
+        this.loginOtpError = err.error?.message || 'Failed to send OTP. Please try again.';
+        Notiflix.Loading.remove();
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   onStudentLoginSubmit(event: Event) {
     event.preventDefault();
-    const otpInput = this.loginForm.get('otpInput')?.value;
+
     const email = this.loginForm.get('email')?.value;
+    const otpCode = this.loginForm.get('otpCode')?.value;    
 
     if (!this.loginOtpSent) {
       this.loginOtpError = "Please click 'Send OTP' first.";
       return;
     }
-    if (otpInput !== this.loginOtpCode) {
-      this.loginOtpError = 'Invalid OTP entered. Please try again.';
+
+    if (!otpCode || otpCode.length != 6) {
+      this.loginOtpError = 'Please enter the 6-digit OTP sent to your email.';
       return;
     }
 
-    this.portalService.currentUser = email;
-    this.portalService.userRole = 'student';
-    this.portalService.userMetadata = {
-      name: email === 'john.doe@academic.edu' ? 'John Doe' : email?.split('@')[0],
-      email: email,
-      category: 'OBC',
-      income: 240000,
-      gpa: 8.8,
-      regNo: 'REG-2026-9048',
-      college: 'Indian Institute of Technology, Delhi',
-    };
+    const loginPayload = this.loginForm.value;
+    Notiflix.Loading.hourglass('Loading...', {});
 
-    this.closeModal();
+    this.authService.verifyOtpAndLogin(loginPayload).subscribe({
+      next: (res) => {
+        console.log('Student login response :', res);
+        this.authService.saveTokens(res.data.accessToken, res.data.refreshToken);
+
+        this.portalService.currentUser = email;
+        this.portalService.userRole = 'student';
+
+        this.portalService.userMetadata = {
+          name: email.split('@')[0],
+          email: email,
+          category: 'OBC',
+          income: 240000,
+          gpa: 8.8,
+          regNo: 'REG-2026-9048',
+          college: 'Indian Institute of Technology, Delhi',
+        };
+
+        localStorage.setItem('user_role', 'student');
+        localStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
+
+        this.closeModal();
+        Notiflix.Loading.remove();
+
+        this.router.navigate(['/student']);
+      },
+      error: (err) => {
+        this.loginOtpError = err.error?.message || 'Invalid OTP entered. Please try again.';
+        Notiflix.Loading.remove();
+      },
+    });
   }
 
   sendRegisterOtp() {
@@ -152,7 +196,7 @@ export class Modals {
       this.registerOtpError = "Please click 'Send OTP' first.";
       return;
     }
-    if (formValues.otpInput !== this.registerOtpCode) {
+    if (formValues.otpCode !== this.registerOtpCode) {
       this.registerOtpError = 'Invalid OTP entered. Please try again.';
       return;
     }
@@ -253,6 +297,7 @@ export class Modals {
     };
 
     this.closeModal();
+    this.router.navigate(['/college']);
   }
 
   onGovtLoginSubmit(event: Event) {
@@ -266,6 +311,7 @@ export class Modals {
       clearance: 'Level 1 Administrator',
     };
     this.closeModal();
+    this.router.navigate(['/government']);
   }
 
   //Modal header color fixing through ts

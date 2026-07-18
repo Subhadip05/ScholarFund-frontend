@@ -4,10 +4,6 @@ import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
 import { PortalService } from '../shared/portal.service';
 import { CommonModule } from '@angular/common';
-import { StudentDashboard } from './main/student-dashboard/student-dashboard';
-import { CollageDashboard } from './main/collage-dashboard/collage-dashboard';
-import { GovernmentDashboard } from './main/government-dashboard/government-dashboard';
-import { Landing } from './main/landing/landing';
 import { Modals } from './main/modals/modals';
 
 @Component({
@@ -16,12 +12,9 @@ import { Modals } from './main/modals/modals';
     CommonModule,
     Navbar,
     Footer,
-    StudentDashboard,
-    CollageDashboard,
-    GovernmentDashboard,
-    Landing,
     Modals,
-  ],
+    RouterOutlet
+],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
