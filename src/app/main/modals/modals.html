@@ -140,7 +140,6 @@
           <a href="#" class="text-blue-600 hover:underline no-underline">Trouble logging in?</a>
         </div>
 
-
         <button
           type="submit"
           class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer mt-4 border-0"
@@ -165,8 +164,8 @@
       <!-- 2. STUDENT REGISTRATION FORM -->
       <form
         *ngIf="portalService.activeModal() === 'register'"
-        [formGroup]="registerForm"
-        (submit)="onRegisterSubmit($event)"
+        [formGroup]="studentRegisterForm"
+        (submit)="onStudentRegisterSubmit($event)"
         class="space-y-4"
       >
         <!-- Full Legal Name -->
@@ -182,14 +181,14 @@
               type="text"
               required
               formControlName="fullName"
-              name="registerName"
+              name="fullName"
               placeholder="Amit Kumar Patel"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
             />
           </div>
 
           <span
-            *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched"
+            *ngIf="studentRegisterSubmit && studentRegisterForm.get('fullName')?.invalid"
             class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
           >
             <i class="pi pi-exclamation-circle text-[10px]"></i>
@@ -210,18 +209,18 @@
               type="email"
               required
               formControlName="email"
-              name="registerEmail"
+              name="email"
               placeholder="amit.patel@email.com"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
             />
           </div>
 
           <span
-            *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            *ngIf="studentRegisterSubmit && studentRegisterForm.get('email')?.invalid"
             class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
           >
             <i class="pi pi-exclamation-circle text-[10px]"></i>
-            Email is required
+            Please enter valid email
           </span>
         </div>
 
@@ -238,7 +237,7 @@
               type="tel"
               required
               formControlName="phoneNumber"
-              name="registerMobile"
+              name="phoneNumber"
               placeholder="+91 94523 11842"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
             />
@@ -246,9 +245,7 @@
         </div>
 
         <span
-          *ngIf="
-            registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched
-          "
+          *ngIf="studentRegisterSubmit && studentRegisterForm.get('phoneNumber')?.invalid"
           class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
         >
           <i class="pi pi-exclamation-circle text-[10px]"></i>
@@ -308,7 +305,7 @@
         <button
           *ngIf="!registerOtpSent"
           type="button"
-          (click)="sendRegisterOtp()"
+          (click)="studentRegisterOtp()"
           class="w-full py-3.5 bg-gradient-to-r from-indigo-700 to-slate-900 hover:from-indigo-800 hover:to-slate-950 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-indigo-700/10 hover:shadow-xl hover:shadow-indigo-700/20 active:scale-[0.98] transition-all cursor-pointer mt-2 border-0"
         >
           Register
@@ -588,10 +585,11 @@
       <!-- 4. GOVERNMENT ADMIN LOGIN FORM -->
       <form
         *ngIf="portalService.activeModal() === 'govt-login'"
+        [formGroup]="adminLoginFrom"
         (submit)="onGovtLoginSubmit($event)"
         class="space-y-4"
       >
-        <div class="space-y-1.5">
+        <!-- <div class="space-y-1.5">
           <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
             Department / Ministry Selection
           </label>
@@ -605,11 +603,11 @@
             <option>Ministry of Social Justice & Empowerment</option>
             <option>Ministry of Tribal Affairs</option>
           </select>
-        </div>
+        </div> -->
 
         <div class="space-y-1.5">
           <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
-            NIC Government Email
+            Government Email
           </label>
           <div class="relative">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -618,12 +616,20 @@
             <input
               type="email"
               required
-              [formControl]="govtEmail"
-              name="govtEmail"
+              formControlName="email"
+              name="email"
               placeholder="director-scholarship@nic.in"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50 focus:bg-white transition-all"
             />
           </div>
+
+          <span
+            *ngIf="adminLoginSubmit && adminLoginFrom.get('email')?.invalid"
+            class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
+          >
+            <i class="pi pi-exclamation-circle text-[10px]"></i>
+            Email is required
+          </span>
         </div>
 
         <div class="space-y-1.5">
@@ -637,12 +643,19 @@
             <input
               type="password"
               required
-              [formControl]="govtPassphrase"
-              name="govtPassphrase"
+              formControlName="password"
+              name="password"
               placeholder="••••••••"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/95 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-4 focus:ring-emerald-50 focus:bg-white transition-all"
             />
           </div>
+          <span
+            *ngIf="adminLoginSubmit && adminLoginFrom.get('password')?.invalid"
+            class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
+          >
+            <i class="pi pi-exclamation-circle text-[10px]"></i>
+            Password is required
+          </span>
         </div>
 
         <div
@@ -659,7 +672,7 @@
           type="submit"
           class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-800 hover:from-emerald-700 hover:to-teal-900 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-emerald-600/10 active:scale-[0.98] transition-all cursor-pointer border-0"
         >
-          Enter Central Government Repository
+          Enter Government Credential
         </button>
       </form>
 

@@ -1,5 +1,6 @@
-export type ModalType = 'student-login' | 'register' | 'college-login' | 'govt-login' | 'eligibility-checker' | null;
-export type UserRole = 'student' | 'college-admin' | 'govt-admin' | null;
+export type ModalType =
+  'student-login' | 'register' | 'college-login' | 'govt-login' | 'eligibility-checker' | null;
+export type UserRole = 'student' | 'college-admin' | 'GOVT' | null;
 
 export interface ScholarshipScheme {
   id: string;
@@ -34,7 +35,6 @@ export interface RegisteredCollege {
   code: string;
   collegeName: string;
 }
-
 
 // ------------------------ For Auth Service ------------------------
 export interface ApiResponse<T> {
@@ -79,4 +79,3 @@ export interface AdminLoginDto {
   email: string;
   password: string;
 }
-

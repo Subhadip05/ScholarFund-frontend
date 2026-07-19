@@ -62,6 +62,8 @@ export class Authservice {
   logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('user_metadata');
     this.router.navigate(['/']);
   }
 }

@@ -8,12 +8,16 @@ import {
   RegisteredCollege,
 } from './types';
 import { Router } from '@angular/router';
+import { Authservice } from './auth/authservice';
+import Notiflix from 'notiflix';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortalService {
   private router = inject(Router);
+  private authservice = inject(Authservice);
+
   isScrolled = false;
   mobileMenuOpen = false;
   activeModal = signal<ModalType>(null);
@@ -137,7 +141,6 @@ export class PortalService {
 
   constructor() {}
 
-
   openModal(type: ModalType) {
     console.log('Open modal type: ', type);
     this.activeModal.set(type);
@@ -151,12 +154,14 @@ export class PortalService {
 
   // Log out current session
   logout() {
+    Notiflix.Loading.pulse('Loading...', {});
+    this.authservice.logout();
     this.currentUser = null;
     this.userRole = null;
     this.userMetadata = null;
     this.appliedScholarships = [];
     this.hasCalculated = false;
-    this.router.navigate(['/']);
+    Notiflix.Loading.remove();
   }
 
   // Apply for scholarship

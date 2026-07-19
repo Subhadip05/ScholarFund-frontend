@@ -26,7 +26,9 @@ export class Modals {
   private cdr = inject(ChangeDetectorRef);
 
   loginForm!: FormGroup;
-  registerForm!: FormGroup;
+  studentRegisterForm!: FormGroup;
+  collageLoginForm!: FormGroup;
+  adminLoginFrom!: FormGroup;
 
   // Student Login States
   loginOtpSent = false;
@@ -36,6 +38,7 @@ export class Modals {
   registerOtpSent = false;
   registerOtpCode = '';
   registerOtpError = '';
+  studentRegisterSubmit = false;
 
   // College Admin States
   collegeNodalId = new FormControl('nodal.officer@iitd.ac.in');
@@ -48,29 +51,39 @@ export class Modals {
   collegePhone = new FormControl('');
 
   // Govt Admin States
-  govtDept = new FormControl('Ministry of Education (MoE)');
-  govtEmail = new FormControl('director-schol@nic.in');
-  govtPassphrase = new FormControl('official-token-nic');
+  adminLoginSubmit = false;
 
   ngOnInit() {
-    this.initStudentForms();
+    this.initForms();
   }
 
-  initStudentForms() {
+  initForms() {
     this.loginForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
       otpCode: [''],
     });
 
-    this.registerForm = this._fb.group({
+    this.studentRegisterForm = this._fb.group({
       fullName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.required],
       otpCode: [''],
     });
+
+    this.collageLoginForm = this._fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      otpCode: [''],
+    });
+
+    this.adminLoginFrom = this._fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    });
   }
 
   closeModal() {
+    this.adminLoginSubmit = false;
+    this.studentRegisterSubmit = false;
     this.portalService.closeModal();
     this.resetOtpStates();
   }
@@ -83,11 +96,11 @@ export class Modals {
     this.registerOtpSent = false;
     this.registerOtpCode = '';
     this.registerOtpError = '';
-    this.registerForm.get('otpCode')?.reset();
+    this.studentRegisterForm.get('otpCode')?.reset();
 
-    this.registerForm.get('name')?.enable();
-    this.registerForm.get('email')?.enable();
-    this.registerForm.get('mobile')?.enable();
+    this.studentRegisterForm.get('fullName')?.enable();
+    this.studentRegisterForm.get('email')?.enable();
+    this.studentRegisterForm.get('phoneNumber')?.enable();
 
     this.collegeOtpSent = false;
     this.collegeOtpCode = '';
@@ -106,7 +119,7 @@ export class Modals {
 
     this.loginOtpError = '';
 
-    Notiflix.Loading.hourglass('Loading...', {});
+    Notiflix.Loading.pulse('Loading...', {});
     this.authService.requestOtp({ email: email }).subscribe({
       next: (res) => {
         console.log('Reqest otp response', res.message);
@@ -128,7 +141,7 @@ export class Modals {
     event.preventDefault();
 
     const email = this.loginForm.get('email')?.value;
-    const otpCode = this.loginForm.get('otpCode')?.value;    
+    const otpCode = this.loginForm.get('otpCode')?.value;
 
     if (!this.loginOtpSent) {
       this.loginOtpError = "Please click 'Send OTP' first.";
@@ -141,7 +154,7 @@ export class Modals {
     }
 
     const loginPayload = this.loginForm.value;
-    Notiflix.Loading.hourglass('Loading...', {});
+    Notiflix.Loading.pulse('Loading...', {});
 
     this.authService.verifyOtpAndLogin(loginPayload).subscribe({
       next: (res) => {
@@ -176,21 +189,27 @@ export class Modals {
     });
   }
 
-  sendRegisterOtp() {
-    if (this.registerForm.invalid) return;
+  studentRegisterOtp() {
+    this.studentRegisterSubmit = true;
 
-    this.registerForm.get('name')?.disable();
-    this.registerForm.get('email')?.disable();
-    this.registerForm.get('mobile')?.disable();
+    if (this.studentRegisterForm.invalid) return;
+    console.log(
+      'Student Registration and request for otp. ',
+      this.studentRegisterForm.getRawValue(),
+    );
+
+    this.studentRegisterForm.get('fullName')?.disable();
+    this.studentRegisterForm.get('email')?.disable();
+    this.studentRegisterForm.get('phoneNumber')?.disable();
 
     this.registerOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
     this.registerOtpSent = true;
     this.registerOtpError = '';
   }
 
-  onRegisterSubmit(event: Event) {
+  onStudentRegisterSubmit(event: Event) {
     event.preventDefault();
-    const formValues = this.registerForm.getRawValue();
+    const formValues = this.studentRegisterForm.getRawValue();
 
     if (!this.registerOtpSent) {
       this.registerOtpError = "Please click 'Send OTP' first.";
@@ -227,6 +246,7 @@ export class Modals {
       { label: 'Money Distribute By Govt.', status: 'upcoming', date: 'Awaiting Approval' },
     ];
 
+    this.studentRegisterForm.reset();
     this.closeModal();
   }
 
@@ -302,16 +322,44 @@ export class Modals {
 
   onGovtLoginSubmit(event: Event) {
     event.preventDefault();
-    this.portalService.currentUser = this.govtEmail.value;
-    this.portalService.userRole = 'govt-admin';
-    this.portalService.userMetadata = {
-      name: 'National Scholarship Directorate',
-      department: this.govtDept.value,
-      email: this.govtEmail.value,
-      clearance: 'Level 1 Administrator',
-    };
-    this.closeModal();
-    this.router.navigate(['/government']);
+    this.adminLoginSubmit = true;
+
+    if (this.adminLoginFrom.invalid) return;
+
+    const adminloginPayload = this.adminLoginFrom.value;
+    console.log('Admin Login form value: ', adminloginPayload);
+    // return;
+
+    Notiflix.Loading.pulse('Loading...', {});
+    this.authService.adminLogin(adminloginPayload).subscribe({
+      next: (res) => {
+        console.log('Admin login response :', res);
+        this.authService.saveTokens(res.data.accessToken, res.data.refreshToken);
+
+        this.portalService.currentUser = 'Ministry of Education (MoE)';
+        this.portalService.userRole = 'GOVT';
+        this.portalService.userMetadata = {
+          name: 'National Scholarship Directorate',
+          department: 'Ministry of Education (MoE)',
+          email: this.adminLoginFrom.get('email')?.value,
+          clearance: 'Level 1 Administrator',
+        };
+
+        localStorage.setItem('user_role', 'GOVT');
+        localStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
+
+        this.closeModal();
+        Notiflix.Loading.remove();
+
+        this.adminLoginFrom.reset();
+        this.router.navigate(['/government']);
+      },
+      error: (err) => {
+        const errorMsg = err.error?.message || 'Admin login failed. Please try again.';
+        console.log(errorMsg);
+        Notiflix.Loading.remove();
+      },
+    });
   }
 
   //Modal header color fixing through ts

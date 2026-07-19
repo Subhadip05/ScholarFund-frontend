@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RouterModule } from '@angular/router';
 import { PortalService } from '../../../shared/portal.service';
-
 @Component({
   selector: 'app-navbar',
   imports: [CommonModule],

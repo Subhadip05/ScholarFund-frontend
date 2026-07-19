@@ -1,45 +1,55 @@
-<div class="min-h-screen bg-slate-50 text-slate-900 font-sans transition-all duration-300 antialiased selection:bg-blue-600 selection:text-white">
-  
+<div
+  class="min-h-screen bg-slate-50 text-slate-900 font-sans transition-all duration-300 antialiased selection:bg-blue-600 selection:text-white"
+>
   <app-navbar></app-navbar>
 
   <div class="pt-20">
     <!-- Show Dashboard Header Banner ONLY if logged in -->
     <div *ngIf="portalService.userRole" class="max-w-7xl mx-auto px-4 sm:px-8 py-8 pb-0">
-      
-      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+      <div
+        class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden"
+      >
         <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-12 translate-y-12">
-          <i class="pi pi-graduation-cap text-9xl text-slate-50" style="font-size: 8rem;"></i>
+          <i class="pi pi-graduation-cap text-9xl text-slate-50" style="font-size: 8rem"></i>
         </div>
         <div class="relative z-10">
-          <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 font-semibold text-xs uppercase tracking-widest border border-blue-500/30">
-            {{ portalService.userRole === 'student' ? 'Student Workspace' : portalService.userRole === 'college-admin' ? 'Institutional Nodal Desk' : 'National Directorate' }}
+          <span
+            class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 font-semibold text-xs uppercase tracking-widest border border-blue-500/30"
+          >
+            {{
+              portalService.userRole === 'student'
+                ? 'Student Workspace'
+                : portalService.userRole === 'college-admin'
+                  ? 'Institutional Nodal Desk'
+                  : 'National Directorate'
+            }}
           </span>
           <h1 class="text-2xl sm:text-4xl font-extrabold font-display mt-3 text-white">
             Welcome back, {{ portalService.userMetadata?.name }}
           </h1>
           <p class="text-slate-300 text-sm sm:text-base mt-2 max-w-2xl">
             <span *ngIf="portalService.userRole === 'student'">
-              Verify your profile details, apply for new national scholarships, and monitor your disbursement status in real-time.
+              Verify your profile details, apply for new national scholarships, and monitor your
+              disbursement status in real-time.
             </span>
             <span *ngIf="portalService.userRole === 'college-admin'">
-              Administering registrations for {{ portalService.userMetadata?.code }}. Audit student credentials and issue verification status reports.
+              Administering registrations for {{ portalService.userMetadata?.code }}. Audit student
+              credentials and issue verification status reports.
             </span>
-            <span *ngIf="portalService.userRole === 'govt-admin'">
-              State level clearance database. Access digital files, review ministry distribution quotas, and release disbursements.
+            <span *ngIf="portalService.userRole === 'GOVT'">
+              State level clearance database. Access digital files, review ministry distribution
+              quotas, and release disbursements.
             </span>
           </p>
         </div>
       </div>
-      
     </div>
 
     <div [class]="portalService.userRole ? 'max-w-7xl mx-auto px-4 sm:px-8 pb-8' : ''">
       <router-outlet></router-outlet>
     </div>
-
   </div>
 
   <app-footer></app-footer>
   <app-modals></app-modals>
-
 </div>
