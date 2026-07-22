@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
 
 @Component({
@@ -8,16 +8,20 @@ import { PortalService } from '../../../shared/portal.service';
   templateUrl: './government-dashboard.html',
   styleUrl: './government-dashboard.css',
 })
-export class GovernmentDashboard {
+export class GovernmentDashboard implements OnInit {
   public portalService = inject(PortalService);
 
   ministryList = [
-    "All Schemes",
-    "Ministry of Education (MoE)",
-    "Ministry of Social Justice & Empowerment",
-    "Ministry of Minority Affairs (MoMA)",
-    "Ministry of Tribal Affairs"
+    'All Schemes',
+    'Ministry of Education (MoE)',
+    'Ministry of Social Justice & Empowerment',
+    'Ministry of Minority Affairs (MoMA)',
+    'Ministry of Tribal Affairs',
   ];
+
+  ngOnInit(): void {
+    console.log('Govt Admin Dashboard Page Working...');
+  }
 
   selectScheme(scheme: string) {
     this.portalService.selectedDeptScheme = scheme;
@@ -27,11 +31,10 @@ export class GovernmentDashboard {
     const nextStatus = !this.portalService.disbursalApprovedStatus;
     this.portalService.disbursalApprovedStatus = nextStatus;
     if (nextStatus) {
-      this.portalService.systemAlertMessage = "Direct bank transfer releases initialized successfully. System dispatch pending.";
+      this.portalService.systemAlertMessage =
+        'Direct bank transfer releases initialized successfully. System dispatch pending.';
     } else {
-      this.portalService.systemAlertMessage = "Releases paused. Verification cycle logged.";
+      this.portalService.systemAlertMessage = 'Releases paused. Verification cycle logged.';
     }
   }
-
-
 }

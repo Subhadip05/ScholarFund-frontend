@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
+import { Apiservice } from '../../../shared/api/apiservice';
+import { StudentProfileResponse } from '../../../shared/types';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -8,30 +11,40 @@ import { PortalService } from '../../../shared/portal.service';
   templateUrl: './student-dashboard.html',
   styleUrl: './student-dashboard.css',
 })
-export class StudentDashboard {
-    public portalService = inject(PortalService);
+export class StudentDashboard implements OnInit {
+  public portalService = inject(PortalService);
+  private apiService = inject(Apiservice);
+  private router = inject(Router);
 
-    isSchemeEligible(scheme: any): boolean {
-    const meta = this.portalService.userMetadata;
-    if (!meta) return false;
-    const isIncomeEligible = meta.income <= scheme.maxIncome;
-    const isCategoryEligible = scheme.category.includes(meta.category);
-    const isGPAEligible = (meta.gpa * 10) >= scheme.minGPA;
-    return isIncomeEligible && isCategoryEligible && isGPAEligible;
+  
+  ngOnInit(): void {
+    this.fetchStudentProfile();
   }
 
-  isSchemeApplied(schemeId: string): boolean {
-    return this.portalService.appliedScholarships.includes(schemeId);
+  studentProfile: StudentProfileResponse | null = null;
+
+  fetchStudentProfile() {
+    this.apiService.getStudentProfile().subscribe({
+      next: (res) => {
+        this.studentProfile = res.data;
+
+        console.log('Student Profile response:', this.studentProfile);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
   }
 
-  getMatchedCount(): number {
-    const meta = this.portalService.userMetadata;
-    if (!meta) return 0;
-    return this.portalService.scholarshipSchemes.filter(scheme => {
-      return meta.income <= scheme.maxIncome &&
-             scheme.category.includes(meta.category) &&
-             (meta.gpa * 10) >= scheme.minGPA;
-    }).length;
+  readonly schemeId = '1';
+
+  get isApplied(): boolean {
+    return this.portalService.appliedScholarships.includes(this.schemeId);
+  }
+
+  applyForScheme() {
+    this.router.navigate(['/application-form']);
+    // this.portalService.applyScholarship(this.schemeId);
   }
 
 }

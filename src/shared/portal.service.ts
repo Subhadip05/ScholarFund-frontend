@@ -22,7 +22,6 @@ export class PortalService {
   mobileMenuOpen = false;
   activeModal = signal<ModalType>(null);
 
-  currentUser: string | null = null;
   userRole: UserRole = null;
   userMetadata: any = null;
 
@@ -90,8 +89,8 @@ export class PortalService {
   appliedScholarships: string[] = [];
   studentTimeline: TimelineItem[] = [
     { label: 'Student Register/Login', status: 'completed', date: 'July 10, 2026' },
-    { label: 'Scholarship Apply', status: 'completed', date: 'July 11, 2026' },
-    { label: 'Institute Verification', status: 'pending', date: 'In Progress' },
+    { label: 'Scholarship Apply', status: 'pending', date: 'In Progress' },
+    { label: 'Institute Verification', status: 'upcoming', date: 'Awaiting Application' },
     { label: 'Government Approved Scholarship', status: 'upcoming', date: 'Awaiting Verification' },
     { label: 'Money Distribute By Govt.', status: 'upcoming', date: 'Awaiting Approval' },
   ];
@@ -132,14 +131,18 @@ export class PortalService {
   systemAlertMessage = '';
   disbursalApprovedStatus = false;
 
-  // Eligibility Verification state
-  calcIncome = 350000;
-  calcCategory = 'OBC';
-  calcGPA = 82;
-  calcVerifiedSchemes: ScholarshipScheme[] = [];
-  hasCalculated = false;
+  constructor() {
+    this.userRole = sessionStorage.getItem('user_role') as UserRole;
+    const savedMetadata = sessionStorage.getItem('user_metadata');
 
-  constructor() {}
+    if (savedMetadata) {
+      try {
+        this.userMetadata = JSON.parse(savedMetadata);
+      } catch (e) {
+        console.error('Error parsing user metadata from sessionStorage', e);
+      }
+    }
+  }
 
   openModal(type: ModalType) {
     console.log('Open modal type: ', type);
@@ -156,11 +159,9 @@ export class PortalService {
   logout() {
     Notiflix.Loading.pulse('Loading...', {});
     this.authservice.logout();
-    this.currentUser = null;
     this.userRole = null;
     this.userMetadata = null;
     this.appliedScholarships = [];
-    this.hasCalculated = false;
     Notiflix.Loading.remove();
   }
 
@@ -197,17 +198,6 @@ export class PortalService {
     this.collegeApplications = this.collegeApplications.map((app) =>
       app.id === id ? { ...app, status: 'Rejected' } : app,
     );
-  }
-
-  // Eligibility Calculator
-  calculateEligibility() {
-    this.calcVerifiedSchemes = this.scholarshipSchemes.filter((scheme) => {
-      const gpaPass = this.calcGPA >= scheme.minGPA;
-      const incomePass = this.calcIncome <= scheme.maxIncome;
-      const categoryPass = scheme.category.includes(this.calcCategory);
-      return gpaPass && incomePass && categoryPass;
-    });
-    this.hasCalculated = true;
   }
 
   // Helper scroll

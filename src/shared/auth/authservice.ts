@@ -47,23 +47,23 @@ export class Authservice {
   }
 
   getAccessToken() {
-    return localStorage.getItem('access_token');
+    return sessionStorage.getItem('access_token');
   }
 
   getRefreshToken() {
-    return localStorage.getItem('refresh_token');
+    return sessionStorage.getItem('refresh_token');
   }
 
   saveTokens(accessToken: string, refreshToken: string) {
-    localStorage.setItem('access_token', accessToken);
-    localStorage.setItem('refresh_token', refreshToken);
+    sessionStorage.setItem('access_token', accessToken);
+    sessionStorage.setItem('refresh_token', refreshToken);
   }
 
   logout() {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('user_metadata');
+    sessionStorage.removeItem('access_token');
+    sessionStorage.removeItem('refresh_token');
+    sessionStorage.removeItem('user_role');
+    sessionStorage.removeItem('user_metadata');
     this.router.navigate(['/']);
   }
 }

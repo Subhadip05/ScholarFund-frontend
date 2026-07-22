@@ -11,23 +11,27 @@ import { PortalService } from '../../../shared/portal.service';
 import { Router } from '@angular/router';
 import Notiflix from 'notiflix';
 import { Authservice } from '../../../shared/auth/authservice';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-modals',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ToastModule],
   templateUrl: './modals.html',
   styleUrl: './modals.css',
+  providers: [MessageService],
 })
 export class Modals {
   public portalService = inject(PortalService);
-  private authService = inject(Authservice);
+  private _authService = inject(Authservice);
   private _fb = inject(FormBuilder);
-  private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
+  private _router = inject(Router);
+  private _cdr = inject(ChangeDetectorRef);
+  private _messageService = inject(MessageService);
 
-  loginForm!: FormGroup;
+  studentLoginForm!: FormGroup;
   studentRegisterForm!: FormGroup;
-  collageLoginForm!: FormGroup;
+  collageForm!: FormGroup;
   adminLoginFrom!: FormGroup;
 
   // Student Login States
@@ -58,9 +62,10 @@ export class Modals {
   }
 
   initForms() {
-    this.loginForm = this._fb.group({
+    this.studentLoginForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
       otpCode: [''],
+      role: 'STUDENT',
     });
 
     this.studentRegisterForm = this._fb.group({
@@ -70,9 +75,12 @@ export class Modals {
       otpCode: [''],
     });
 
-    this.collageLoginForm = this._fb.group({
+    this.collageForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
+      contactPersonName: ['', Validators.required],
+      phoneNumber: ['', Validators.required],
       otpCode: [''],
+      role: 'COLLEGE',
     });
 
     this.adminLoginFrom = this._fb.group({
@@ -91,7 +99,7 @@ export class Modals {
   resetOtpStates() {
     this.loginOtpSent = false;
     this.loginOtpError = '';
-    this.loginForm.get('otpCode')?.reset();
+    this.studentLoginForm.get('otpCode')?.reset();
 
     this.registerOtpSent = false;
     this.registerOtpCode = '';
@@ -110,9 +118,9 @@ export class Modals {
   }
 
   sendStudentLoginOtp() {
-    const email = this.loginForm.get('email')?.value;
+    const email = this.studentLoginForm.get('email')?.value;
 
-    if (!email || this.loginForm.get('email')?.invalid) {
+    if (!email || this.studentLoginForm.get('email')?.invalid) {
       this.loginOtpError = 'Please enter a valid email first.';
       return;
     }
@@ -120,19 +128,19 @@ export class Modals {
     this.loginOtpError = '';
 
     Notiflix.Loading.pulse('Loading...', {});
-    this.authService.requestOtp({ email: email }).subscribe({
+    this._authService.requestOtp({ email: email, role: 'STUDENT' }).subscribe({
       next: (res) => {
         console.log('Reqest otp response', res.message);
 
         this.loginOtpSent = true;
         Notiflix.Loading.remove();
-        this.cdr.detectChanges();
+        this._cdr.detectChanges();
       },
       error: (err) => {
         this.loginOtpSent = false;
         this.loginOtpError = err.error?.message || 'Failed to send OTP. Please try again.';
         Notiflix.Loading.remove();
-        this.cdr.detectChanges();
+        this._cdr.detectChanges();
       },
     });
   }
@@ -140,8 +148,7 @@ export class Modals {
   onStudentLoginSubmit(event: Event) {
     event.preventDefault();
 
-    const email = this.loginForm.get('email')?.value;
-    const otpCode = this.loginForm.get('otpCode')?.value;
+    const otpCode = this.studentLoginForm.get('otpCode')?.value;
 
     if (!this.loginOtpSent) {
       this.loginOtpError = "Please click 'Send OTP' first.";
@@ -153,38 +160,37 @@ export class Modals {
       return;
     }
 
-    const loginPayload = this.loginForm.value;
+    const loginPayload = this.studentLoginForm.value;
     Notiflix.Loading.pulse('Loading...', {});
 
-    this.authService.verifyOtpAndLogin(loginPayload).subscribe({
+    this._authService.verifyOtpAndLogin(loginPayload).subscribe({
       next: (res) => {
         console.log('Student login response :', res);
-        this.authService.saveTokens(res.data.accessToken, res.data.refreshToken);
+        this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
 
-        this.portalService.currentUser = email;
         this.portalService.userRole = 'student';
 
         this.portalService.userMetadata = {
-          name: email.split('@')[0],
-          email: email,
-          category: 'OBC',
-          income: 240000,
-          gpa: 8.8,
-          regNo: 'REG-2026-9048',
-          college: 'Indian Institute of Technology, Delhi',
+          name: res.data?.fullName,
+          email: res.data?.email,
         };
 
-        localStorage.setItem('user_role', 'student');
-        localStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
+        sessionStorage.setItem('user_role', 'student');
+        sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();
         Notiflix.Loading.remove();
 
-        this.router.navigate(['/student']);
+        this._router.navigate(['/student']);
       },
       error: (err) => {
         this.loginOtpError = err.error?.message || 'Invalid OTP entered. Please try again.';
         Notiflix.Loading.remove();
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Student Login Failed',
+          detail: err.error?.message,
+        });
       },
     });
   }
@@ -222,7 +228,6 @@ export class Modals {
 
     console.log('Student Register form value :', formValues);
 
-    this.portalService.currentUser = formValues.email;
     this.portalService.userRole = 'student';
     this.portalService.userMetadata = {
       name: formValues.name || 'New Scholar',
@@ -251,21 +256,51 @@ export class Modals {
   }
 
   verifyCollegeEmail() {
-    if (!this.collegeNodalId.value) {
-      this.collegeOtpError = 'Please enter your nodal email first.';
+    const email = this.collageForm.get('email')?.value;
+
+    if (!email || this.collageForm.get('email')?.invalid) {
+      this.collegeOtpError = 'Please enter a valid institute email first.';
       return;
     }
-    const exists = this.portalService.registeredColleges.some(
-      (c: { email: string }) => c.email.toLowerCase() === this.collegeNodalId.value?.toLowerCase(),
-    );
-    if (exists) {
-      this.collegeOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-      this.collegeOtpSent = true;
-      this.collegeOtpError = '';
-    } else {
-      this.collegeShowRegisterForm = true;
-      this.collegeOtpError = '';
-    }
+
+    this.collegeOtpError = '';
+
+    Notiflix.Loading.pulse('Loading...', {});
+    this._authService.requestOtp({ email: email, role: 'COLLAGE' }).subscribe({
+      next: (res) => {
+        console.log('Reqest otp response', res);
+
+        if (res?.status === 200) {
+          this.collegeOtpSent = true;
+
+          this._messageService.add({
+            severity: 'success',
+            summary: 'OTP Sent',
+            detail: res?.message,
+          });
+        }
+
+        this.collegeOtpError = '';
+        Notiflix.Loading.remove();
+        this._cdr.detectChanges();
+      },
+      error: (err) => {
+        console.log('Institute Login error:', err);
+
+        if (err?.status === 404 || err?.status === 0) {
+          this._messageService.add({
+            severity: 'info',
+            summary: 'Institute Not Found',
+            detail: err?.error?.message,
+          });
+          this.collegeShowRegisterForm = true;
+        }
+        this.collegeOtpSent = false;
+        this.collegeOtpError = 'Failed to send OTP. Please try again.';
+        Notiflix.Loading.remove();
+        this._cdr.detectChanges();
+      },
+    });
   }
 
   sendCollegeRegisterOtp() {
@@ -306,7 +341,6 @@ export class Modals {
       this.portalService.registeredColleges.push(matchedCollege);
     }
 
-    this.portalService.currentUser = this.collegeNodalId.value;
     this.portalService.userRole = 'college-admin';
     this.portalService.userMetadata = {
       name: matchedCollege.contactPersonName,
@@ -317,7 +351,7 @@ export class Modals {
     };
 
     this.closeModal();
-    this.router.navigate(['/college']);
+    this._router.navigate(['/college']);
   }
 
   onGovtLoginSubmit(event: Event) {
@@ -331,33 +365,35 @@ export class Modals {
     // return;
 
     Notiflix.Loading.pulse('Loading...', {});
-    this.authService.adminLogin(adminloginPayload).subscribe({
+    this._authService.adminLogin(adminloginPayload).subscribe({
       next: (res) => {
         console.log('Admin login response :', res);
-        this.authService.saveTokens(res.data.accessToken, res.data.refreshToken);
+        this._authService.saveTokens(res.data.accessToken, res.data.refreshToken);
 
-        this.portalService.currentUser = 'Ministry of Education (MoE)';
         this.portalService.userRole = 'GOVT';
         this.portalService.userMetadata = {
-          name: 'National Scholarship Directorate',
-          department: 'Ministry of Education (MoE)',
-          email: this.adminLoginFrom.get('email')?.value,
-          clearance: 'Level 1 Administrator',
+          name: res.data?.fullName,
+          email: res.data?.email,
         };
 
-        localStorage.setItem('user_role', 'GOVT');
-        localStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
+        sessionStorage.setItem('user_role', 'GOVT');
+        sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();
         Notiflix.Loading.remove();
 
         this.adminLoginFrom.reset();
-        this.router.navigate(['/government']);
+        this._router.navigate(['/government']);
       },
       error: (err) => {
         const errorMsg = err.error?.message || 'Admin login failed. Please try again.';
         console.log(errorMsg);
         Notiflix.Loading.remove();
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Admin Login Failed',
+          detail: errorMsg,
+        });
       },
     });
   }

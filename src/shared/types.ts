@@ -68,14 +68,36 @@ export interface RegisterCollegeDto {
 
 export interface RequestOtpDto {
   email: string;
+  role: 'STUDENT' | 'COLLAGE';
 }
 
 export interface VerifyOtpDto {
   email: string;
   otpCode: string;
+  role: 'STUDENT' | 'COLLAGE';
 }
 
 export interface AdminLoginDto {
   email: string;
   password: string;
+}
+export interface StudentProfileResponse {
+  profileId: number;
+  fullName: string;
+  email: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  aadhaarNumber: string;
+  lastQualificationMarks: number;
+  lastQualificationCourse: string;
+  annualIncome: number;
+  isWestBengalResident: boolean;
+  bankAccountNumber: string;
+  ifscCode: string;
+
+  aadhaarDocumentUrl: string;
+  incomeCertificateUrl: string;
+  hsMarksheetUrl: string;
+  bankPassbookUrl: string;
 }
