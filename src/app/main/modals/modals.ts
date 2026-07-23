@@ -13,6 +13,7 @@ import Notiflix from 'notiflix';
 import { Authservice } from '../../../shared/auth/authservice';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { TimerUtil } from '../../../shared/utils/timer.util';
 
 @Component({
   selector: 'app-modals',
@@ -31,12 +32,12 @@ export class Modals {
 
   studentLoginForm!: FormGroup;
   studentRegisterForm!: FormGroup;
-  collageForm!: FormGroup;
+  collegeForm!: FormGroup;
   adminLoginFrom!: FormGroup;
 
   // Student Login States
-  loginOtpSent = false;
-  loginOtpError = '';
+  studentLoginOtpSent = false;
+  studentLoginOtpError = '';
 
   // Student Register States
   registerOtpSent = false;
@@ -57,8 +58,16 @@ export class Modals {
   // Govt Admin States
   adminLoginSubmit = false;
 
+  studentTimer = new TimerUtil();
+
   ngOnInit() {
     this.initForms();
+    this.studentLoginForm.valueChanges.subscribe(() => {
+      if (this.studentLoginOtpError) {
+        this.studentLoginOtpError = '';
+        this._cdr.detectChanges();
+      }
+    });
   }
 
   initForms() {
@@ -75,7 +84,7 @@ export class Modals {
       otpCode: [''],
     });
 
-    this.collageForm = this._fb.group({
+    this.collegeForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
       contactPersonName: ['', Validators.required],
       phoneNumber: ['', Validators.required],
@@ -97,8 +106,8 @@ export class Modals {
   }
 
   resetOtpStates() {
-    this.loginOtpSent = false;
-    this.loginOtpError = '';
+    this.studentLoginOtpSent = false;
+    this.studentLoginOtpError = '';
     this.studentLoginForm.get('otpCode')?.reset();
 
     this.registerOtpSent = false;
@@ -121,24 +130,34 @@ export class Modals {
     const email = this.studentLoginForm.get('email')?.value;
 
     if (!email || this.studentLoginForm.get('email')?.invalid) {
-      this.loginOtpError = 'Please enter a valid email first.';
+      this.studentLoginOtpError = 'Please enter a valid email first.';
+      this._cdr.detectChanges();
       return;
     }
 
-    this.loginOtpError = '';
+    this.studentLoginOtpError = '';
+    this._cdr.detectChanges();
 
     Notiflix.Loading.pulse('Loading...', {});
     this._authService.requestOtp({ email: email, role: 'STUDENT' }).subscribe({
       next: (res) => {
-        console.log('Reqest otp response', res.message);
+        console.log('Reqest otp response', res);
 
-        this.loginOtpSent = true;
+        this._messageService.add({
+          severity: 'success',
+          summary: 'OTP Sent',
+          detail: res.message,
+        });
+
+        this.studentLoginOtpSent = true;
+        this.startStudetOtpTimer();
+        this.studentLoginForm.get('email')?.disable();
         Notiflix.Loading.remove();
         this._cdr.detectChanges();
       },
       error: (err) => {
-        this.loginOtpSent = false;
-        this.loginOtpError = err.error?.message || 'Failed to send OTP. Please try again.';
+        this.studentLoginOtpSent = false;
+        this.studentLoginOtpError = err.error?.message || 'Failed to send OTP. Please try again.';
         Notiflix.Loading.remove();
         this._cdr.detectChanges();
       },
@@ -150,17 +169,22 @@ export class Modals {
 
     const otpCode = this.studentLoginForm.get('otpCode')?.value;
 
-    if (!this.loginOtpSent) {
-      this.loginOtpError = "Please click 'Send OTP' first.";
+    if (!this.studentLoginOtpSent) {
+      this.studentLoginOtpError = "Please click 'Send OTP' first.";
+      this._cdr.detectChanges();
       return;
     }
 
     if (!otpCode || otpCode.length != 6) {
-      this.loginOtpError = 'Please enter the 6-digit OTP sent to your email.';
+      this.studentLoginOtpError = 'Please enter the 6-digit OTP sent to your email.';
+      this._cdr.detectChanges();
       return;
     }
 
-    const loginPayload = this.studentLoginForm.value;
+    this.studentLoginOtpError = '';
+    this._cdr.detectChanges();
+
+    const loginPayload = this.studentLoginForm.getRawValue();
     Notiflix.Loading.pulse('Loading...', {});
 
     this._authService.verifyOtpAndLogin(loginPayload).subscribe({
@@ -179,12 +203,15 @@ export class Modals {
         sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();
+        this.studentLoginForm.reset();
         Notiflix.Loading.remove();
 
         this._router.navigate(['/student']);
       },
       error: (err) => {
-        this.loginOtpError = err.error?.message || 'Invalid OTP entered. Please try again.';
+        this.studentLoginOtpError = err.error?.message || 'Invalid OTP entered. Please try again.';
+        this._cdr.detectChanges();
+
         Notiflix.Loading.remove();
         this._messageService.add({
           severity: 'error',
@@ -256,9 +283,9 @@ export class Modals {
   }
 
   verifyCollegeEmail() {
-    const email = this.collageForm.get('email')?.value;
+    const email = this.collegeForm.get('email')?.value;
 
-    if (!email || this.collageForm.get('email')?.invalid) {
+    if (!email || this.collegeForm.get('email')?.invalid) {
       this.collegeOtpError = 'Please enter a valid institute email first.';
       return;
     }
@@ -266,7 +293,7 @@ export class Modals {
     this.collegeOtpError = '';
 
     Notiflix.Loading.pulse('Loading...', {});
-    this._authService.requestOtp({ email: email, role: 'COLLAGE' }).subscribe({
+    this._authService.requestOtp({ email: email, role: 'COLLEGE' }).subscribe({
       next: (res) => {
         console.log('Reqest otp response', res);
 
@@ -287,16 +314,23 @@ export class Modals {
       error: (err) => {
         console.log('Institute Login error:', err);
 
-        if (err?.status === 404 || err?.status === 0) {
+        if (err?.status === 404 && err?.error?.code === 'USER_NOT_FOUND') {
           this._messageService.add({
             severity: 'info',
             summary: 'Institute Not Found',
-            detail: err?.error?.message,
+            detail: 'Please complete registration first.',
           });
           this.collegeShowRegisterForm = true;
         }
+        if (err?.status === 500 && err?.error?.code === 'USER_EXIST_DIFF_ROLE') {
+          this._messageService.add({
+            severity: 'warn',
+            summary: 'User Exists',
+            detail: err?.error?.message,
+          });
+        }
         this.collegeOtpSent = false;
-        this.collegeOtpError = 'Failed to send OTP. Please try again.';
+        this.collegeOtpError = 'Failed to send OTP';
         Notiflix.Loading.remove();
         this._cdr.detectChanges();
       },
@@ -440,5 +474,20 @@ export class Modals {
           desc: 'Authorized department clearance console',
         };
     }
+  }
+
+  startStudetOtpTimer() {
+    this.studentLoginForm.get('otpCode')?.enable();
+    this.studentLoginOtpError = '';
+
+    this.studentTimer.start(300, () => {
+      this.studentLoginOtpError = 'Your OTP has expired. Please request a new one.';
+      this.studentLoginForm.get('otpCode')?.disable();
+      this._cdr.markForCheck();
+    });
+  }
+
+  ngOnDestroy() {
+    this.studentTimer.stop();
   }
 }

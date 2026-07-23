@@ -68,13 +68,13 @@ export interface RegisterCollegeDto {
 
 export interface RequestOtpDto {
   email: string;
-  role: 'STUDENT' | 'COLLAGE';
+  role: 'STUDENT' | 'COLLEGE';
 }
 
 export interface VerifyOtpDto {
   email: string;
   otpCode: string;
-  role: 'STUDENT' | 'COLLAGE';
+  role: 'STUDENT' | 'COLLEGE';
 }
 
 export interface AdminLoginDto {

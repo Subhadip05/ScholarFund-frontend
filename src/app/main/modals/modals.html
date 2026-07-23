@@ -80,9 +80,12 @@
             <button
               type="button"
               (click)="sendStudentLoginOtp()"
+              [disabled]="studentLoginOtpSent && studentTimer.timeLeft() > 0"
+              [class.opacity-50]="studentLoginOtpSent && studentTimer.timeLeft() > 0"
+              [class.cursor-not-allowed]="studentLoginOtpSent && studentTimer.timeLeft() > 0"
               class="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all whitespace-nowrap active:scale-95 cursor-pointer border-0"
             >
-              {{ loginOtpSent ? 'Resend OTP' : 'Send OTP' }}
+              {{ studentLoginOtpSent ? 'Resend OTP' : 'Send OTP' }}
             </button>
           </div>
           <span class="text-[10px] text-slate-400 block font-medium"
@@ -91,12 +94,27 @@
         </div>
 
         <div
-          *ngIf="loginOtpSent"
+          *ngIf="studentLoginOtpSent"
           class="space-y-1.5 p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100/60 animate-fadeIn"
         >
-          <span class="text-[10px] font-extrabold text-blue-800 block uppercase tracking-wider">
-            OTP Sent!
-          </span>
+          <!-- left side = "OTP Sent!", right = Timer status -->
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-extrabold text-blue-800 uppercase tracking-wider">
+              OTP Sent!
+            </span>
+
+            <div class="text-[11px] font-bold">
+              <span *ngIf="studentTimer.timeLeft() > 0" class="text-slate-500">
+                Expires in:
+                <span class="text-blue-600 font-extrabold">{{ studentTimer.display() }}</span>
+              </span>
+
+              <span *ngIf="studentTimer.timeLeft() === 0" class="text-red-500 font-extrabold">
+                OTP Expired
+              </span>
+            </div>
+          </div>
+
           <p class="text-[11px] text-blue-700 mb-2 leading-relaxed">
             An OTP has been sent to your email. Please enter it below to authenticate.
           </p>
@@ -106,6 +124,7 @@
           >
             Enter 6-Digit OTP
           </label>
+
           <div class="relative">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
               <i class="pi pi-lock text-sm"></i>
@@ -123,10 +142,10 @@
         </div>
 
         <div
-          *ngIf="loginOtpError"
+          *ngIf="studentLoginOtpError"
           class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
         >
-          {{ loginOtpError }}
+          {{ studentLoginOtpError }}
         </div>
 
         <div class="flex items-center justify-between text-[11px] font-bold pt-1">
@@ -336,7 +355,7 @@
       <!-- 3. COLLEGE ADMIN LOGIN FORM -->
       <form
         *ngIf="portalService.activeModal() === 'college-login'"
-        [formGroup]="collageForm"
+        [formGroup]="collegeForm"
         (submit)="onCollegeLoginSubmit($event)"
         class="space-y-4"
       >
