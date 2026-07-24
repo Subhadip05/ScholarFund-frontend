@@ -158,8 +158,17 @@ export class Modals {
       error: (err) => {
         this.studentLoginOtpSent = false;
         this.studentLoginOtpError = err.error?.message || 'Failed to send OTP. Please try again.';
-        Notiflix.Loading.remove();
         this._cdr.detectChanges();
+        Notiflix.Loading.remove();
+
+        if (err?.error?.code === 'USER_NOT_FOUND') {
+          this.portalService.openModal('register');
+          this._messageService.add({
+            severity: 'info',
+            summary: 'User Not Found',
+            detail: 'Please register yourself first.',
+          });
+        }
       },
     });
   }
