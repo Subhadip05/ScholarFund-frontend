@@ -81,23 +81,32 @@ export interface AdminLoginDto {
   email: string;
   password: string;
 }
-export interface StudentProfileResponse {
-  profileId: number;
+
+export interface StudentProfileDto {
   fullName: string;
-  email: string;
+  phoneNumber: string;
   dateOfBirth: string;
   gender: string;
   address: string;
   aadhaarNumber: string;
-  lastQualificationMarks: number;
-  lastQualificationCourse: string;
-  annualIncome: number;
   isWestBengalResident: boolean;
-  bankAccountNumber: string;
-  ifscCode: string;
+  aadhaarFileId: number;
+  selfImageFileId: number;
+  selfSignatureFileId: number;
+}
+export interface StudentProfileResponse {
+  profileId: number;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  aadhaarNumber: string;
+  isWestBengalResident: boolean;
 
+  // AWS Presigned URLs - 15 mintues valid
   aadhaarDocumentUrl: string;
-  incomeCertificateUrl: string;
-  hsMarksheetUrl: string;
-  bankPassbookUrl: string;
+  selfImageDocUrl: string;
+  selfSignatureUrl: string;
 }
