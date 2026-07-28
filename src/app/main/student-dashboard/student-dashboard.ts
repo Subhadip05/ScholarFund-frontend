@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
 import { Apiservice } from '../../../shared/api/apiservice';
 import { StudentProfileResponse } from '../../../shared/types';
@@ -43,7 +43,7 @@ export class StudentDashboard implements OnInit {
   private fb = inject(FormBuilder);
   private _messageService = inject(MessageService);
 
-  isProfileSaved: boolean = false;
+  isProfileSaved = signal<boolean>(false);
   studentDetails: StudentProfileResponse | null = null;
   userMetadata: any = null;
 
@@ -53,12 +53,6 @@ export class StudentDashboard implements OnInit {
   aadhaarFileId: number | null = null;
   selfImageFileId: number | null = null;
   selfSignatureFileId: number | null = null;
-
-  genderSelection = [
-    { label: 'Male', value: 'MALE' },
-    { label: 'Female', value: 'FEMALE' },
-    { label: 'Other', value: 'OTHER' },
-  ];
 
   constructor() {
     const savedMetadata = sessionStorage.getItem('user_metadata');
@@ -74,7 +68,7 @@ export class StudentDashboard implements OnInit {
 
   initForm() {
     this.studentDetailsForm = this.fb.group({
-      fullName: ['', Validators.required],
+      fullName: [this.userMetadata?.name, Validators.required],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
       dateOfBirth: ['', Validators.required],
       gender: ['', Validators.required],
@@ -89,14 +83,18 @@ export class StudentDashboard implements OnInit {
     this.apiService.getStudentProfile().subscribe({
       next: (res) => {
         this.studentDetails = res.data;
-        this.isProfileSaved = true;
+        this.isProfileSaved.set(true);
         console.log('Student Profile response:', this.studentDetails);
-        Notiflix.Loading.remove();
+        setTimeout(() => {
+          Notiflix.Loading.remove();
+        }, 3000);
       },
       error: (err) => {
-        this.isProfileSaved = false;
+        this.isProfileSaved.set(false);
         console.error(err);
-        Notiflix.Loading.remove();
+        setTimeout(() => {
+          Notiflix.Loading.remove();
+        }, 3000);
       },
     });
   }
@@ -166,8 +164,9 @@ export class StudentDashboard implements OnInit {
   }
 
   saveBasicDetails() {
+    console.log('Student details saving payload :', this.studentDetailsForm.value);
+
     if (this.studentDetailsForm.invalid) {
-      this.studentDetailsForm.markAllAsTouched();
       this._messageService.add({
         severity: 'warn',
         summary: 'Incomplete Details',
@@ -180,7 +179,7 @@ export class StudentDashboard implements OnInit {
       this._messageService.add({
         severity: 'error',
         summary: 'Missing Documents',
-        detail: 'Please upload all 3 required documents before saving.',
+        detail: 'Please upload all 3 mandatory documents before saving.',
       });
       return;
     }
@@ -192,8 +191,8 @@ export class StudentDashboard implements OnInit {
       selfSignatureFileId: this.selfSignatureFileId,
     };
 
-    console.log('Student details saving payload :', payload);
-    return
+    console.log('Student details after upload file:', payload);
+    return;
 
     Notiflix.Loading.pulse('Saving Profile Details...', {});
 
