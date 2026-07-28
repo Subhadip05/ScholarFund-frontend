@@ -192,55 +192,74 @@
         }
 
         <!-- Scholarship Card -->
-        <div
-          class="p-5 rounded-xl border transition-all"
-          [ngClass]="
-            isApplied
-              ? 'bg-blue-50/40 border-blue-200'
-              : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
-          "
-        >
-          <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
-            <div class="space-y-1">
-              <span
-                class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider"
-              >
-                Ministry of Education (MoE)
-              </span>
-              <!-- Dynamically grab name and amount from the service based on schemeId '1' -->
-              <h4 class="text-sm font-bold text-slate-900 pt-1.5">
-                {{ portalService.scholarshipSchemes[0].name }}
-              </h4>
-              <div class="flex flex-wrap gap-4 text-xs text-slate-500 pt-2">
-                <span class="flex items-center gap-1">
-                  <span class="text-slate-400 font-bold text-sm">₹</span>
-                  <strong class="text-slate-800">20,000 / Yr</strong>
+        <div class="space-y-4">
+          <div
+            class="p-5 rounded-xl border transition-all"
+            [ngClass]="
+              isApplied
+                ? 'bg-blue-50/40 border-blue-200'
+                : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
+            "
+          >
+            <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+              <div class="space-y-1">
+                <span
+                  class="text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full uppercase tracking-wider"
+                >
+                  Ministry of Education (MoE)
                 </span>
-                <span>Income Limit: Under ₹4,50,000</span>
-                <span>Minimum Marks: 80%</span>
-              </div>
-            </div>
-
-            <!-- Action Area -->
-            <div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
-              <!-- Applied State -->
-              <div
-                *ngIf="isApplied"
-                class="w-full text-center px-4 py-2 bg-emerald-100 text-emerald-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1 border border-emerald-200"
-              >
-                <i class="pi pi-check text-xs"></i>
-                <span>Application Submitted</span>
+                <h4 class="text-sm font-bold text-slate-900 pt-1.5">
+                  {{ portalService.scholarshipSchemes[0].name }}
+                </h4>
+                <div class="flex flex-wrap gap-4 text-xs text-slate-500 pt-2">
+                  <span class="flex items-center gap-1">
+                    <span class="text-slate-400 font-bold text-sm">₹</span>
+                    <strong class="text-slate-800">20,000 / Yr</strong>
+                  </span>
+                  <span>Income Limit: Under ₹4,50,000</span>
+                  <span>Minimum Marks: 80%</span>
+                </div>
               </div>
 
-              <!-- Unapplied State -->
-              <button
-                *ngIf="!isApplied"
-                (click)="applyForScheme()"
-                class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-sm"
-              >
-                <span>Apply Scheme</span>
-                <i class="pi pi-arrow-right text-[10px]"></i>
-              </button>
+              <div class="shrink-0 w-full sm:w-auto mt-2 sm:mt-0 flex flex-col sm:flex-row gap-2">
+                <ng-container *ngIf="isApplied">
+                  <div
+                    class="w-full sm:w-auto text-center px-4 py-2.5 bg-emerald-100 text-emerald-800 rounded-xl font-bold text-xs flex items-center justify-center gap-1 border border-emerald-200"
+                  >
+                    <i class="pi pi-check text-xs"></i>
+                    <span>Application Submitted</span>
+                  </div>
+
+                  <button
+                    (click)="downloadApplicationForm()"
+                    class="w-full sm:w-auto px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border-0 shadow-sm"
+                  >
+                    <i class="pi pi-download text-xs"></i>
+                    <span>Download Form</span>
+                  </button>
+                </ng-container>
+
+                <ng-container *ngIf="!isApplied">
+                  <div class="flex flex-col gap-1 items-end">
+                    <button
+                      [disabled]="!isProfileSaved()"
+                      (click)="applyForScheme()"
+                      class="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border-0 shadow-sm"
+                    >
+                      <span>Apply Scheme</span>
+                      <i class="pi pi-arrow-right text-[10px]"></i>
+                    </button>
+
+                    <span
+                      *ngIf="!isProfileSaved()"
+                      class="text-[10px] text-amber-600 font-medium flex items-center gap-1 pt-1"
+                    >
+                      <i class="pi pi-exclamation-circle text-[10px]"></i>
+                      Please save basic profile first to apply
+                    </span>
+                  </div>
+                </ng-container>
+              </div>
             </div>
           </div>
         </div>

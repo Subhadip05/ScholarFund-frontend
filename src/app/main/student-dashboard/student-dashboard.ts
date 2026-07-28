@@ -87,14 +87,14 @@ export class StudentDashboard implements OnInit {
         console.log('Student Profile response:', this.studentDetails);
         setTimeout(() => {
           Notiflix.Loading.remove();
-        }, 3000);
+        }, 1500);
       },
       error: (err) => {
         this.isProfileSaved.set(false);
         console.error(err);
         setTimeout(() => {
           Notiflix.Loading.remove();
-        }, 3000);
+        }, 1500);
       },
     });
   }
@@ -221,6 +221,10 @@ export class StudentDashboard implements OnInit {
     });
   }
 
+  downloadApplicationForm() {
+    console.log('Downloading application clicked');
+  }
+
   readonly schemeId = '1';
 
   get isApplied(): boolean {
@@ -229,6 +233,5 @@ export class StudentDashboard implements OnInit {
 
   applyForScheme() {
     this.router.navigate(['/application-form']);
-    // this.portalService.applyScholarship(this.schemeId);
   }
 }

@@ -1,1 +1,311 @@
-<p>application-form works!</p>
+<!-- PrimeNG Toast Component -->
+<p-toast position="top-right" />
+
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" [formGroup]="applicationForm">
+  
+  <!-- Header & Stepper Header -->
+  <div class="bg-slate-50 px-6 py-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-900">ScholarFund Application Form</h2>
+      <p class="text-xs text-slate-500 mt-0.5">Government of West Bengal & MoE Financial Assistance Scheme</p>
+    </div>
+    
+    <!-- Stepper pills -->
+    <div class="flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm">
+      <div *ngFor="let s of stepperStages" class="flex items-center gap-2">
+        <span class="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+              [ngClass]="s.num === step ? 'bg-blue-600 text-white ring-2 ring-blue-100' : s.num < step ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'">
+          <i *ngIf="s.num < step" class="pi pi-check text-[10px]"></i>
+          <span *ngIf="s.num >= step">{{ s.num }}</span>
+        </span>
+        <span class="text-xs font-semibold hidden md:inline" [ngClass]="s.num === step ? 'text-blue-700' : 'text-slate-500'">
+          {{ s.name }}
+        </span>
+        <span *ngIf="s.num < 3" class="text-slate-300 mx-1">/</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Step Body -->
+  <div class="p-6 sm:p-8">
+    
+    <!-- STEP 1 -->
+    <div *ngIf="step === 1" class="space-y-6">
+      <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Step 1: Academic, Institute & Financial Details</h3>
+          <p class="text-xs text-slate-500">Provide accurate qualification marks, institute info, and bank credentials.</p>
+        </div>
+        <span class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full">Step 1 of 3</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <!-- Institution Select -->
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <i class="pi pi-building text-blue-600 text-sm"></i>
+            <span>Institution Name / ID (instituteId)</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <select formControlName="instituteId" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm bg-white font-medium">
+            <option *ngFor="let inst of institutes" [value]="inst.id">[{{ inst.id }}] - {{ inst.name }}</option>
+          </select>
+        </div>
+
+        <!-- Course Name -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <i class="pi pi-book text-slate-400 text-sm"></i>
+            <span>Current Course Name</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="text" formControlName="courseName" placeholder="e.g., B.Tech Computer Science" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" />
+        </div>
+
+        <!-- Academic Year -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <i class="pi pi-graduation-cap text-slate-400 text-sm"></i>
+            <span>Academic Year / Semester</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <select formControlName="academicYear" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm bg-white">
+            <option value="1st Year (2026-2027)">1st Year (2026-2027)</option>
+            <option value="2nd Year (2026-2027)">2nd Year (2026-2027)</option>
+            <option value="3rd Year (2026-2027)">3rd Year (2026-2027)</option>
+            <option value="4th Year (2026-2027)">4th Year (2026-2027)</option>
+          </select>
+        </div>
+
+        <!-- Last Qualification Course -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span>Last Qualification Course</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="text" formControlName="lastQualificationCourse" placeholder="e.g., 10+2 Higher Secondary (Science)" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" />
+        </div>
+
+        <!-- Last Qualification Marks -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span>Last Qualification Marks (%)</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="number" step="0.01" formControlName="lastQualificationMarks" placeholder="e.g. 88.50" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" />
+        </div>
+
+        <!-- Last Qualification Exam Roll No -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span>Last Exam Roll Number</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="text" formControlName="lastQualificationExamRollNo" placeholder="e.g. WB2024/10293847" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono" />
+        </div>
+
+        <!-- Pass Out Board Name -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span>Pass Out Board / Council Name</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="text" formControlName="passOutBoardName" placeholder="e.g., WBCHSE / CBSE / ICSE" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" />
+        </div>
+
+        <!-- Annual Income -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span class="font-bold text-slate-400 text-sm">₹</span>
+            <span>Annual Family Income (₹)</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="number" formControlName="annualIncome" placeholder="250000" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm" />
+        </div>
+
+        <!-- Bank Account Details Header -->
+        <div class="md:col-span-2 pt-2 border-t border-slate-100">
+          <h4 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="pi pi-credit-card text-blue-600 text-sm"></i>
+            <span>Bank Account Information (Double Entry Verification)</span>
+          </h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">Please enter bank account number and IFSC code twice to prevent typos and ensure correct scholarship fund transfer.</p>
+        </div>
+
+        <!-- Bank Error Banner -->
+        <div *ngIf="bankError" class="md:col-span-2 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-bold flex items-center gap-2">
+          <i class="pi pi-exclamation-circle text-red-600 shrink-0"></i>
+          <span>{{ bankError }}</span>
+        </div>
+
+        <!-- Bank Account Number 1 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span>Bank Account Number</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="text" (input)="bankError = null" formControlName="bankAccountNumber" placeholder="Enter Account Number" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono" />
+        </div>
+
+        <!-- Bank Account Number 2 (Re-enter) -->
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
+              <span>Confirm Bank Account Number (Re-enter)</span>
+              <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+            </label>
+            <span *ngIf="applicationForm.value.confirmBankAccountNumber?.length > 0 && accountMismatch" class="text-[10px] font-bold text-red-600 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle text-[10px]"></i> Mismatch
+            </span>
+            <span *ngIf="applicationForm.value.confirmBankAccountNumber?.length > 0 && !accountMismatch" class="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
+              <i class="pi pi-check-circle text-[10px]"></i> Matched
+            </span>
+          </div>
+          <input type="text" (input)="bankError = null" formControlName="confirmBankAccountNumber" placeholder="Re-enter Account Number" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 outline-none text-sm font-mono" [ngClass]="applicationForm.value.confirmBankAccountNumber?.length > 0 && accountMismatch ? 'border-red-300 bg-red-50/20 focus:ring-red-400' : 'border-slate-300 focus:ring-blue-500'" />
+        </div>
+
+        <!-- IFSC Code 1 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+            <span>Bank IFSC Code</span>
+            <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+          </label>
+          <input type="text" (input)="bankError = null; applicationForm.patchValue({ifscCode: applicationForm.value.ifscCode?.toUpperCase()})" formControlName="ifscCode" placeholder="e.g. SBIN0001234" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-mono uppercase" />
+        </div>
+
+        <!-- IFSC Code 2 (Re-enter) -->
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
+              <span>Confirm Bank IFSC Code (Re-enter)</span>
+              <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+            </label>
+            <span *ngIf="applicationForm.value.confirmIfscCode?.length > 0 && ifscMismatch" class="text-[10px] font-bold text-red-600 flex items-center gap-1">
+              <i class="pi pi-exclamation-circle text-[10px]"></i> Mismatch
+            </span>
+            <span *ngIf="applicationForm.value.confirmIfscCode?.length > 0 && !ifscMismatch" class="text-[10px] font-bold text-emerald-600 flex items-center gap-1">
+              <i class="pi pi-check-circle text-[10px]"></i> Matched
+            </span>
+          </div>
+          <input type="text" (input)="bankError = null; applicationForm.patchValue({confirmIfscCode: applicationForm.value.confirmIfscCode?.toUpperCase()})" formControlName="confirmIfscCode" placeholder="Re-enter IFSC Code" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 outline-none text-sm font-mono uppercase" [ngClass]="applicationForm.value.confirmIfscCode?.length > 0 && ifscMismatch ? 'border-red-300 bg-red-50/20 focus:ring-red-400' : 'border-slate-300 focus:ring-blue-500'" />
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Document Upload -->
+    <div *ngIf="step === 2" class="space-y-6">
+      <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Step 2: Upload Required Verification Files</h3>
+          <p class="text-xs text-slate-500">Please upload clear, scanned copies of the 3 required documents (PDF, PNG, JPG max 2MB).</p>
+        </div>
+        <span class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full">Step 2 of 3</span>
+      </div>
+
+      <div *ngIf="bankError" class="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-bold flex items-center gap-2">
+        <i class="pi pi-exclamation-circle text-red-600 shrink-0"></i>
+        <span>{{ bankError }}</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div *ngFor="let doc of uploadDocuments" class="border-2 rounded-xl p-5 flex flex-col justify-between transition-all" [ngClass]="applicationForm.get(doc.key)?.value ? 'border-emerald-300 bg-emerald-50/30' : 'border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50/30'">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-bold text-slate-800 flex items-center gap-1">
+                <span>{{ doc.title }}</span>
+                <span class="text-red-500 font-bold ml-0.5" title="Mandatory field">*</span>
+              </h4>
+              <span *ngIf="applicationForm.get(doc.key)?.value" class="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded flex items-center gap-1">
+                <i class="pi pi-check text-[10px]"></i> Uploaded
+              </span>
+            </div>
+          </div>
+
+          <!-- File Uploaded State -->
+          <div *ngIf="applicationForm.get(doc.key)?.value" class="flex items-center justify-between bg-white border border-slate-200 rounded-lg p-3 mt-2">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <i class="pi pi-file text-blue-600 shrink-0"></i>
+              <span class="text-xs font-semibold text-slate-700 truncate">{{ getFileName(doc.key) }}</span>
+            </div>
+            <button type="button" (click)="removeFile(doc.key)" class="text-slate-400 hover:text-red-500 transition-colors p-1 bg-transparent border-0 cursor-pointer" title="Remove file">
+              <i class="pi pi-times text-xs"></i>
+            </button>
+          </div>
+
+          <!-- File Empty State -->
+          <label *ngIf="!applicationForm.get(doc.key)?.value" class="flex flex-col items-center justify-center p-4 cursor-pointer group border border-slate-200 rounded-xl bg-white hover:bg-slate-50 transition-colors">
+            <div class="h-10 w-10 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center mb-2 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+              <i class="pi pi-upload text-sm"></i>
+            </div>
+            <p class="text-xs text-slate-600 font-medium">Click to upload document</p>
+            <span class="text-[10px] text-slate-400 mt-0.5">PDF, JPG or PNG (Max 2MB)</span>
+            <input type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelect(doc.key, $event)" class="hidden" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Confirmation -->
+    <div *ngIf="step === 3" class="space-y-6">
+      <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Step 3: Confirmation & Summary</h3>
+          <p class="text-xs text-slate-500">Review all details before final submission.</p>
+        </div>
+        <span class="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1 rounded-full">Step 3 of 3</span>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 space-y-4">
+        <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wide border-b border-slate-200 pb-2">Application Summary</h4>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          <div><span class="text-slate-400 font-bold block uppercase">Institute ID</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.instituteId }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Course Name</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.courseName }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Academic Year</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.academicYear }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Last Qualification Marks</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.lastQualificationCourse }} ({{ applicationForm.value.lastQualificationMarks }}%)</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Exam Roll No & Board</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.lastQualificationExamRollNo }} - {{ applicationForm.value.passOutBoardName }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Annual Income</span><span class="text-slate-800 font-semibold">₹{{ applicationForm.value.annualIncome }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Bank Account</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.bankAccountNumber }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">IFSC Code</span><span class="text-slate-800 font-semibold">{{ applicationForm.value.ifscCode }}</span></div>
+          <div><span class="text-slate-400 font-bold block uppercase">Documents Status</span><span class="text-emerald-700 font-bold">3 of 3 Files Attached</span></div>
+        </div>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-100 rounded-xl p-5">
+        <h4 class="font-bold text-blue-900 flex items-center gap-2 mb-2">
+          <i class="pi pi-shield text-blue-600 text-lg"></i>
+          Declaration & Submission
+        </h4>
+        <p class="text-sm text-blue-800/80">
+          You are submitting your application for the <strong>ScholarFund</strong> scheme. Please ensure all details are correct. Once submitted, your application will be routed to your institution for verification.
+        </p>
+      </div>
+
+      <div class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl bg-slate-50 hover:bg-white transition-colors">
+        <input type="checkbox" id="confirm" [ngModelOptions]="{standalone: true}" [(ngModel)]="agreed" class="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer" />
+        <label for="confirm" class="text-sm font-medium text-slate-700 cursor-pointer">
+          I hereby declare that all the details furnished above are genuine, true, and correct to the best of my knowledge and belief. I understand that if any information is found to be false, my application will be rejected immediately.
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Controls -->
+  <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+   <button type="button" (click)="step === 1 ? onCancelClick() : step = step - 1" class="px-5 py-2.5 text-sm font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-200 rounded-xl transition-colors flex items-center gap-2 border-0 bg-transparent cursor-pointer">
+      <ng-container *ngIf="step === 1"><i class="pi pi-arrow-left text-xs"></i>Back</ng-container>
+      <ng-container *ngIf="step !== 1"><i class="pi pi-arrow-left text-xs"></i> Previous Step</ng-container>
+    </button>
+    
+    <button *ngIf="step < 3" type="button" (click)="handleDraftAndSave()" class="px-5 py-2.5 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors flex items-center gap-2 shadow-sm border-0 cursor-pointer">
+      <i class="pi pi-save text-xs"></i>
+      <span>Draft and Save</span>
+      <i class="pi pi-arrow-right text-xs ml-1"></i>
+    </button>
+
+    <button *ngIf="step === 3" type="button" (click)="onSubmitClick()" [disabled]="!agreed || applicationForm.invalid" class="px-6 py-2.5 text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors flex items-center gap-2 shadow-sm border-0 cursor-pointer">
+      <i class="pi pi-check text-xs"></i> Submit Scholarship Application
+    </button>
+  </div>
+</div>
