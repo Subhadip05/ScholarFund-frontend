@@ -42,7 +42,7 @@
       <!-- Close Button -->
       <div class="flex items-center gap-2 relative z-10">
         <button
-          (click)="portalService.closeModal()"
+          (click)="closeModal()"
           class="p-1.5 rounded-xl bg-black/10 hover:bg-black/20 text-white transition-colors cursor-pointer border-0"
         >
           <i class="pi pi-times text-sm"></i>
@@ -97,7 +97,6 @@
           *ngIf="studentLoginOtpSent"
           class="space-y-1.5 p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100/60 animate-fadeIn"
         >
-          <!-- left side = "OTP Sent!", right = Timer status -->
           <div class="flex items-center justify-between mb-1">
             <span class="text-[10px] font-extrabold text-blue-800 uppercase tracking-wider">
               OTP Sent!
@@ -188,10 +187,9 @@
         (submit)="onStudentRegisterSubmit($event)"
         class="space-y-4"
       >
-        <!-- Full Legal Name -->
         <div class="space-y-1.5">
           <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
-            Full Legal Name
+            Full Name As Per Aadhaar
           </label>
           <div class="relative">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -216,7 +214,6 @@
           </span>
         </div>
 
-        <!-- Contact Email -->
         <div class="space-y-1.5">
           <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
             Contact Email
@@ -244,7 +241,6 @@
           </span>
         </div>
 
-        <!-- Mobile Number -->
         <div class="space-y-1.5">
           <label class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
             Mobile Phone Number
@@ -257,8 +253,9 @@
               type="tel"
               required
               formControlName="phoneNumber"
+              maxlength="10"
               name="phoneNumber"
-              placeholder="+91 94523 11842"
+              placeholder="9452311842"
               class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
             />
           </div>
@@ -273,15 +270,28 @@
         </span>
 
         <div
-          *ngIf="registerOtpSent"
-          class="space-y-1.5 p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100/60 animate-fadeIn"
+          *ngIf="studentLoginOtpSent"
+          class="space-y-1.5 p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100/60 animate-fadeIn"
         >
-          <span class="text-[10px] font-extrabold text-indigo-800 block uppercase tracking-wider">
-            OTP Sent!
-          </span>
-          <p class="text-[11px] text-indigo-700 mb-2 leading-relaxed">
-            We have simulated sending an OTP code. For this demo, use:
-            <strong class="font-extrabold">{{ registerOtpCode }}</strong>
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[10px] font-extrabold text-blue-800 uppercase tracking-wider">
+              OTP Sent!
+            </span>
+
+            <div class="text-[11px] font-bold">
+              <span *ngIf="studentTimer.timeLeft() > 0" class="text-slate-500">
+                Expires in:
+                <span class="text-blue-600 font-extrabold">{{ studentTimer.display() }}</span>
+              </span>
+
+              <span *ngIf="studentTimer.timeLeft() === 0" class="text-red-500 font-extrabold">
+                OTP Expired
+              </span>
+            </div>
+          </div>
+
+          <p class="text-[11px] text-blue-700 mb-2 leading-relaxed">
+            An OTP has been sent to your email. Please enter it below to authenticate.
           </p>
 
           <label
@@ -289,6 +299,7 @@
           >
             Enter 6-Digit OTP
           </label>
+
           <div class="relative">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
               <i class="pi pi-lock text-sm"></i>
@@ -298,9 +309,9 @@
               required
               maxLength="6"
               formControlName="otpCode"
-              name="registerOtpInput"
+              name="loginOtpInput"
               placeholder="e.g. 123456"
-              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50 focus:bg-white transition-all"
+              class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-50 focus:bg-white transition-all"
             />
           </div>
         </div>
@@ -323,7 +334,7 @@
         </div>
 
         <button
-          *ngIf="!registerOtpSent"
+          *ngIf="!registerOtpSent && studentRegistrationOtpTimer.timeLeft() <= 0"
           type="button"
           (click)="studentRegisterOtp()"
           class="w-full py-3.5 bg-gradient-to-r from-indigo-700 to-slate-900 hover:from-indigo-800 hover:to-slate-950 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-indigo-700/10 hover:shadow-xl hover:shadow-indigo-700/20 active:scale-[0.98] transition-all cursor-pointer mt-2 border-0"
@@ -331,7 +342,7 @@
           Register
         </button>
         <button
-          *ngIf="registerOtpSent"
+          *ngIf="registerOtpSent  && studentRegistrationOtpTimer.timeLeft() > 0"
           type="submit"
           class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-emerald-700/10 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer mt-2 border-0"
         >

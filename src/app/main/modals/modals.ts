@@ -41,7 +41,6 @@ export class Modals {
 
   // Student Register States
   registerOtpSent = false;
-  registerOtpCode = '';
   registerOtpError = '';
   studentRegisterSubmit = false;
 
@@ -59,6 +58,7 @@ export class Modals {
   adminLoginSubmit = false;
 
   studentTimer = new TimerUtil();
+  studentRegistrationOtpTimer = new TimerUtil();
 
   ngOnInit() {
     this.initForms();
@@ -111,13 +111,8 @@ export class Modals {
     this.studentLoginForm.get('otpCode')?.reset();
 
     this.registerOtpSent = false;
-    this.registerOtpCode = '';
     this.registerOtpError = '';
-    this.studentRegisterForm.get('otpCode')?.reset();
-
-    this.studentRegisterForm.get('fullName')?.enable();
-    this.studentRegisterForm.get('email')?.enable();
-    this.studentRegisterForm.get('phoneNumber')?.enable();
+    this.studentRegisterForm.reset();
 
     this.collegeOtpSent = false;
     this.collegeOtpCode = '';
@@ -157,7 +152,8 @@ export class Modals {
       },
       error: (err) => {
         this.studentLoginOtpSent = false;
-        this.studentLoginOtpError = err.error?.message || 'Failed to send OTP. Please try again.';
+        this.studentLoginOtpError =
+          err.error?.message || 'Failed to send OTP. Please try again after some time.';
         this._cdr.detectChanges();
         Notiflix.Loading.remove();
 
@@ -235,60 +231,94 @@ export class Modals {
     this.studentRegisterSubmit = true;
 
     if (this.studentRegisterForm.invalid) return;
-    console.log(
-      'Student Registration and request for otp. ',
-      this.studentRegisterForm.getRawValue(),
-    );
+    const registrationPayload = this.studentRegisterForm.getRawValue();
+    console.log('Student Registration and request for otp. ', registrationPayload);
 
-    this.studentRegisterForm.get('fullName')?.disable();
-    this.studentRegisterForm.get('email')?.disable();
-    this.studentRegisterForm.get('phoneNumber')?.disable();
+    Notiflix.Loading.pulse('Loading...', {});
+    this._authService.registerStudent(registrationPayload).subscribe({
+      next: (res) => {
+        console.log('Student registration otp response', res);
 
-    this.registerOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    this.registerOtpSent = true;
-    this.registerOtpError = '';
+        this._messageService.add({
+          severity: 'success',
+          summary: 'OTP Sent',
+          detail: res.message,
+        });
+
+        this.studentRegisterForm.get('fullName')?.disable();
+        this.studentRegisterForm.get('email')?.disable();
+        this.studentRegisterForm.get('phoneNumber')?.disable();
+
+        this.registerOtpSent = true;
+        this.registerStudentOtpTimer();
+        Notiflix.Loading.remove();
+        this._cdr.detectChanges();
+      },
+      error: (err) => {
+        this.registerOtpSent = false;
+        this.registerOtpError =
+          err.error?.message || 'Failed to send OTP. Please try again after some time.';
+        this._messageService.add({
+          severity: 'error',
+          summary: 'OTP Request Failed',
+          detail: 'Failed to send otp. Please try again after some time.',
+        });
+        this._cdr.detectChanges();
+        Notiflix.Loading.remove();
+      },
+    });
   }
 
   onStudentRegisterSubmit(event: Event) {
     event.preventDefault();
     const formValues = this.studentRegisterForm.getRawValue();
 
-    if (!this.registerOtpSent) {
-      this.registerOtpError = "Please click 'Send OTP' first.";
+    if (!formValues.otpCode) {
+      this.registerOtpError = "Please enter 'OTP' first.";
       return;
     }
-    if (formValues.otpCode !== this.registerOtpCode) {
-      this.registerOtpError = 'Invalid OTP entered. Please try again.';
+
+    if (!formValues.otpCode || formValues.otpCode.length != 6) {
+      this.registerOtpError = 'Please enter the 6-digit OTP sent to your email.';
+      this._cdr.detectChanges();
       return;
     }
 
     console.log('Student Register form value :', formValues);
 
-    this.portalService.userRole = 'student';
-    this.portalService.userMetadata = {
-      name: formValues.name || 'New Scholar',
-      email: formValues.email,
-      category: formValues.category,
-      income: Number(formValues.income),
-      gpa: Number(formValues.gpa),
-      regNo: 'REG-2026-' + Math.floor(1000 + Math.random() * 9000),
-      college: 'State Technological University',
-    };
+    this._authService.verifyOtpAndLogin(formValues).subscribe({
+      next: (res) => {
+        console.log('Student otp verify response :', res);
+        this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
 
-    this.portalService.studentTimeline = [
-      { label: 'Student Register/Login', status: 'completed', date: 'Just now' },
-      { label: 'Scholarship Apply', status: 'pending', date: 'Awaiting Submission' },
-      { label: 'Institute Verification', status: 'upcoming', date: 'Awaiting Application' },
-      {
-        label: 'Government Approved Scholarship',
-        status: 'upcoming',
-        date: 'Awaiting Verification',
+        this.portalService.userRole = 'student';
+
+        this.portalService.userMetadata = {
+          name: res.data?.fullName,
+          email: res.data?.email,
+        };
+
+        sessionStorage.setItem('user_role', 'student');
+        sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
+
+        this.closeModal();
+        this.studentRegisterForm.reset();
+        Notiflix.Loading.remove();
+
+        this._router.navigate(['/student']);
       },
-      { label: 'Money Distribute By Govt.', status: 'upcoming', date: 'Awaiting Approval' },
-    ];
+      error: (err) => {
+        this.registerOtpError = err.error?.message || 'Invalid OTP entered. Please try again.';
+        this._cdr.detectChanges();
 
-    this.studentRegisterForm.reset();
-    this.closeModal();
+        Notiflix.Loading.remove();
+        this._messageService.add({
+          severity: 'error',
+          summary: 'OTP Verification Failed',
+          detail: err.error?.message,
+        });
+      },
+    });
   }
 
   verifyCollegeEmail() {
@@ -496,7 +526,19 @@ export class Modals {
     });
   }
 
+  registerStudentOtpTimer() {
+    this.studentRegisterForm.get('otpCode')?.enable();
+    this.registerOtpError = '';
+
+    this.studentRegistrationOtpTimer.start(300, () => {
+      this.registerOtpError = 'Your OTP has expired. Please request a new one.';
+      this.studentRegisterForm.get('otpCode')?.disable();
+      this._cdr.markForCheck();
+    });
+  }
+
   ngOnDestroy() {
     this.studentTimer.stop();
+    this.studentRegistrationOtpTimer.stop();
   }
 }
