@@ -104,6 +104,7 @@ export interface StudentProfileResponse {
   address: string;
   aadhaarNumber: string;
   isWestBengalResident: boolean;
+  isApplicationSubmitted: boolean;
 
   // AWS Presigned URLs - 15 mintues valid
   aadhaarDocumentUrl: string;

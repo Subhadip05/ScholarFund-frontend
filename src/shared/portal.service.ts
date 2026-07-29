@@ -85,8 +85,7 @@ export class PortalService {
     },
   ];
 
-  // Student Dashboard Application workflow
-  appliedScholarships: string[] = [];
+
   studentTimeline: TimelineItem[] = [
     { label: 'Student Register/Login', status: 'completed', date: 'July 10, 2026' },
     { label: 'Scholarship Apply', status: 'pending', date: 'In Progress' },
@@ -161,30 +160,7 @@ export class PortalService {
     this.authservice.logout();
     this.userRole = null;
     this.userMetadata = null;
-    this.appliedScholarships = [];
     Notiflix.Loading.remove();
-  }
-
-  // Apply for scholarship
-  applyScholarship(schemeId: string) {
-    if (!this.appliedScholarships.includes(schemeId)) {
-      this.appliedScholarships.push(schemeId);
-      this.studentTimeline = [
-        { label: 'Student Register/Login', status: 'completed', date: 'July 10, 2026' },
-        { label: 'Scholarship Apply', status: 'completed', date: 'Just now' },
-        {
-          label: 'Institute Verification',
-          status: 'pending',
-          date: 'In review: Scheme ' + schemeId,
-        },
-        {
-          label: 'Government Approved Scholarship',
-          status: 'upcoming',
-          date: 'Awaiting Verification',
-        },
-        { label: 'Money Distribute By Govt.', status: 'upcoming', date: 'Awaiting Approval' },
-      ];
-    }
   }
 
   // College Actions

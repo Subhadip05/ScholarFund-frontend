@@ -225,12 +225,6 @@ export class StudentDashboard implements OnInit {
     console.log('Downloading application clicked');
   }
 
-  readonly schemeId = '1';
-
-  get isApplied(): boolean {
-    return this.portalService.appliedScholarships.includes(this.schemeId);
-  }
-
   applyForScheme() {
     this.router.navigate(['/application-form']);
   }

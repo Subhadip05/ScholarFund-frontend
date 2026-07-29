@@ -184,8 +184,6 @@ export class ApplicationForm implements OnInit {
   onSubmitClick(): void {
     if (this.agreed && this.applicationForm.valid) {
 
-      this.portalService.applyScholarship('1');
-
       const { confirmBankAccountNumber, confirmIfscCode, ...submitData } = this.applicationForm.value;
       
       this._messageService.add({
