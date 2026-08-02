@@ -82,6 +82,7 @@ export class Modals {
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.required],
       otpCode: [''],
+      role: 'STUDENT',
     });
 
     this.collegeForm = this._fb.group({
@@ -102,10 +103,10 @@ export class Modals {
     this.adminLoginSubmit = false;
     this.studentRegisterSubmit = false;
     this.portalService.closeModal();
-    this.resetOtpStates();
+    this.resetFormStates();
   }
 
-  resetOtpStates() {
+  resetFormStates() {
     this.studentLoginOtpSent = false;
     this.studentLoginOtpError = '';
     this.studentLoginForm.get('otpCode')?.reset();
@@ -142,6 +143,7 @@ export class Modals {
           severity: 'success',
           summary: 'OTP Sent',
           detail: res.message,
+          life: 5000
         });
 
         this.studentLoginOtpSent = true;
@@ -163,6 +165,7 @@ export class Modals {
             severity: 'info',
             summary: 'User Not Found',
             detail: 'Please register yourself first.',
+            life: 5000
           });
         }
       },
@@ -202,6 +205,7 @@ export class Modals {
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
+          phoneNo: res.data?.phoneNo
         };
 
         sessionStorage.setItem('user_role', 'student');
@@ -222,6 +226,7 @@ export class Modals {
           severity: 'error',
           summary: 'Student Login Failed',
           detail: err.error?.message,
+          life: 5000
         });
       },
     });
@@ -243,6 +248,7 @@ export class Modals {
           severity: 'success',
           summary: 'OTP Sent',
           detail: res.message,
+          life: 5000
         });
 
         this.studentRegisterForm.get('fullName')?.disable();
@@ -262,6 +268,7 @@ export class Modals {
           severity: 'error',
           summary: 'OTP Request Failed',
           detail: 'Failed to send otp. Please try again after some time.',
+          life: 5000
         });
         this._cdr.detectChanges();
         Notiflix.Loading.remove();
@@ -296,6 +303,7 @@ export class Modals {
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
+          phoneNo: res.data?.phoneNo
         };
 
         sessionStorage.setItem('user_role', 'student');
@@ -316,6 +324,7 @@ export class Modals {
           severity: 'error',
           summary: 'OTP Verification Failed',
           detail: err.error?.message,
+          life: 5000
         });
       },
     });
@@ -343,6 +352,7 @@ export class Modals {
             severity: 'success',
             summary: 'OTP Sent',
             detail: res?.message,
+            life: 5000
           });
         }
 
@@ -358,6 +368,7 @@ export class Modals {
             severity: 'info',
             summary: 'Institute Not Found',
             detail: 'Please complete registration first.',
+            life: 5000
           });
           this.collegeShowRegisterForm = true;
         }
@@ -366,6 +377,7 @@ export class Modals {
             severity: 'warn',
             summary: 'User Exists',
             detail: err?.error?.message,
+            life: 5000
           });
         }
         this.collegeOtpSent = false;
@@ -466,6 +478,7 @@ export class Modals {
           severity: 'error',
           summary: 'Admin Login Failed',
           detail: errorMsg,
+          life: 5000
         });
       },
     });
@@ -532,6 +545,7 @@ export class Modals {
 
     this.studentRegistrationOtpTimer.start(300, () => {
       this.registerOtpError = 'Your OTP has expired. Please request a new one.';
+      this.registerOtpSent = false;
       this.studentRegisterForm.get('otpCode')?.disable();
       this._cdr.markForCheck();
     });

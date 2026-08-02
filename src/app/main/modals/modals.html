@@ -270,7 +270,7 @@
         </span>
 
         <div
-          *ngIf="studentLoginOtpSent"
+          *ngIf="registerOtpSent"
           class="space-y-1.5 p-3.5 bg-blue-50/50 rounded-2xl border border-blue-100/60 animate-fadeIn"
         >
           <div class="flex items-center justify-between mb-1">
@@ -279,12 +279,17 @@
             </span>
 
             <div class="text-[11px] font-bold">
-              <span *ngIf="studentTimer.timeLeft() > 0" class="text-slate-500">
+              <span *ngIf="studentRegistrationOtpTimer.timeLeft() > 0" class="text-slate-500">
                 Expires in:
-                <span class="text-blue-600 font-extrabold">{{ studentTimer.display() }}</span>
+                <span class="text-blue-600 font-extrabold">{{
+                  studentRegistrationOtpTimer.display()
+                }}</span>
               </span>
 
-              <span *ngIf="studentTimer.timeLeft() === 0" class="text-red-500 font-extrabold">
+              <span
+                *ngIf="studentRegistrationOtpTimer.timeLeft() === 0"
+                class="text-red-500 font-extrabold"
+              >
                 OTP Expired
               </span>
             </div>
@@ -342,7 +347,7 @@
           Register
         </button>
         <button
-          *ngIf="registerOtpSent  && studentRegistrationOtpTimer.timeLeft() > 0"
+          *ngIf="registerOtpSent && studentRegistrationOtpTimer.timeLeft() > 0"
           type="submit"
           class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-emerald-700/10 hover:shadow-xl active:scale-[0.98] transition-all cursor-pointer mt-2 border-0"
         >

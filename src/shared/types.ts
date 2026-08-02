@@ -52,6 +52,7 @@ export interface AuthResponse {
   role: string;
   fullName: string;
   email: string;
+  phoneNo: string;
 }
 
 export interface RegisterStudentDto {

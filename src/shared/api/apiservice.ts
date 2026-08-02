@@ -35,7 +35,7 @@ export class Apiservice {
     formData.append('folder', folder);
 
     return this.client.post<ApiResponse<{ documentId: number }>>(
-      `${baseUrl}/upload`,
+      `${baseUrl}/documents/upload`,
       formData
     );
   }

@@ -496,15 +496,37 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <label
-              class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center hover:bg-indigo-50/40 hover:border-indigo-400 transition-all cursor-pointer group"
+              class="border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all cursor-pointer group"
+              [class.border-emerald-400]="aadhaarFileId"
+              [class.bg-emerald-50\40]="aadhaarFileId"
+              [class.border-slate-200]="!aadhaarFileId"
+              [class.hover:bg-indigo-50\40]="!aadhaarFileId"
+              [class.hover:border-indigo-400]="!aadhaarFileId"
             >
-              <i
-                class="pi pi-cloud-upload text-slate-400 group-hover:text-indigo-600 text-lg mb-1 transition-colors"
-              ></i>
-              <span class="text-[10px] font-bold text-slate-700">
-                Aadhaar Card <span class="text-rose-500 font-bold">*</span>
-              </span>
-              <span class="text-[9px] text-slate-400">PDF, JPG, PNG</span>
+              @if (aadhaarFileId) {
+                <i class="pi pi-check-circle text-emerald-600 text-xl mb-1"></i>
+                <span class="text-[10px] font-bold text-emerald-900">Aadhaar Card</span>
+                <span
+                  class="text-[9px] font-medium text-emerald-700 truncate max-w-[140px]"
+                  [title]="aadhaarFileName"
+                >
+                  {{ aadhaarFileName }}
+                </span>
+                <span
+                  class="text-[8px] text-emerald-600 font-semibold mt-1 bg-emerald-100 px-2 py-0.5 rounded-full"
+                >
+                  Click to replace
+                </span>
+              } @else {
+                <i
+                  class="pi pi-cloud-upload text-slate-400 group-hover:text-indigo-600 text-lg mb-1 transition-colors"
+                ></i>
+                <span class="text-[10px] font-bold text-slate-700">
+                  Aadhaar Card <span class="text-rose-500 font-bold">*</span>
+                </span>
+                <span class="text-[9px] text-slate-400">PDF, JPG, PNG</span>
+              }
+
               <input
                 type="file"
                 (change)="onFileSelected($event, 'aadhaar')"
@@ -514,15 +536,37 @@
             </label>
 
             <label
-              class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center hover:bg-indigo-50/40 hover:border-indigo-400 transition-all cursor-pointer group"
+              class="border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all cursor-pointer group"
+              [class.border-emerald-400]="selfImageFileId"
+              [class.bg-emerald-50\40]="selfImageFileId"
+              [class.border-slate-200]="!selfImageFileId"
+              [class.hover:bg-indigo-50\40]="!selfImageFileId"
+              [class.hover:border-indigo-400]="!selfImageFileId"
             >
-              <i
-                class="pi pi-camera text-slate-400 group-hover:text-indigo-600 text-lg mb-1 transition-colors"
-              ></i>
-              <span class="text-[10px] font-bold text-slate-700">
-                Self Image <span class="text-rose-500 font-bold">*</span>
-              </span>
-              <span class="text-[9px] text-slate-400">Passport photo</span>
+              @if (selfImageFileId) {
+                <i class="pi pi-check-circle text-emerald-600 text-xl mb-1"></i>
+                <span class="text-[10px] font-bold text-emerald-900">Self Image</span>
+                <span
+                  class="text-[9px] font-medium text-emerald-700 truncate max-w-[140px]"
+                  [title]="selfImageFileName"
+                >
+                  {{ selfImageFileName }}
+                </span>
+                <span
+                  class="text-[8px] text-emerald-600 font-semibold mt-1 bg-emerald-100 px-2 py-0.5 rounded-full"
+                >
+                  Click to replace
+                </span>
+              } @else {
+                <i
+                  class="pi pi-camera text-slate-400 group-hover:text-indigo-600 text-lg mb-1 transition-colors"
+                ></i>
+                <span class="text-[10px] font-bold text-slate-700">
+                  Self Image <span class="text-rose-500 font-bold">*</span>
+                </span>
+                <span class="text-[9px] text-slate-400">Passport photo</span>
+              }
+
               <input
                 type="file"
                 (change)="onFileSelected($event, 'selfImage')"
@@ -532,15 +576,37 @@
             </label>
 
             <label
-              class="border-2 border-dashed border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center text-center hover:bg-indigo-50/40 hover:border-indigo-400 transition-all cursor-pointer group"
+              class="border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all cursor-pointer group"
+              [class.border-emerald-400]="selfSignatureFileId"
+              [class.bg-emerald-50\40]="selfSignatureFileId"
+              [class.border-slate-200]="!selfSignatureFileId"
+              [class.hover:bg-indigo-50\40]="!selfSignatureFileId"
+              [class.hover:border-indigo-400]="!selfSignatureFileId"
             >
-              <i
-                class="pi pi-pencil text-slate-400 group-hover:text-indigo-600 text-lg mb-1 transition-colors"
-              ></i>
-              <span class="text-[10px] font-bold text-slate-700">
-                Self Signature <span class="text-rose-500 font-bold">*</span>
-              </span>
-              <span class="text-[9px] text-slate-400">Sign on paper</span>
+              @if (selfSignatureFileId) {
+                <i class="pi pi-check-circle text-emerald-600 text-xl mb-1"></i>
+                <span class="text-[10px] font-bold text-emerald-900">Self Signature</span>
+                <span
+                  class="text-[9px] font-medium text-emerald-700 truncate max-w-[140px]"
+                  [title]="selfSignatureFileName"
+                >
+                  {{ selfSignatureFileName }}
+                </span>
+                <span
+                  class="text-[8px] text-emerald-600 font-semibold mt-1 bg-emerald-100 px-2 py-0.5 rounded-full"
+                >
+                  Click to replace
+                </span>
+              } @else {
+                <i
+                  class="pi pi-pencil text-slate-400 group-hover:text-indigo-600 text-lg mb-1 transition-colors"
+                ></i>
+                <span class="text-[10px] font-bold text-slate-700">
+                  Self Signature <span class="text-rose-500 font-bold">*</span>
+                </span>
+                <span class="text-[9px] text-slate-400">Sign on paper</span>
+              }
+
               <input
                 type="file"
                 (change)="onFileSelected($event, 'signature')"
