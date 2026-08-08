@@ -112,3 +112,19 @@ export interface StudentProfileResponse {
   selfImageDocUrl: string;
   selfSignatureUrl: string;
 }
+
+export interface InstituteProfileResponse{
+  profileId: number;
+  email: string;
+  instituteName: string;
+  collegeCode: string;
+  universityAffiliation: string;
+  principalName: string;
+  address: string;
+  affiliationCertificateUrl: string
+}
+
+export interface DocumentUploadResponse {
+  documentId: number;
+  documentUrl: string;
+}

@@ -50,13 +50,29 @@ export class StudentDashboard implements OnInit {
   studentDetailsForm!: FormGroup;
   visible: boolean = false;
 
-  aadhaarFileId: number | null = null;
-  selfImageFileId: number | null = null;
-  selfSignatureFileId: number | null = null;
-
-  aadhaarFileName: string | null = null;
-  selfImageFileName: string | null = null;
-  selfSignatureFileName: string | null = null;
+  documents = {
+    aadhaar: {
+      id: null as number | null,
+      url: null as string | null,
+      name: null as string | null,
+      folder: 'aadhaar',
+      label: 'Aadhaar Document',
+    },
+    selfImage: {
+      id: null as number | null,
+      url: null as string | null,
+      name: null as string | null,
+      folder: 'self-image',
+      label: 'Self Image',
+    },
+    signature: {
+      id: null as number | null,
+      url: null as string | null,
+      name: null as string | null,
+      folder: 'self-signature',
+      label: 'Self Signature',
+    },
+  };
 
   constructor() {
     const savedMetadata = sessionStorage.getItem('user_metadata');
@@ -115,68 +131,47 @@ export class StudentDashboard implements OnInit {
     this.visible = false;
   }
 
-  onFileSelected(event: Event, type: 'aadhaar' | 'selfImage' | 'signature') {
+  onFileSelected(event: Event, docKey: 'aadhaar' | 'selfImage' | 'signature') {
     const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
 
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
+    if (!file) return;
 
-      let folderName = 'general';
-      let documentName = 'Document';
+    if (file.size > 1048576) {
+      this._messageService.add({
+        severity: 'warn',
+        summary: 'File Too Large',
+        detail: 'Max size is 1MB.',
+      });
+      input.value = '';
+      return;
+    }
 
-      if (type === 'aadhaar') {
-        folderName = 'aadhaar';
-        documentName = 'Aadhaar Document';
-      } else if (type === 'selfImage') {
-        folderName = 'self-image';
-        documentName = 'Self Image';
-      } else if (type === 'signature') {
-        folderName = 'self-signature';
-        documentName = 'Self Signature';
-      }
+    const docData = this.documents[docKey]; 
+    Notiflix.Loading.pulse(`Uploading ${docData.label}...`, {});
 
-      Notiflix.Loading.pulse(`Uploading ${documentName}...`, {});
-
-      this.apiService.uploadDocument(file, folderName).subscribe({
-        next: (res) => {
-          if (res.status === 200 && res.data?.documentId) {
-            const uploadedId = res.data.documentId;
-
-            // Assign IDs and file names based on type
-            if (type === 'aadhaar') {
-              this.aadhaarFileId = uploadedId;
-              this.aadhaarFileName = file.name;
-            } else if (type === 'selfImage') {
-              this.selfImageFileId = uploadedId;
-              this.selfImageFileName = file.name;
-            } else if (type === 'signature') {
-              this.selfSignatureFileId = uploadedId;
-              this.selfSignatureFileName = file.name;
-            }
-
-            this._messageService.add({
-              severity: 'success',
-              summary: `${documentName} Uploaded`,
-              detail: res.message || 'File uploaded successfully',
-            });
-          }
-
-          Notiflix.Loading.remove();
-        },
-        error: (err) => {
-          console.error(`Failed to upload ${type}:`, err);
+    this.apiService.uploadDocument(file, docData.folder).subscribe({
+      next: (res) => {
+        if (res.status === 200 && res.data) {
+          docData.id = res.data.documentId;
+          docData.url = res.data.documentUrl;
+          docData.name = file.name;
 
           this._messageService.add({
-            severity: 'error',
-            summary: 'Upload Failed',
-            detail: `Failed to upload ${documentName}. Please try again.`,
-            life: 5000,
+            severity: 'success',
+            summary: 'Success',
+            detail: `${docData.label} uploaded successfully`,
           });
-
-          Notiflix.Loading.remove();
-        },
-      });
-    }
+        }
+        Notiflix.Loading.remove();
+      },
+      error: (err) => {
+        const msg = err.error?.message || 'Failed to upload document.';
+        this._messageService.add({ severity: 'error', summary: 'Upload Failed', detail: msg });
+        input.value = '';
+        Notiflix.Loading.remove();
+      },
+    });
   }
 
   saveBasicDetails() {
@@ -192,7 +187,11 @@ export class StudentDashboard implements OnInit {
       return;
     }
 
-    if (!this.aadhaarFileId || !this.selfImageFileId || !this.selfSignatureFileId) {
+    if (
+      !this.documents.aadhaar.id ||
+      !this.documents.selfImage.id ||
+      !this.documents.signature.id
+    ) {
       this._messageService.add({
         severity: 'error',
         summary: 'Missing Documents',
@@ -204,9 +203,9 @@ export class StudentDashboard implements OnInit {
 
     const payload = {
       ...this.studentDetailsForm.value,
-      aadhaarFileId: this.aadhaarFileId,
-      selfImageFileId: this.selfImageFileId,
-      selfSignatureFileId: this.selfSignatureFileId,
+      aadhaarFileId: this.documents.aadhaar.id,
+      selfImageFileId: this.documents.selfImage.id,
+      selfSignatureFileId: this.documents.signature.id,
     };
 
     Notiflix.Confirm.show(

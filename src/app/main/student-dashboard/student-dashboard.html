@@ -490,27 +490,36 @@
 
         <!-- Upload Documents Section -->
         <div class="border-t border-slate-100 pt-4 space-y-2">
-          <span class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest">
-            Document Attachments <span class="text-rose-500 font-bold">*</span>
-          </span>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-extrabold uppercase text-slate-400 tracking-widest">
+              Document Attachments <span class="text-rose-500 font-bold">*</span>
+            </span>
+            <!-- Hint displaying max size limit -->
+            <span
+              class="text-[10px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded-md"
+            >
+              Max size: <strong class="text-slate-700">1MB per file</strong>
+            </span>
+          </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- 1. Aadhaar Card Upload Box -->
             <label
               class="border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all cursor-pointer group"
-              [class.border-emerald-400]="aadhaarFileId"
-              [class.bg-emerald-50\40]="aadhaarFileId"
-              [class.border-slate-200]="!aadhaarFileId"
-              [class.hover:bg-indigo-50\40]="!aadhaarFileId"
-              [class.hover:border-indigo-400]="!aadhaarFileId"
+              [ngClass]="
+                documents.aadhaar.id
+                  ? 'border-emerald-400 bg-emerald-50/40'
+                  : 'border-slate-200 hover:bg-indigo-50/40 hover:border-indigo-400'
+              "
             >
-              @if (aadhaarFileId) {
+              @if (documents.aadhaar.id) {
                 <i class="pi pi-check-circle text-emerald-600 text-xl mb-1"></i>
                 <span class="text-[10px] font-bold text-emerald-900">Aadhaar Card</span>
                 <span
                   class="text-[9px] font-medium text-emerald-700 truncate max-w-[140px]"
-                  [title]="aadhaarFileName"
+                  [title]="documents.aadhaar.name"
                 >
-                  {{ aadhaarFileName }}
+                  {{ documents.aadhaar.name }}
                 </span>
                 <span
                   class="text-[8px] text-emerald-600 font-semibold mt-1 bg-emerald-100 px-2 py-0.5 rounded-full"
@@ -524,7 +533,7 @@
                 <span class="text-[10px] font-bold text-slate-700">
                   Aadhaar Card <span class="text-rose-500 font-bold">*</span>
                 </span>
-                <span class="text-[9px] text-slate-400">PDF, JPG, PNG</span>
+                <span class="text-[9px] text-slate-400">PDF, JPG, PNG (Max 1MB)</span>
               }
 
               <input
@@ -535,22 +544,23 @@
               />
             </label>
 
+            <!-- 2. Self Image Upload Box -->
             <label
               class="border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all cursor-pointer group"
-              [class.border-emerald-400]="selfImageFileId"
-              [class.bg-emerald-50\40]="selfImageFileId"
-              [class.border-slate-200]="!selfImageFileId"
-              [class.hover:bg-indigo-50\40]="!selfImageFileId"
-              [class.hover:border-indigo-400]="!selfImageFileId"
+              [ngClass]="
+                documents.selfImage.id
+                  ? 'border-emerald-400 bg-emerald-50/40'
+                  : 'border-slate-200 hover:bg-indigo-50/40 hover:border-indigo-400'
+              "
             >
-              @if (selfImageFileId) {
+              @if (documents.selfImage.id) {
                 <i class="pi pi-check-circle text-emerald-600 text-xl mb-1"></i>
                 <span class="text-[10px] font-bold text-emerald-900">Self Image</span>
                 <span
                   class="text-[9px] font-medium text-emerald-700 truncate max-w-[140px]"
-                  [title]="selfImageFileName"
+                  [title]="documents.selfImage.name"
                 >
-                  {{ selfImageFileName }}
+                  {{ documents.selfImage.name }}
                 </span>
                 <span
                   class="text-[8px] text-emerald-600 font-semibold mt-1 bg-emerald-100 px-2 py-0.5 rounded-full"
@@ -564,7 +574,7 @@
                 <span class="text-[10px] font-bold text-slate-700">
                   Self Image <span class="text-rose-500 font-bold">*</span>
                 </span>
-                <span class="text-[9px] text-slate-400">Passport photo</span>
+                <span class="text-[9px] text-slate-400">JPG, PNG (Max 1MB)</span>
               }
 
               <input
@@ -575,22 +585,23 @@
               />
             </label>
 
+            <!-- 3. Self Signature Upload Box -->
             <label
               class="border-2 border-dashed rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all cursor-pointer group"
-              [class.border-emerald-400]="selfSignatureFileId"
-              [class.bg-emerald-50\40]="selfSignatureFileId"
-              [class.border-slate-200]="!selfSignatureFileId"
-              [class.hover:bg-indigo-50\40]="!selfSignatureFileId"
-              [class.hover:border-indigo-400]="!selfSignatureFileId"
+              [ngClass]="
+                documents.signature.id
+                  ? 'border-emerald-400 bg-emerald-50/40'
+                  : 'border-slate-200 hover:bg-indigo-50/40 hover:border-indigo-400'
+              "
             >
-              @if (selfSignatureFileId) {
+              @if (documents.signature.id) {
                 <i class="pi pi-check-circle text-emerald-600 text-xl mb-1"></i>
                 <span class="text-[10px] font-bold text-emerald-900">Self Signature</span>
                 <span
                   class="text-[9px] font-medium text-emerald-700 truncate max-w-[140px]"
-                  [title]="selfSignatureFileName"
+                  [title]="documents.signature.name"
                 >
-                  {{ selfSignatureFileName }}
+                  {{ documents.signature.name }}
                 </span>
                 <span
                   class="text-[8px] text-emerald-600 font-semibold mt-1 bg-emerald-100 px-2 py-0.5 rounded-full"
@@ -604,7 +615,7 @@
                 <span class="text-[10px] font-bold text-slate-700">
                   Self Signature <span class="text-rose-500 font-bold">*</span>
                 </span>
-                <span class="text-[9px] text-slate-400">Sign on paper</span>
+                <span class="text-[9px] text-slate-400">JPG, PNG (Max 1MB)</span>
               }
 
               <input
