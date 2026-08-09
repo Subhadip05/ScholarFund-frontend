@@ -113,7 +113,7 @@ export interface StudentProfileResponse {
   selfSignatureUrl: string;
 }
 
-export interface InstituteProfileResponse{
+export interface InstituteProfileResponse {
   profileId: number;
   email: string;
   instituteName: string;
@@ -121,10 +121,66 @@ export interface InstituteProfileResponse{
   universityAffiliation: string;
   principalName: string;
   address: string;
-  affiliationCertificateUrl: string
+  affiliationCertificateUrl: string;
 }
 
 export interface DocumentUploadResponse {
   documentId: number;
   documentUrl: string;
+}
+
+export interface ApplicationSubmitRequest {
+  instituteId: number;
+  courseName: string;
+  academicYear: string;
+  lastQualificationMarks: string;
+  lastQualificationCourse: string;
+  lastQualificationExamRollNo: string;
+  passOutBoardName: string;
+  annualIncome: number;
+  bankAccountNumber: string;
+  ifscCode: string;
+
+  incomeFileId: number;
+  hsMarksheetFileId: number;
+  bankPassbookFileId: number;
+  admissionReceiptFileId: number
+}
+
+export enum ApplicationStatus {
+  SUBMITTED,
+  INSTITUTE_VERIFIED,
+  INSTITUTE_REJECTED,
+  ADMIN_APPROVED,
+  ADMIN_REJECTED,
+  DISBURSED,
+}
+
+export interface ApplicationHistoryDto{
+  actionTaken: string;
+  actionBy: string;
+  actorRole: string;
+  remarks: string;
+  actionTime: string;
+}
+export interface ApplicationResponse {
+  applicationId: number;
+  studentName: string;
+  instituteName: string;
+  courseName: string;
+  academicYear: string;
+  lastQualificationMarks: string;
+  lastQualificationCourse: string;
+  lastQualificationExamRollNo: string;
+  passOutBoardName: string;
+  annualIncome: number;
+  bankAccountNumber: string;
+  ifscCode: string;
+  status: ApplicationStatus,
+
+  incomeCertificateUrl: string;
+  hsMarksheetUrl: string;
+  bankPassbookUrl: string;
+  admissionReceiptUrl: string,
+  timeline: ApplicationHistoryDto[]
 }

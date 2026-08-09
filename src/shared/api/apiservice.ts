@@ -3,6 +3,8 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import {
   ApiResponse,
+  ApplicationResponse,
+  ApplicationSubmitRequest,
   DocumentUploadResponse,
   InstituteProfileResponse,
   StudentProfileDto,
@@ -47,6 +49,13 @@ export class Apiservice {
   getVerifiedInstitutes() {
     return this.client.get<ApiResponse<InstituteProfileResponse[]>>(
       `${baseUrl}/institute/verified-list`,
+    );
+  }
+
+  submitApplication(payload: ApplicationSubmitRequest): Observable<ApiResponse<ApplicationResponse>> {
+    return this.client.post<ApiResponse<ApplicationResponse>>(
+      `${baseUrl}/applications/submit`,
+      payload,
     );
   }
 }

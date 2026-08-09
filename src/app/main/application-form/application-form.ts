@@ -48,6 +48,7 @@ export class ApplicationForm implements OnInit {
     { key: 'incomeFileId', title: 'Family Income Certificate', folder: 'income-certificate' },
     { key: 'hsMarksheetFileId', title: '10+2 Marksheet', folder: 'marksheet' },
     { key: 'bankPassbookFileId', title: 'Bank Passbook (Front)', folder: 'bank-passbook' },
+    { key: 'admissionReceiptFileId', title: 'Admission Receipt', folder: 'admission-receipt' },
   ];
 
   // Store Name and URL for UI display
@@ -55,6 +56,7 @@ export class ApplicationForm implements OnInit {
     incomeFileId: { name: null, url: null },
     hsMarksheetFileId: { name: null, url: null },
     bankPassbookFileId: { name: null, url: null },
+    admissionReceiptFileId: { name: null, url: null },
   };
 
   ngOnInit(): void {
@@ -79,6 +81,7 @@ export class ApplicationForm implements OnInit {
       incomeFileId: [null, Validators.required],
       hsMarksheetFileId: [null, Validators.required],
       bankPassbookFileId: [null, Validators.required],
+      admissionReceiptFileId: [null, Validators.required],
     });
   }
 
@@ -108,7 +111,6 @@ export class ApplicationForm implements OnInit {
     this.apiService.uploadDocument(file, docConfig.folder).subscribe({
       next: (res) => {
         if (res.status === 200 && res.data?.documentId) {
-
           this.applicationForm.patchValue({ [fieldKey]: res.data.documentId });
           this.applicationForm.get(fieldKey)?.markAsTouched();
 
@@ -132,41 +134,41 @@ export class ApplicationForm implements OnInit {
           life: 5000,
         });
 
-        input.value = ''; 
+        input.value = '';
         Notiflix.Loading.remove();
       },
     });
   }
 
   removeFile(fieldKey: string): void {
-  const docConfig = this.uploadDocuments.find(d => d.key === fieldKey);
-  const docTitle = docConfig ? docConfig.title : 'this document';
+    const docConfig = this.uploadDocuments.find((d) => d.key === fieldKey);
+    const docTitle = docConfig ? docConfig.title : 'this document';
 
-  Notiflix.Confirm.show(
-    'Remove File',
-    `Are you sure you want to remove the uploaded ${docTitle}?`,
-    'Yes',
-    'No',
-    () => {
-      this.applicationForm.patchValue({ [fieldKey]: null });
-      this.documentDetails[fieldKey] = { name: null, url: null };
+    Notiflix.Confirm.show(
+      'Remove File',
+      `Are you sure you want to remove the uploaded ${docTitle}?`,
+      'Yes',
+      'No',
+      () => {
+        this.applicationForm.patchValue({ [fieldKey]: null });
+        this.documentDetails[fieldKey] = { name: null, url: null };
 
-      this._messageService.add({
-        severity: 'info',
-        summary: 'File Removed',
-        detail: `${docTitle} has been removed.`,
-        life: 3000,
-      });
-    },
-    () => {
-      console.log("Cancel Click to remove file.");
-    },
-    {
-      okButtonBackground: '#ef4444',
-      titleColor: '#0f172a',
-    }
-  );
-}
+        this._messageService.add({
+          severity: 'info',
+          summary: 'File Removed',
+          detail: `${docTitle} has been removed.`,
+          life: 3000,
+        });
+      },
+      () => {
+        console.log('Cancel Click to remove file.');
+      },
+      {
+        okButtonBackground: '#ef4444',
+        titleColor: '#0f172a',
+      },
+    );
+  }
 
   getFileName(fieldKey: string): string {
     return this.documentDetails[fieldKey]?.name || 'Document uploaded';
@@ -278,10 +280,36 @@ export class ApplicationForm implements OnInit {
     if (this.agreed && this.applicationForm.valid) {
       console.log('Total Application Form value', this.applicationForm.value);
 
-      this._messageService.add({
-        severity: 'success',
-        summary: 'Application Submitted',
-        detail: 'Your scholarship application has been submitted successfully.',
+      const { confirmBankAccountNumber, confirmIfscCode, ...applicationPayload } =
+        this.applicationForm.value;
+      console.log('The Application payload: ', applicationPayload);
+
+      return;
+      Notiflix.Loading.pulse('Submitting Application...', {});
+      this.apiService.submitApplication(applicationPayload).subscribe({
+        next: (res) => {
+          if (res.status === 200) {
+            console.log('Submit scholarship response:', res);
+
+            this._messageService.add({
+              severity: 'success',
+              summary: 'Application Submitted',
+              detail: 'Your scholarship application has been submitted successfully.',
+              life: 5000,
+            });
+          }
+          Notiflix.Loading.remove();
+        },
+        error: (err) => {
+          console.error('Failed to save profile:', err);
+          this._messageService.add({
+            severity: 'error',
+            summary: 'Application Submission Failed',
+            detail: err.error?.message || 'An error occurred while submitting your application.',
+            life: 5000,
+          });
+          Notiflix.Loading.remove();
+        },
       });
 
       this.router.navigate(['/student']);
