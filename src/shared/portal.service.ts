@@ -43,8 +43,8 @@ export class PortalService {
       name: 'Central Sector Scheme of Scholarship for College Students',
       ministry: 'Ministry of Education (MoE)',
       amount: '₹20,000 / Yr',
-      minGPA: 80,
-      maxIncome: 450000,
+      minGPA: 70,
+      maxIncome: 200000,
       category: ['General', 'OBC', 'SC', 'ST'],
     },
     {

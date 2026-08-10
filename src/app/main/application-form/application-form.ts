@@ -121,6 +121,7 @@ export class ApplicationForm implements OnInit {
             severity: 'success',
             summary: 'Uploaded',
             detail: res.message,
+            life: 5000,
           });
         }
         Notiflix.Loading.remove();
@@ -176,6 +177,14 @@ export class ApplicationForm implements OnInit {
 
   getFileUrl(fieldKey: string): string | null {
     return this.documentDetails[fieldKey]?.url;
+  }
+
+  getSelectedInstituteName(): string {
+    const selectedId = this.applicationForm.get('instituteId')?.value;
+    if (!selectedId) return 'Not Selected';
+
+    const college = this.verifiedColleges.find((inst) => inst.profileId === selectedId);
+    return college ? college.instituteName : 'Not Selected';
   }
 
   fetchVerifiedInstituteList() {
@@ -284,7 +293,7 @@ export class ApplicationForm implements OnInit {
         this.applicationForm.value;
       console.log('The Application payload: ', applicationPayload);
 
-      return;
+      // return;
       Notiflix.Loading.pulse('Submitting Application...', {});
       this.apiService.submitApplication(applicationPayload).subscribe({
         next: (res) => {
