@@ -75,11 +75,12 @@
           </label>
           <select
             formControlName="instituteId"
-            class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm bg-white font-medium"
+            class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm bg-white font-medium text-slate-700"
           >
-            <option value="" disabled selected>Select an Institute</option>
+            <option [ngValue]="null" disabled selected>-- Select an Institute --</option>
+
             @for (inst of verifiedColleges; track inst.profileId) {
-              <option [value]="inst.profileId">
+              <option [ngValue]="inst.profileId">
                 {{ inst.instituteName }}
               </option>
             }
@@ -116,7 +117,7 @@
             formControlName="academicYear"
             class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm bg-white"
           >
-            <option value="" disabled selected>Select Qualification</option>
+            <option value="" disabled selected>Select Academic Year</option>
             <option value="2026-2027">2026-2027</option>
             <option value="2025-2026">2025-2026</option>
           </select>

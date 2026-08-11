@@ -66,7 +66,7 @@ export class ApplicationForm implements OnInit {
 
   initForm(): void {
     this.applicationForm = this.fb.group({
-      instituteId: ['', Validators.required],
+      instituteId: [null, Validators.required],
       courseName: ['', Validators.required],
       academicYear: ['', Validators.required],
       lastQualificationMarks: ['', Validators.required],
@@ -181,9 +181,15 @@ export class ApplicationForm implements OnInit {
 
   getSelectedInstituteName(): string {
     const selectedId = this.applicationForm.get('instituteId')?.value;
-    if (!selectedId) return 'Not Selected';
 
-    const college = this.verifiedColleges.find((inst) => inst.profileId === selectedId);
+    if (selectedId === null || selectedId === undefined || selectedId === '') {
+      return 'Not Selected';
+    }
+
+    const college = this.verifiedColleges.find(
+      (inst) => Number(inst.profileId) === Number(selectedId),
+    );
+
     return college ? college.instituteName : 'Not Selected';
   }
 
@@ -304,8 +310,10 @@ export class ApplicationForm implements OnInit {
               severity: 'success',
               summary: 'Application Submitted',
               detail: 'Your scholarship application has been submitted successfully.',
-              life: 5000,
+              life: 10000,
             });
+
+            this.router.navigate(['/student']);
           }
           Notiflix.Loading.remove();
         },
@@ -320,8 +328,6 @@ export class ApplicationForm implements OnInit {
           Notiflix.Loading.remove();
         },
       });
-
-      this.router.navigate(['/student']);
     }
   }
 }

@@ -372,7 +372,7 @@
       <form
         *ngIf="portalService.activeModal() === 'college-login'"
         [formGroup]="collegeForm"
-        (submit)="onCollegeLoginSubmit($event)"
+        (submit)="onCollegeVerifyOTPSubmit($event)"
         class="space-y-4"
       >
         <div *ngIf="!collegeShowRegisterForm; else registerCollegeFlow" class="space-y-4">
@@ -401,16 +401,27 @@
             *ngIf="collegeOtpSent"
             class="space-y-1.5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/60 animate-fadeIn"
           >
-            <span class="text-[10px] font-extrabold text-slate-600 block uppercase tracking-wider">
-              OTP Verification Sent!
-            </span>
-            <p class="text-[11px] text-slate-500 leading-relaxed">
-              A 6-digit OTP has been dispatched to . (Simulated OTP:
-              <strong class="font-mono text-xs text-blue-600 bg-blue-50 px-1 py-0.5 rounded">{{
-                collegeOtpCode
-              }}</strong
-              >)
-            </p>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[10px] font-extrabold text-blue-800 uppercase tracking-wider">
+                OTP Sent!
+              </span>
+
+              <div class="text-[11px] font-bold">
+                <span *ngIf="collegeLoginTimer.timeLeft() > 0" class="text-slate-500">
+                  Expires in:
+                  <span class="text-blue-600 font-extrabold">{{
+                    collegeLoginTimer.display()
+                  }}</span>
+                </span>
+
+                <span
+                  *ngIf="collegeLoginTimer.timeLeft() === 0"
+                  class="text-red-500 font-extrabold"
+                >
+                  OTP Expired
+                </span>
+              </div>
+            </div>
 
             <label
               class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest mt-3"
@@ -453,7 +464,7 @@
           <button
             *ngIf="!collegeOtpSent"
             type="button"
-            (click)="verifyCollegeEmail()"
+            (click)="requestCollegeLoginOTP()"
             class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-slate-900/10 active:scale-[0.98] transition-all cursor-pointer border-0"
           >
             Proceed
@@ -498,6 +509,14 @@
               </div>
             </div>
 
+            <span
+              *ngIf="submitCollegeRegister && collegeForm.get('email')?.invalid"
+              class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
+            >
+              <i class="pi pi-exclamation-circle text-[10px]"></i>
+              Institute email is required
+            </span>
+
             <div class="space-y-1.5">
               <label
                 class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest"
@@ -517,6 +536,14 @@
                   class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
                 />
               </div>
+
+              <span
+                *ngIf="submitCollegeRegister && collegeForm.get('contactPersonName')?.invalid"
+                class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
+              >
+                <i class="pi pi-exclamation-circle text-[10px]"></i>
+                Contact Person is required
+              </span>
             </div>
 
             <div class="space-y-1.5">
@@ -538,24 +565,41 @@
                   class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white disabled:opacity-75 disabled:bg-slate-100 transition-all"
                 />
               </div>
+
+              <span
+                *ngIf="submitCollegeRegister && collegeForm.get('phoneNumber')?.invalid"
+                class="flex items-center gap-1 mt-1 text-[10px] font-extrabold text-red-600 tracking-wide animate-fadeIn"
+              >
+                <i class="pi pi-exclamation-circle text-[10px]"></i>
+                Phone Number is required
+              </span>
             </div>
 
             <div
               *ngIf="collegeOtpSent"
               class="space-y-1.5 p-3.5 bg-violet-50/50 rounded-2xl border border-violet-100/60 animate-fadeIn"
             >
-              <span
-                class="text-[10px] font-extrabold text-violet-800 block uppercase tracking-wider"
-              >
-                Registration OTP Sent!
-              </span>
-              <p class="text-[11px] text-slate-500 leading-relaxed">
-                A 6-digit OTP verification code has been dispatched. (Simulated OTP:
-                <strong
-                  class="font-mono text-xs text-violet-700 bg-violet-50 px-1 py-0.5 rounded"
-                  >{{ collegeOtpCode }}</strong
-                >)
-              </p>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-[10px] font-extrabold text-blue-800 uppercase tracking-wider">
+                  OTP Sent!
+                </span>
+
+                <div class="text-[11px] font-bold">
+                  <span *ngIf="collegeLoginTimer.timeLeft() > 0" class="text-slate-500">
+                    Expires in:
+                    <span class="text-blue-600 font-extrabold">{{
+                      collegeLoginTimer.display()
+                    }}</span>
+                  </span>
+
+                  <span
+                    *ngIf="collegeLoginTimer.timeLeft() === 0"
+                    class="text-red-500 font-extrabold"
+                  >
+                    OTP Expired
+                  </span>
+                </div>
+              </div>
 
               <label
                 class="text-[10px] font-extrabold uppercase text-slate-400 block tracking-widest mt-3"
@@ -570,12 +614,19 @@
                   type="text"
                   required
                   maxLength="6"
-                  [formControl]="collegeOtpInput"
+                  formControlName="otpCode"
                   name="collegeOtpInput"
                   placeholder="e.g. 123456"
                   class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200/90 rounded-xl text-xs font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-slate-800 focus:ring-4 focus:ring-slate-100 focus:bg-white transition-all"
                 />
               </div>
+            </div>
+
+            <div
+              *ngIf="collegeOtpError"
+              class="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-100 font-medium"
+            >
+              {{ collegeOtpError }}
             </div>
 
             <div class="flex gap-3">
@@ -592,13 +643,13 @@
               <button
                 *ngIf="!collegeOtpSent"
                 type="button"
-                (click)="sendCollegeRegisterOtp()"
+                (click)="requestCollegeRegisterOtp()"
                 class="flex-1 py-3 bg-violet-700 hover:bg-violet-800 text-white rounded-xl font-bold text-xs transition-all cursor-pointer border-0"
               >
                 Register & Send OTP
               </button>
               <button
-                *ngIf="collegeOtpSent"
+                *ngIf="collegeOtpSent && collegeLoginTimer.timeLeft() > 0"
                 type="submit"
                 class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-bold text-xs transition-all cursor-pointer border-0"
               >

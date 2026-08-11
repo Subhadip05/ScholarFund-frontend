@@ -45,20 +45,17 @@ export class Modals {
   studentRegisterSubmit = false;
 
   // College Admin States
-  collegeNodalId = new FormControl('nodal.officer@iitd.ac.in');
   collegeOtpSent = false;
-  collegeOtpCode = '';
-  collegeOtpInput = new FormControl('');
   collegeOtpError = '';
   collegeShowRegisterForm = false;
-  collegeContactName = new FormControl('');
-  collegePhone = new FormControl('');
+  submitCollegeRegister = false;
 
   // Govt Admin States
   adminLoginSubmit = false;
 
   studentTimer = new TimerUtil();
   studentRegistrationOtpTimer = new TimerUtil();
+  collegeLoginTimer = new TimerUtil();
 
   ngOnInit() {
     this.initForms();
@@ -102,6 +99,7 @@ export class Modals {
   closeModal() {
     this.adminLoginSubmit = false;
     this.studentRegisterSubmit = false;
+    this.submitCollegeRegister = false;
     this.portalService.closeModal();
     this.resetFormStates();
   }
@@ -116,10 +114,9 @@ export class Modals {
     this.studentRegisterForm.reset();
 
     this.collegeOtpSent = false;
-    this.collegeOtpCode = '';
-    this.collegeOtpInput.setValue('');
     this.collegeOtpError = '';
     this.collegeShowRegisterForm = false;
+    this.collegeForm.reset();
   }
 
   sendStudentLoginOtp() {
@@ -137,18 +134,21 @@ export class Modals {
     Notiflix.Loading.pulse('Loading...', {});
     this._authService.requestOtp({ email: email, role: 'STUDENT' }).subscribe({
       next: (res) => {
+        if (res?.status === 200) {
+          this._messageService.add({
+            severity: 'success',
+            summary: 'OTP Sent',
+            detail: res.message,
+            life: 5000,
+          });
+
+          this.studentLoginOtpSent = true;
+          this.startStudetOtpTimer();
+          this.studentLoginForm.get('email')?.disable();
+        }
+
         console.log('Reqest otp response', res);
 
-        this._messageService.add({
-          severity: 'success',
-          summary: 'OTP Sent',
-          detail: res.message,
-          life: 5000
-        });
-
-        this.studentLoginOtpSent = true;
-        this.startStudetOtpTimer();
-        this.studentLoginForm.get('email')?.disable();
         Notiflix.Loading.remove();
         this._cdr.detectChanges();
       },
@@ -165,7 +165,7 @@ export class Modals {
             severity: 'info',
             summary: 'User Not Found',
             detail: 'Please register yourself first.',
-            life: 5000
+            life: 5000,
           });
         }
       },
@@ -205,7 +205,7 @@ export class Modals {
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
-          phoneNo: res.data?.phoneNo
+          phoneNo: res.data?.phoneNo,
         };
 
         sessionStorage.setItem('user_role', 'student');
@@ -226,7 +226,7 @@ export class Modals {
           severity: 'error',
           summary: 'Student Login Failed',
           detail: err.error?.message,
-          life: 5000
+          life: 5000,
         });
       },
     });
@@ -248,7 +248,7 @@ export class Modals {
           severity: 'success',
           summary: 'OTP Sent',
           detail: res.message,
-          life: 5000
+          life: 5000,
         });
 
         this.studentRegisterForm.get('fullName')?.disable();
@@ -268,7 +268,7 @@ export class Modals {
           severity: 'error',
           summary: 'OTP Request Failed',
           detail: 'Failed to send otp. Please try again after some time.',
-          life: 5000
+          life: 5000,
         });
         this._cdr.detectChanges();
         Notiflix.Loading.remove();
@@ -303,7 +303,7 @@ export class Modals {
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
-          phoneNo: res.data?.phoneNo
+          phoneNo: res.data?.phoneNo,
         };
 
         sessionStorage.setItem('user_role', 'student');
@@ -324,20 +324,22 @@ export class Modals {
           severity: 'error',
           summary: 'OTP Verification Failed',
           detail: err.error?.message,
-          life: 5000
+          life: 5000,
         });
       },
     });
   }
 
-  verifyCollegeEmail() {
+  requestCollegeLoginOTP() {
     const email = this.collegeForm.get('email')?.value;
 
     if (!email || this.collegeForm.get('email')?.invalid) {
       this.collegeOtpError = 'Please enter a valid institute email first.';
+      this._cdr.detectChanges();
       return;
     }
 
+    this._cdr.detectChanges();
     this.collegeOtpError = '';
 
     Notiflix.Loading.pulse('Loading...', {});
@@ -347,18 +349,20 @@ export class Modals {
 
         if (res?.status === 200) {
           this.collegeOtpSent = true;
+          this.collegeForm.get('email')?.disable();
 
           this._messageService.add({
             severity: 'success',
             summary: 'OTP Sent',
             detail: res?.message,
-            life: 5000
+            life: 5000,
           });
-        }
 
-        this.collegeOtpError = '';
-        Notiflix.Loading.remove();
-        this._cdr.detectChanges();
+          this.collegeOtpError = '';
+          this.startCollageLoginTimer();
+          Notiflix.Loading.remove();
+          this._cdr.detectChanges();
+        }
       },
       error: (err) => {
         console.log('Institute Login error:', err);
@@ -368,7 +372,7 @@ export class Modals {
             severity: 'info',
             summary: 'Institute Not Found',
             detail: 'Please complete registration first.',
-            life: 5000
+            life: 5000,
           });
           this.collegeShowRegisterForm = true;
         }
@@ -377,7 +381,7 @@ export class Modals {
             severity: 'warn',
             summary: 'User Exists',
             detail: err?.error?.message,
-            life: 5000
+            life: 5000,
           });
         }
         this.collegeOtpSent = false;
@@ -388,55 +392,109 @@ export class Modals {
     });
   }
 
-  sendCollegeRegisterOtp() {
-    if (!this.collegeContactName.value || !this.collegePhone.value) {
-      this.collegeOtpError = 'Please provide Contact Person Name and Phone Number.';
-      return;
-    }
-    this.collegeOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    this.collegeOtpSent = true;
-    this.collegeOtpError = '';
+  requestCollegeRegisterOtp() {
+    this.submitCollegeRegister = true;
+
+    if (this.collegeForm.invalid) return;
+    const registerCollegePayload = this.collegeForm.getRawValue();
+    console.log('Institute Registration and request for otp payload:', registerCollegePayload);
+
+    Notiflix.Loading.pulse('Loading...', {});
+    this._authService.registerCollege(registerCollegePayload).subscribe({
+      next: (res) => {
+        console.log('Institute registration otp response', res);
+
+        this._messageService.add({
+          severity: 'success',
+          summary: 'OTP Sent',
+          detail: res.message,
+          life: 5000,
+        });
+
+        this.collegeForm.get('contactPersonName')?.disable();
+        this.collegeForm.get('email')?.disable();
+        this.collegeForm.get('phoneNumber')?.disable();
+
+        this.collegeOtpSent = true;
+        this.collegeOtpError = '';
+        this.startCollageLoginTimer();
+        Notiflix.Loading.remove();
+        this._cdr.detectChanges();
+      },
+      error: (err) => {
+        this.collegeOtpSent = false;
+        this.collegeOtpError =
+          err.error?.message || 'Failed to send OTP. Please try again after some time.';
+        this._messageService.add({
+          severity: 'error',
+          summary: 'OTP Request Failed',
+          detail: 'Failed to send otp. Please try again after some time.',
+          life: 5000,
+        });
+        this._cdr.detectChanges();
+        Notiflix.Loading.remove();
+      },
+    });
   }
 
-  onCollegeLoginSubmit(event: Event) {
+  onCollegeVerifyOTPSubmit(event: Event) {
     event.preventDefault();
+    const otpCode = this.collegeForm.get('otpCode')?.value;
     if (!this.collegeOtpSent) {
       this.collegeOtpError = "Please click 'Send OTP' first.";
-      return;
-    }
-    if (this.collegeOtpInput.value !== this.collegeOtpCode) {
-      this.collegeOtpError = 'Invalid 6-digit OTP entered. Please try again.';
+      this._cdr.detectChanges();
       return;
     }
 
-    let matchedCollege = this.portalService.registeredColleges.find(
-      (c: { email: string }) => c.email.toLowerCase() === this.collegeNodalId.value?.toLowerCase(),
-    );
-
-    if (!matchedCollege) {
-      matchedCollege = {
-        email: this.collegeNodalId.value || '',
-        contactPersonName: this.collegeContactName.value || 'Nodal Officer',
-        phone: this.collegePhone.value || '+91 99999 99999',
-        code: 'AISHE-C-' + Math.floor(10000 + Math.random() * 90000),
-        collegeName: this.collegeContactName.value
-          ? `${this.collegeContactName.value} Institution`
-          : 'State Technical Institute',
-      };
-      this.portalService.registeredColleges.push(matchedCollege);
+    if (!otpCode || otpCode.length != 6) {
+      this.collegeOtpError = 'Please enter the 6-digit OTP sent to your email.';
+      this._cdr.detectChanges();
+      return;
     }
 
-    this.portalService.userRole = 'college-admin';
-    this.portalService.userMetadata = {
-      name: matchedCollege.contactPersonName,
-      email: this.collegeNodalId.value,
-      code: matchedCollege.code,
-      college: matchedCollege.collegeName,
-      department: 'Academic & Scholarship Division',
-    };
+    this.collegeOtpError = '';
+    this._cdr.detectChanges();
 
-    this.closeModal();
-    this._router.navigate(['/college']);
+    const otpVerifyPayload = this.collegeForm.getRawValue();
+    console.log('Institute otp verify payload:', otpVerifyPayload);
+
+    Notiflix.Loading.pulse('Loading...', {});
+    this._authService.verifyOtpAndLogin(otpVerifyPayload).subscribe({
+      next: (res) => {
+        console.log('College login response :', res);
+        this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
+
+        this.portalService.userRole = 'college-admin';
+
+        this.portalService.userMetadata = {
+          name: res.data?.fullName,
+          email: res.data?.email,
+          phoneNo: res.data?.phoneNo,
+        };
+
+        sessionStorage.setItem('user_role', 'college-admin');
+        sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
+
+        this.closeModal();
+        this.collegeOtpError = '';
+        this.collegeForm.reset();
+        Notiflix.Loading.remove();
+
+        this._router.navigate(['/college']);
+      },
+      error: (err) => {
+        this.collegeOtpError = err.error?.message || 'Invalid OTP entered. Please try again.';
+        this._cdr.detectChanges();
+
+        Notiflix.Loading.remove();
+        this._messageService.add({
+          severity: 'error',
+          summary: 'Institute Login Failed',
+          detail: err.error?.message,
+          life: 5000,
+        });
+      },
+    });
   }
 
   onGovtLoginSubmit(event: Event) {
@@ -478,7 +536,7 @@ export class Modals {
           severity: 'error',
           summary: 'Admin Login Failed',
           detail: errorMsg,
-          life: 5000
+          life: 5000,
         });
       },
     });
@@ -551,8 +609,21 @@ export class Modals {
     });
   }
 
+  startCollageLoginTimer() {
+    this.collegeForm.get('otpCode')?.enable();
+    this.collegeOtpError = '';
+
+    this.collegeLoginTimer.start(300, () => {
+      this.collegeOtpError = 'Your OTP has expired. Please request a new one.';
+      this.collegeOtpSent = false;
+      this.collegeForm.get('otpCode')?.disable();
+      this._cdr.markForCheck();
+    });
+  }
+
   ngOnDestroy() {
     this.studentTimer.stop();
     this.studentRegistrationOtpTimer.stop();
+    this.collegeLoginTimer.stop();
   }
 }

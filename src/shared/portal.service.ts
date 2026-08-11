@@ -25,17 +25,6 @@ export class PortalService {
   userRole: UserRole = null;
   userMetadata: any = null;
 
-  // Demo Registered Colleges
-  registeredColleges: RegisteredCollege[] = [
-    {
-      email: 'nodal.officer@iitd.ac.in',
-      contactPersonName: 'IIT Delhi Nodal Office',
-      phone: '+91 98765 43210',
-      code: 'AISHE-C-34190',
-      collegeName: 'Indian Institute of Technology, Delhi',
-    },
-  ];
-
   // Scholarship Database
   scholarshipSchemes: ScholarshipScheme[] = [
     {
