@@ -6,6 +6,7 @@ import {
   ApplicationResponse,
   ApplicationSubmitRequest,
   DocumentUploadResponse,
+  InstituteProfileDto,
   InstituteProfileResponse,
   StudentProfileDto,
   StudentProfileResponse,
@@ -55,6 +56,17 @@ export class Apiservice {
   submitApplication(payload: ApplicationSubmitRequest): Observable<ApiResponse<ApplicationResponse>> {
     return this.client.post<ApiResponse<ApplicationResponse>>(
       `${baseUrl}/applications/submit`,
+      payload,
+    );
+  }
+
+  getInstituteProfile() {
+    return this.client.get<ApiResponse<InstituteProfileResponse>>(`${baseUrl}/institute/get-profile`);
+  }
+
+  saveInstituteProfile(payload: InstituteProfileDto): Observable<ApiResponse<InstituteProfileResponse>> {
+    return this.client.post<ApiResponse<InstituteProfileResponse>>(
+      `${baseUrl}/institute/save-profile`,
       payload,
     );
   }

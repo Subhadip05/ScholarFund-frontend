@@ -14,6 +14,7 @@ import { Authservice } from '../../../shared/auth/authservice';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { TimerUtil } from '../../../shared/utils/timer.util';
+import { VerifyOtpDto } from '../../../shared/types';
 
 @Component({
   selector: 'app-modals',
@@ -439,14 +440,16 @@ export class Modals {
 
   onCollegeVerifyOTPSubmit(event: Event) {
     event.preventDefault();
+    const email = this.collegeForm.get('email')?.value;
     const otpCode = this.collegeForm.get('otpCode')?.value;
+
     if (!this.collegeOtpSent) {
       this.collegeOtpError = "Please click 'Send OTP' first.";
       this._cdr.detectChanges();
       return;
     }
 
-    if (!otpCode || otpCode.length != 6) {
+    if (!otpCode || otpCode.length !== 6) {
       this.collegeOtpError = 'Please enter the 6-digit OTP sent to your email.';
       this._cdr.detectChanges();
       return;
@@ -455,7 +458,11 @@ export class Modals {
     this.collegeOtpError = '';
     this._cdr.detectChanges();
 
-    const otpVerifyPayload = this.collegeForm.getRawValue();
+    const otpVerifyPayload: VerifyOtpDto = {
+      email: email,
+      otpCode: otpCode,
+      role: 'COLLEGE',
+    };
     console.log('Institute otp verify payload:', otpVerifyPayload);
 
     Notiflix.Loading.pulse('Loading...', {});

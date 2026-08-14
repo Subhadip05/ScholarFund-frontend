@@ -144,7 +144,7 @@ export interface ApplicationSubmitRequest {
   incomeFileId: number;
   hsMarksheetFileId: number;
   bankPassbookFileId: number;
-  admissionReceiptFileId: number
+  admissionReceiptFileId: number;
 }
 
 export enum ApplicationStatus {
@@ -156,7 +156,7 @@ export enum ApplicationStatus {
   DISBURSED,
 }
 
-export interface ApplicationHistoryDto{
+export interface ApplicationHistoryDto {
   actionTaken: string;
   actionBy: string;
   actorRole: string;
@@ -176,11 +176,35 @@ export interface ApplicationResponse {
   annualIncome: number;
   bankAccountNumber: string;
   ifscCode: string;
-  status: ApplicationStatus,
+  status: ApplicationStatus;
 
   incomeCertificateUrl: string;
   hsMarksheetUrl: string;
   bankPassbookUrl: string;
-  admissionReceiptUrl: string,
-  timeline: ApplicationHistoryDto[]
+  admissionReceiptUrl: string;
+  timeline: ApplicationHistoryDto[];
+}
+
+export interface InstituteProfileDto {
+  instituteName: string;
+  collegeCode: string;
+  universityAffiliation: string;
+  principalName: string;
+  officerPhoneNo: string;
+  officerName: string;
+  address: string;
+  affiliationCertificateFileId: number;
+}
+export interface InstituteProfileResponse {
+  profileId: number;
+  email: string;
+  officerName: string;
+  officerPhoneNo: string;
+  instituteName: string;
+  isVerifyByGovt: boolean;
+  collegeCode: string;
+  universityAffiliation: string;
+  principalName: string;
+  address: string;
+  affiliationCertificateUrl: string;
 }

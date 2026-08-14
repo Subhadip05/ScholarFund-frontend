@@ -1,98 +1,758 @@
-<div class="space-y-6 animate-fadeIn">
-  <!-- Stats Counters -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-      <div>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Pending Verifications</span>
-        <span class="text-2xl font-extrabold text-slate-800 mt-1 block">
-          {{ getPendingCount() }} Files
-        </span>
-      </div>
-      <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
-        <i class="pi pi-file text-xl"></i>
-      </div>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-      <div>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Nodal Office Code</span>
-        <span class="text-2xl font-extrabold text-slate-800 mt-1 block">{{ portalService.userMetadata?.code }}</span>
-      </div>
-      <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-        <i class="pi pi-building text-xl"></i>
-      </div>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
-      <div>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Audited Registrations</span>
-        <span class="text-2xl font-extrabold text-slate-800 mt-1 block">
-          {{ getApprovedCount() }} Approved
-        </span>
-      </div>
-      <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-        <i class="pi pi-check-circle text-xl"></i>
-      </div>
-    </div>
-  </div>
+<p-toast position="top-right" />
 
-  <!-- Submissions Table -->
-  <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-    <div class="p-6 border-b border-slate-100">
-      <h3 class="text-lg font-bold text-slate-900">Student Enrollment Ledger</h3>
-      <p class="text-xs text-slate-500">Nodal officers must review student certificates, verify marksheets against AISHE databases, and update statuses.</p>
+<!--        STAGE 1: PROFILE NOT SAVED -> SHOW INSTITUTE REGISTRATION FORM      -->
+@if (!isProfileSaved()) {
+  <div class="max-w-4xl mx-auto space-y-6 animate-fadeIn py-4">
+    <div
+      class="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 rounded-2xl p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between shadow-sm"
+    >
+      <div class="flex gap-4 items-start">
+        <div
+          class="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
+        >
+          <i class="pi pi-building text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-900">Institute Registration Pending</h2>
+          <p class="text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+            Your Institution profile must be registered and verified on the ScholarFund portal
+            before students from your college can receive scholarship disbursements.
+          </p>
+        </div>
+      </div>
     </div>
-    
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-sm border-collapse">
-        <thead>
-          <tr class="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
-            <th class="p-4 text-xs uppercase tracking-wider">Student Details</th>
-            <th class="p-4 text-xs uppercase tracking-wider">Applied Scholarship</th>
-            <th class="p-4 text-xs uppercase tracking-wider">GPA / Academic</th>
-            <th class="p-4 text-xs uppercase tracking-wider">Income Bracket</th>
-            <th class="p-4 text-xs uppercase tracking-wider text-center">Nodal Status</th>
-            <th class="p-4 text-xs uppercase tracking-wider text-right">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100 font-medium">
-          <tr *ngFor="let app of portalService.collegeApplications" class="hover:bg-slate-50/60 transition-colors">
-            <td class="p-4">
-              <div class="font-bold text-slate-900">{{ app.name }}</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">{{ app.course }} • Ref: {{ app.id }}</div>
-            </td>
-            <td class="p-4 text-slate-700">{{ app.scheme }}</td>
-            <td class="p-4 text-slate-800 font-bold">{{ app.gpa }} CGPA</td>
-            <td class="p-4 text-slate-800">{{ app.income }}</td>
-            <td class="p-4 text-center">
-              <span [ngClass]="{
-                'bg-emerald-50 text-emerald-700 border-emerald-200': app.status === 'Approved',
-                'bg-red-50 text-red-700 border-red-200': app.status === 'Rejected',
-                'bg-amber-50 text-amber-700 border-amber-200': app.status !== 'Approved' && app.status !== 'Rejected'
-              }" class="px-2.5 py-1 rounded-full text-xs font-bold inline-block border">
-                {{ app.status }}
-              </span>
-            </td>
-            <td class="p-4 text-right">
-              <div *ngIf="app.status === 'Pending'; else lockedState" class="flex gap-2 justify-end">
-                <button 
-                  (click)="portalService.rejectApplication(app.id)"
-                  class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
+
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <i class="pi pi-shield text-emerald-600 text-xl"></i>
+            <span>ScholarFund Institute Profile Form</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Enter official college registration records as accredited with Ministry of Education /
+            AISHE portal.
+          </p>
+        </div>
+      </div>
+
+      <form
+        [formGroup]="instituteDetailsForm"
+        (ngSubmit)="saveInstituteProfile()"
+        class="p-6 space-y-6"
+      >
+        @if (errorMessage) {
+          <div
+            class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-3"
+          >
+            <i class="pi pi-exclamation-circle text-red-600 text-lg"></i>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Institute Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="instituteName"
+              placeholder="e.g. National Institute of Technology, Durgapur"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm font-semibold text-slate-800 transition-all outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              College Code (AISHE Code) <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="collegeCode"
+              placeholder="e.g. AISHE-NITD-7041 or C-41209"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm font-bold text-slate-800 transition-all outline-none font-mono"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              University Affiliation <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="universityAffiliation"
+              placeholder="e.g. MAKAUT / Central University / Autonomous"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm font-semibold text-slate-800 transition-all outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Principal / Registrar Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="principalName"
+              placeholder="e.g. Prof. Arvind Mukhopadhyay"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm font-semibold text-slate-800 transition-all outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Designated Officer Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              formControlName="officerName"
+              placeholder="e.g. Dr. Subhashis Ray"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm text-slate-800 transition-all outline-none"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+              Officer Contact Phone No. <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              formControlName="officerPhoneNo"
+              placeholder="e.g. 9876543210"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm text-slate-800 transition-all outline-none font-mono"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            Affiliation / AISHE Certificate File Attachment <span class="text-red-500">*</span>
+          </label>
+          <div
+            class="border-2 border-dashed rounded-2xl p-6 transition-all text-center relative group"
+            [ngClass]="
+              affiliationCertificateDoc.id
+                ? 'border-emerald-400 bg-emerald-50/40'
+                : 'border-slate-200 hover:border-emerald-500 bg-slate-50/70 hover:bg-emerald-50/30'
+            "
+          >
+            @if (!affiliationCertificateDoc.id) {
+              <input
+                type="file"
+                (change)="onAffiliationCertificateSelect($event)"
+                accept=".pdf,.png,.jpg,.jpeg"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              />
+            }
+
+            <div class="flex flex-col items-center justify-center space-y-2">
+              @if (affiliationCertificateDoc.id) {
+                <div
+                  class="flex items-center gap-3 bg-white text-emerald-800 px-4 py-2.5 rounded-xl text-sm font-bold border border-emerald-300 shadow-sm relative z-20"
                 >
-                  Reject
-                </button>
-                <button 
-                  (click)="portalService.approveApplication(app.id)"
-                  class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
+                  <i class="pi pi-file-check text-emerald-600 text-lg"></i>
+                  <a
+                    [href]="affiliationCertificateDoc.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-xs font-bold text-emerald-700 hover:text-emerald-900 hover:underline truncate max-w-xs cursor-pointer"
+                    [title]="'Click to view ' + affiliationCertificateDoc.name"
+                  >
+                    {{ affiliationCertificateDoc.name }}
+                  </a>
+                  <button
+                    type="button"
+                    (click)="removeAffiliationCertificate($event)"
+                    class="text-slate-400 hover:text-red-500 transition-colors p-1 bg-transparent border-0 cursor-pointer ml-1"
+                    title="Remove certificate"
+                  >
+                    <i class="pi pi-times text-xs"></i>
+                  </button>
+                </div>
+                <span class="text-[10px] text-emerald-600 font-semibold"
+                  >Document successfully uploaded</span
                 >
-                  Verify & Approve
-                </button>
-              </div>
-              <ng-template #lockedState>
-                <span class="text-xs text-slate-400">Locked / Logged</span>
-              </ng-template>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              } @else {
+                <div
+                  class="w-12 h-12 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
+                >
+                  <i class="pi pi-cloud-upload text-xl text-slate-600"></i>
+                </div>
+                <p class="text-sm font-bold text-slate-700">
+                  Click or drag AISHE / University Affiliation Certificate (PDF / JPG / PNG)
+                </p>
+                <p class="text-xs text-slate-400">Max file size: 1MB</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+            Full Institutional Address <span class="text-red-500">*</span>
+          </label>
+          <textarea
+            formControlName="address"
+            rows="3"
+            placeholder="Campus Road, Academic Block A, Pin: 700032"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-sm text-slate-800 transition-all outline-none"
+          ></textarea>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <button
+            type="submit"
+            [disabled]="isSubmitting"
+            class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition-all shadow-md hover:shadow-lg flex items-center gap-2 cursor-pointer disabled:opacity-50 border-0"
+          >
+            @if (isSubmitting) {
+              <div
+                class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></div>
+              <span>Registering Institute...</span>
+            } @else {
+              <span>Save Institute Profile & Register Portal</span>
+              <i class="pi pi-arrow-right"></i>
+            }
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-</div>
+}
+
+<!--       STAGE 2: PROFILE SAVED, PENDING GOVT VERIFICATION        -->
+@else if (isProfileSaved() && !isInstituteVerifiedByGovt()) {
+  <div class="max-w-4xl mx-auto space-y-6 animate-fadeIn py-4">
+    <div
+      class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 flex flex-col md:flex-row gap-5 items-start md:items-center justify-between shadow-sm"
+    >
+      <div class="flex gap-4 items-start">
+        <div
+          class="w-12 h-12 bg-amber-100 text-amber-700 rounded-2xl flex items-center justify-center shrink-0 shadow-sm"
+        >
+          <i class="pi pi-clock text-2xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-lg font-extrabold text-slate-900">
+              Application Under Government Audit
+            </h2>
+            <span
+              class="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider"
+            >
+              Pending Review
+            </span>
+          </div>
+          <p class="text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+            Your Institution registration details have been submitted. The State Higher Education
+            Department is currently verifying your AISHE accreditation and affiliation certificate.
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        (click)="fetchInstituteProfile()"
+        class="px-4 py-2 bg-white hover:bg-slate-50 border border-amber-200 text-amber-800 font-bold text-xs rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer self-start md:self-auto shrink-0"
+      >
+        <i class="pi pi-refresh text-xs"></i>
+        <span>Refresh Status</span>
+      </button>
+    </div>
+
+    <!-- Institute Details Summary Card -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i class="pi pi-building text-slate-600 text-lg"></i>
+            <span>Registered Institutional Profile</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Submitted records pending verification approval
+          </p>
+        </div>
+        <span
+          class="text-xs font-mono font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-lg border border-slate-200"
+        >
+          Ref ID #{{ instituteDetails?.profileId }}
+        </span>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+              >Institute Name</span
+            >
+            <span class="text-sm font-extrabold text-slate-800 block">{{
+              instituteDetails?.instituteName
+            }}</span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+              >College Code (AISHE)</span
+            >
+            <span class="text-sm font-mono font-bold text-slate-800 block">{{
+              instituteDetails?.collegeCode
+            }}</span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+              >University Affiliation</span
+            >
+            <span class="text-sm font-bold text-slate-700 block">{{
+              instituteDetails?.universityAffiliation
+            }}</span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+              >Principal / Registrar</span
+            >
+            <span class="text-sm font-semibold text-slate-700 block">{{
+              instituteDetails?.principalName
+            }}</span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+              >Designated Officer</span
+            >
+            <span class="text-sm font-semibold text-slate-700 block">{{
+              instituteDetails?.officerName
+            }}</span>
+          </div>
+
+          <div class="space-y-1">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+              >Officer Phone / Email</span
+            >
+            <span class="text-sm font-mono text-slate-700 block">
+              {{ instituteDetails?.officerPhoneNo }} • {{ instituteDetails?.email }}
+            </span>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 space-y-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+            >Institutional Address</span
+          >
+          <p
+            class="text-sm text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-200/80"
+          >
+            {{ instituteDetails?.address }}
+          </p>
+        </div>
+
+        <!-- Certificate Link -->
+        <div class="pt-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2"
+            >Submitted Certificate</span
+          >
+          @if (instituteDetails?.affiliationCertificateUrl) {
+            <a
+              [href]="instituteDetails!.affiliationCertificateUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2.5 px-4 py-2.5 bg-emerald-50 hover:bg-emerald-100/80 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition-all"
+            >
+              <i class="pi pi-file-pdf text-emerald-600 text-base"></i>
+              <span>View Uploaded AISHE / Affiliation Certificate</span>
+              <i class="pi pi-external-link text-[10px] text-emerald-600"></i>
+            </a>
+          } @else {
+            <span class="text-xs text-slate-400 italic">No document attached</span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!--       STAGE 3: PROFILE SAVED & VERIFIED BY GOVT -> FULL DASHBOARD & LEDGER     -->
+@else {
+  <div class="space-y-6 animate-fadeIn">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div
+        class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md"
+      >
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+            >Pending Verifications</span
+          >
+          <span class="text-2xl font-extrabold text-slate-800 mt-1 block">
+            {{ getPendingCount() }} Files
+          </span>
+          <span class="text-[11px] text-amber-600 font-medium mt-1 inline-block">
+            Requires Certificate Audit
+          </span>
+        </div>
+        <div
+          class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-file text-xl"></i>
+        </div>
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md"
+      >
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+            >Office Code</span
+          >
+          <span class="text-2xl font-extrabold text-slate-800 mt-1 block font-mono">
+            {{ instituteDetails?.collegeCode || portalService.userMetadata?.code || 'INST-902' }}
+          </span>
+          <span class="text-[11px] text-blue-600 font-medium mt-1 block truncate max-w-[180px]">
+            {{ instituteDetails?.instituteName || 'AISHE Portal Institute' }}
+          </span>
+        </div>
+        <div
+          class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-building text-xl"></i>
+        </div>
+      </div>
+
+      <div
+        class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between transition-all hover:shadow-md"
+      >
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block"
+            >Audited Registrations</span
+          >
+          <span class="text-2xl font-extrabold text-slate-800 mt-1 block">
+            {{ getApprovedCount() }} Approved
+          </span>
+          <span class="text-[11px] text-slate-400 font-medium mt-1 inline-block">
+            {{ getRejectedCount() }} Rejected / Logged
+          </span>
+        </div>
+        <div
+          class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0"
+        >
+          <i class="pi pi-check-circle text-xl"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Ledger Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm space-y-0">
+      <div class="p-6 border-b border-slate-100 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Student Enrollment Ledger</h3>
+            <p class="text-xs text-slate-500">
+              Officers must review student certificates, verify marksheets against AISHE databases,
+              and update statuses.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2 self-start sm:self-auto">
+            <span
+              class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200"
+            >
+              Total Records: {{ portalService.collegeApplications.length }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Filters Controls Toolbar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-2">
+          <div class="lg:col-span-5 relative">
+            <i
+              class="pi pi-search text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 text-xs"
+            ></i>
+            <input
+              type="text"
+              [(ngModel)]="searchQuery"
+              (ngModelChange)="onFilterChange()"
+              placeholder="Search Student Name, Ref ID, Course..."
+              class="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+            @if (searchQuery) {
+              <button
+                type="button"
+                (click)="searchQuery = ''; onFilterChange()"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
+              >
+                <i class="pi pi-times text-xs"></i>
+              </button>
+            }
+          </div>
+
+          <!-- Course Filter Dropdown -->
+          <div class="lg:col-span-4">
+            <select
+              [(ngModel)]="courseFilter"
+              (ngModelChange)="onFilterChange()"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+            >
+              <option value="All">All Courses ({{ uniqueCourses.length - 1 }})</option>
+              @for (course of uniqueCourses; track course) {
+                @if (course !== 'All') {
+                  <option [value]="course">{{ course }}</option>
+                }
+              }
+            </select>
+          </div>
+
+          <!-- Clear Filters Button -->
+          <div class="lg:col-span-3 flex items-center justify-end">
+            @if (isFilterActive) {
+              <button
+                type="button"
+                (click)="handleClearFilters()"
+                class="w-full px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <i class="pi pi-refresh text-xs"></i>
+                <span>Reset Filters</span>
+              </button>
+            } @else {
+              <div class="hidden lg:flex items-center text-[11px] text-slate-400 font-medium px-2">
+                <i class="pi pi-filter text-xs mr-1"></i>
+                <span>Filter Active</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Status Badges -->
+        <div class="flex items-center gap-2 pt-1 overflow-x-auto pb-1">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1"
+            >Status:</span
+          >
+          @for (status of ['All', 'Pending', 'Approved', 'Rejected']; track status) {
+            <button
+              type="button"
+              (click)="setStatusFilter(status)"
+              class="px-3 py-1 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 border-0"
+              [ngClass]="{
+                'bg-emerald-600 text-white shadow-sm':
+                  statusFilter === status && status === 'Approved',
+                'bg-red-600 text-white shadow-sm': statusFilter === status && status === 'Rejected',
+                'bg-amber-500 text-slate-950 shadow-sm':
+                  statusFilter === status && status === 'Pending',
+                'bg-slate-900 text-white shadow-sm': statusFilter === status && status === 'All',
+                'bg-slate-100 hover:bg-slate-200 text-slate-600': statusFilter !== status,
+              }"
+            >
+              <span>{{ status }}</span>
+              <span
+                class="text-[10px] px-1.5 py-0.2 rounded-full font-mono"
+                [ngClass]="
+                  statusFilter === status ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                "
+              >
+                {{ getStatusCount(status) }}
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
+              <th class="p-4 text-xs uppercase tracking-wider">Student Details</th>
+              <th class="p-4 text-xs uppercase tracking-wider">Applied Scholarship</th>
+              <th class="p-4 text-xs uppercase tracking-wider">GPA / Academic</th>
+              <th class="p-4 text-xs uppercase tracking-wider">Income Bracket</th>
+              <th class="p-4 text-xs uppercase tracking-wider text-center">Status</th>
+              <th class="p-4 text-xs uppercase tracking-wider text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-medium">
+            @if (paginatedApplications.length > 0) {
+              @for (app of paginatedApplications; track app.id) {
+                <tr class="hover:bg-slate-50/60 transition-colors group">
+                  <td class="p-4">
+                    <div class="flex items-start gap-2.5">
+                      <button
+                        type="button"
+                        (click)="selectApplication(app)"
+                        class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-emerald-100/60 text-slate-600 group-hover:text-emerald-700 flex items-center justify-center shrink-0 transition-colors mt-0.5 cursor-pointer border-0"
+                        title="Click to view full certificates and details"
+                      >
+                        <i class="pi pi-eye text-xs"></i>
+                      </button>
+                      <div>
+                        <div
+                          (click)="selectApplication(app)"
+                          class="font-bold text-slate-900 hover:text-emerald-600 cursor-pointer transition-colors"
+                        >
+                          {{ app.name }}
+                        </div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">
+                          {{ app.course }} • Ref:
+                          <span class="font-mono text-slate-600 font-bold">{{ app.id }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td class="p-4 text-slate-700 font-medium">{{ app.scheme }}</td>
+
+                  <td class="p-4 text-slate-800 font-bold">
+                    <span
+                      class="bg-slate-100 px-2.5 py-1 rounded-lg text-xs font-mono text-slate-900 border border-slate-200/80"
+                    >
+                      {{ app.gpa }} CGPA
+                    </span>
+                  </td>
+
+                  <td class="p-4 text-slate-800 font-semibold">{{ app.income }}</td>
+
+                  <td class="p-4 text-center">
+                    <span
+                      class="px-2.5 py-1 rounded-full text-xs font-bold inline-block border"
+                      [ngClass]="{
+                        'bg-emerald-50 text-emerald-700 border-emerald-200':
+                          app.status === 'Approved',
+                        'bg-red-50 text-red-700 border-red-200': app.status === 'Rejected',
+                        'bg-amber-50 text-amber-700 border-amber-200':
+                          app.status !== 'Approved' && app.status !== 'Rejected',
+                      }"
+                    >
+                      {{ app.status }}
+                    </span>
+                  </td>
+
+                  <td class="p-4 text-right">
+                    @if (app.status === 'Pending') {
+                      <div class="flex gap-2 justify-end items-center">
+                        <button
+                          type="button"
+                          (click)="portalService.rejectApplication(app.id)"
+                          class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          type="button"
+                          (click)="portalService.approveApplication(app.id)"
+                          class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer border-0 shadow-sm"
+                        >
+                          Verify & Approve
+                        </button>
+                      </div>
+                    } @else {
+                      <span
+                        class="text-xs text-slate-400 font-medium bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/60 inline-block"
+                      >
+                        Locked / Logged
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr>
+                <td colspan="6" class="p-12 text-center text-slate-400 text-sm">
+                  <div class="flex flex-col items-center justify-center space-y-2">
+                    <i class="pi pi-filter text-3xl text-slate-300"></i>
+                    <p class="font-bold text-slate-600">
+                      No matching student scholarship applications found
+                    </p>
+                    <p class="text-xs text-slate-400">
+                      Try adjusting your search terms, course, or status filter.
+                    </p>
+                    @if (isFilterActive) {
+                      <button
+                        type="button"
+                        (click)="handleClearFilters()"
+                        class="mt-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer border-0"
+                      >
+                        Reset All Filters
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div
+        class="p-4 bg-slate-50/90 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600"
+      >
+        <div class="flex items-center gap-4">
+          <span class="font-semibold text-slate-700">
+            Showing <span class="font-mono font-bold text-slate-900">{{ startIndex }}</span> to
+            <span class="font-mono font-bold text-slate-900">{{ endIndex }}</span> of
+            <span class="font-mono font-bold text-slate-900">{{
+              filteredApplications.length
+            }}</span>
+            entries
+          </span>
+          <span
+            class="hidden md:flex items-center gap-1.5 text-slate-400 border-l border-slate-200 pl-4"
+          >
+            <i class="pi pi-file-excel text-emerald-600 text-xs"></i>
+            <span>NSP Database Sync</span>
+          </span>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5">
+            <span class="text-slate-400 font-medium">Rows:</span>
+            <select
+              [(ngModel)]="itemsPerPage"
+              (ngModelChange)="onFilterChange()"
+              class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
+            >
+              <option [ngValue]="5">5 per page</option>
+              <option [ngValue]="10">10 per page</option>
+              <option [ngValue]="20">20 per page</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200">
+            <button
+              type="button"
+              (click)="currentPage = currentPage - 1"
+              [disabled]="validCurrentPage === 1"
+              class="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent text-slate-700 transition-colors cursor-pointer border-0 disabled:cursor-not-allowed"
+              title="Previous Page"
+            >
+              <i class="pi pi-chevron-left text-xs"></i>
+            </button>
+
+            @for (pageNum of pageNumbers; track pageNum) {
+              <button
+                type="button"
+                (click)="currentPage = pageNum"
+                class="w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
+                [ngClass]="
+                  validCurrentPage === pageNum
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:bg-slate-100'
+                "
+              >
+                {{ pageNum }}
+              </button>
+            }
+
+            <button
+              type="button"
+              (click)="currentPage = currentPage + 1"
+              [disabled]="validCurrentPage === totalPages || filteredApplications.length === 0"
+              class="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent text-slate-700 transition-colors cursor-pointer border-0 disabled:cursor-not-allowed"
+              title="Next Page"
+            >
+              <i class="pi pi-chevron-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
