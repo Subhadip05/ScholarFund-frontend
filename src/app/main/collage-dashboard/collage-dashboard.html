@@ -440,112 +440,85 @@
       </div>
     </div>
 
-    <!-- Student Ledger Table -->
-    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm space-y-0">
+    <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
       <div class="p-6 border-b border-slate-100 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h3 class="text-lg font-bold text-slate-900">Student Enrollment Ledger</h3>
-            <p class="text-xs text-slate-500">
-              Officers must review student certificates, verify marksheets against AISHE databases,
-              and update statuses.
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2 self-start sm:self-auto">
-            <span
-              class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200"
-            >
-              Total Records: {{ portalService.collegeApplications.length }}
-            </span>
-          </div>
+        <div class="flex justify-between items-center">
+          <h3 class="text-lg font-bold text-slate-900">Student Enrollment Ledger</h3>
+          <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold">
+            Total: {{ applications().length }}
+          </span>
         </div>
 
-        <!-- Filters Controls Toolbar -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-2">
-          <div class="lg:col-span-5 relative">
-            <i
-              class="pi pi-search text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 text-xs"
-            ></i>
+        <!-- Search & Filters -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-5">
             <input
               type="text"
-              [(ngModel)]="searchQuery"
-              (ngModelChange)="onFilterChange()"
-              placeholder="Search Student Name, Ref ID, Course..."
-              class="w-full pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event); currentPage.set(1)"
+              placeholder="Search Student Name or Ref ID..."
+              class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             />
-            @if (searchQuery) {
-              <button
-                type="button"
-                (click)="searchQuery = ''; onFilterChange()"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer"
-              >
-                <i class="pi pi-times text-xs"></i>
-              </button>
-            }
           </div>
 
-          <!-- Course Filter Dropdown -->
-          <div class="lg:col-span-4">
+          <div class="md:col-span-4">
             <select
-              [(ngModel)]="courseFilter"
-              (ngModelChange)="onFilterChange()"
-              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+              [ngModel]="courseFilter()"
+              (ngModelChange)="courseFilter.set($event); currentPage.set(1)"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 cursor-pointer"
             >
-              <option value="All">All Courses ({{ uniqueCourses.length - 1 }})</option>
-              @for (course of uniqueCourses; track course) {
-                @if (course !== 'All') {
-                  <option [value]="course">{{ course }}</option>
-                }
+              @for (course of courses(); track course) {
+                <option [value]="course">{{ course }}</option>
               }
             </select>
           </div>
 
-          <!-- Clear Filters Button -->
-          <div class="lg:col-span-3 flex items-center justify-end">
-            @if (isFilterActive) {
-              <button
-                type="button"
-                (click)="handleClearFilters()"
-                class="w-full px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <i class="pi pi-refresh text-xs"></i>
-                <span>Reset Filters</span>
-              </button>
-            } @else {
-              <div class="hidden lg:flex items-center text-[11px] text-slate-400 font-medium px-2">
-                <i class="pi pi-filter text-xs mr-1"></i>
-                <span>Filter Active</span>
-              </div>
-            }
+          <div class="md:col-span-3 flex justify-end">
+            <button
+              type="button"
+              (click)="resetFilters()"
+              class="w-full px-3 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-xs font-bold hover:bg-amber-100 cursor-pointer"
+            >
+              Reset Filters
+            </button>
           </div>
         </div>
 
-        <!-- Status Badges -->
+        <!-- Status Tabs -->
         <div class="flex items-center gap-2 pt-1 overflow-x-auto pb-1">
-          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1"
-            >Status:</span
-          >
-          @for (status of ['All', 'Pending', 'Approved', 'Rejected']; track status) {
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
+            Status:
+          </span>
+
+          @for (
+            status of [
+              'All',
+              'SUBMITTED',
+              'INSTITUTE_VERIFIED',
+              'ADMIN_APPROVED',
+              'INSTITUTE_REJECTED',
+            ];
+            track status
+          ) {
             <button
               type="button"
-              (click)="setStatusFilter(status)"
+              (click)="statusFilter.set(status); currentPage.set(1)"
               class="px-3 py-1 text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0 border-0"
-              [ngClass]="{
-                'bg-emerald-600 text-white shadow-sm':
-                  statusFilter === status && status === 'Approved',
-                'bg-red-600 text-white shadow-sm': statusFilter === status && status === 'Rejected',
-                'bg-amber-500 text-slate-950 shadow-sm':
-                  statusFilter === status && status === 'Pending',
-                'bg-slate-900 text-white shadow-sm': statusFilter === status && status === 'All',
-                'bg-slate-100 hover:bg-slate-200 text-slate-600': statusFilter !== status,
-              }"
+              [ngClass]="
+                statusFilter() === status
+                  ? statusConfig[status]?.activeClass
+                  : statusConfig[status]?.class
+              "
             >
-              <span>{{ status }}</span>
+              <span>{{ statusConfig[status]?.label || status }}</span>
               <span
-                class="text-[10px] px-1.5 py-0.2 rounded-full font-mono"
+                class="text-[10px] px-1.5 py-0.5 rounded-full font-mono"
                 [ngClass]="
-                  statusFilter === status ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                  statusFilter() === status
+                    ? status === 'SUBMITTED'
+                      ? 'bg-slate-950/20 text-slate-950'
+                      : 'bg-white/20 text-white'
+                    : 'bg-slate-200 text-slate-700'
                 "
               >
                 {{ getStatusCount(status) }}
@@ -555,123 +528,124 @@
         </div>
       </div>
 
-      <!-- Table Container -->
+      <!-- Application List Table -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm border-collapse">
-          <thead>
-            <tr class="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
-              <th class="p-4 text-xs uppercase tracking-wider">Student Details</th>
-              <th class="p-4 text-xs uppercase tracking-wider">Applied Scholarship</th>
-              <th class="p-4 text-xs uppercase tracking-wider">GPA / Academic</th>
-              <th class="p-4 text-xs uppercase tracking-wider">Income Bracket</th>
-              <th class="p-4 text-xs uppercase tracking-wider text-center">Status</th>
-              <th class="p-4 text-xs uppercase tracking-wider text-right">Actions</th>
+        <table class="w-full text-left text-sm">
+          <thead
+            class="bg-slate-50 text-slate-400 font-bold border-b border-slate-100 text-xs uppercase"
+          >
+            <tr>
+              <th class="p-4">Student Details</th>
+              <th class="p-4">Qualification</th>
+              <th class="p-4">Marks</th>
+              <th class="p-4">Annual Income</th>
+              <th class="p-4 text-center">Status</th>
+              <th class="p-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 font-medium">
-            @if (paginatedApplications.length > 0) {
-              @for (app of paginatedApplications; track app.id) {
-                <tr class="hover:bg-slate-50/60 transition-colors group">
-                  <td class="p-4">
-                    <div class="flex items-start gap-2.5">
-                      <button
-                        type="button"
+            @for (app of paginatedApps(); track app.applicationId) {
+              <tr class="hover:bg-slate-50/60 transition-colors group">
+                <td class="p-4">
+                  <div class="flex items-start gap-2.5">
+                    <button
+                      type="button"
+                      (click)="selectApplication(app)"
+                      class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-emerald-100/60 text-slate-600 group-hover:text-emerald-700 flex items-center justify-center shrink-0 transition-colors mt-0.5 cursor-pointer border-0"
+                      title="Click to view full application & certificates"
+                    >
+                      <i class="pi pi-eye text-xs"></i>
+                    </button>
+
+                    <div>
+                      <div
                         (click)="selectApplication(app)"
-                        class="w-8 h-8 rounded-xl bg-slate-100 group-hover:bg-emerald-100/60 text-slate-600 group-hover:text-emerald-700 flex items-center justify-center shrink-0 transition-colors mt-0.5 cursor-pointer border-0"
-                        title="Click to view full certificates and details"
+                        class="font-bold text-slate-900 hover:text-emerald-600 cursor-pointer transition-colors"
                       >
-                        <i class="pi pi-eye text-xs"></i>
-                      </button>
-                      <div>
-                        <div
-                          (click)="selectApplication(app)"
-                          class="font-bold text-slate-900 hover:text-emerald-600 cursor-pointer transition-colors"
-                        >
-                          {{ app.name }}
-                        </div>
-                        <div class="text-[11px] text-slate-500 mt-0.5">
-                          {{ app.course }} • Ref:
-                          <span class="font-mono text-slate-600 font-bold">{{ app.id }}</span>
-                        </div>
+                        {{ app.studentName }}
+                      </div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">
+                        {{ app.courseName }}
                       </div>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td class="p-4 text-slate-700 font-medium">{{ app.scheme }}</td>
+                <!-- Qualification -->
+                <td class="p-4 text-xs text-slate-700">
+                  <div class="font-semibold text-slate-800">{{ app.lastQualificationCourse }}</div>
+                  <div class="text-slate-400 font-mono mt-0.5">
+                    {{ app.passOutBoardName }} • Roll: {{ app.lastQualificationExamRollNo }}
+                  </div>
+                </td>
 
-                  <td class="p-4 text-slate-800 font-bold">
-                    <span
-                      class="bg-slate-100 px-2.5 py-1 rounded-lg text-xs font-mono text-slate-900 border border-slate-200/80"
-                    >
-                      {{ app.gpa }} CGPA
-                    </span>
-                  </td>
+                <!-- Marks -->
+                <td class="p-4 text-xs font-bold text-slate-800">
+                  <span
+                    class="bg-slate-100 px-2.5 py-1 rounded-lg text-xs font-mono text-slate-900 border border-slate-200/80"
+                  >
+                    {{ app.lastQualificationMarks }}%
+                  </span>
+                </td>
 
-                  <td class="p-4 text-slate-800 font-semibold">{{ app.income }}</td>
+                <!-- Annual Income -->
+                <td class="p-4 text-xs font-semibold text-slate-800 font-mono">
+                  ₹{{ app.annualIncome | number: '1.0-0' }} / yr
+                </td>
 
-                  <td class="p-4 text-center">
-                    <span
-                      class="px-2.5 py-1 rounded-full text-xs font-bold inline-block border"
-                      [ngClass]="{
-                        'bg-emerald-50 text-emerald-700 border-emerald-200':
-                          app.status === 'Approved',
-                        'bg-red-50 text-red-700 border-red-200': app.status === 'Rejected',
-                        'bg-amber-50 text-amber-700 border-amber-200':
-                          app.status !== 'Approved' && app.status !== 'Rejected',
-                      }"
-                    >
-                      {{ app.status }}
-                    </span>
-                  </td>
+                <!-- Status Badge Column -->
+                <td class="p-4 text-center">
+                  <span
+                    class="px-2.5 py-1 rounded-full text-xs font-bold inline-block border"
+                    [ngClass]="
+                      statusConfig[app.status]?.badgeClass ||
+                      'bg-slate-100 text-slate-600 border-slate-200'
+                    "
+                  >
+                    {{ statusConfig[app.status]?.label || app.status }}
+                  </span>
+                </td>
 
-                  <td class="p-4 text-right">
-                    @if (app.status === 'Pending') {
-                      <div class="flex gap-2 justify-end items-center">
-                        <button
-                          type="button"
-                          (click)="portalService.rejectApplication(app.id)"
-                          class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
-                        >
-                          Reject
-                        </button>
-                        <button
-                          type="button"
-                          (click)="portalService.approveApplication(app.id)"
-                          class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-all cursor-pointer border-0 shadow-sm"
-                        >
-                          Verify & Approve
-                        </button>
-                      </div>
-                    } @else {
-                      <span
-                        class="text-xs text-slate-400 font-medium bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/60 inline-block"
+                <!-- Actions Column -->
+                <td class="p-4 text-right">
+                  @if (app.status === ApplicationStatus.SUBMITTED) {
+                    <div class="flex gap-1.5 justify-end items-center">
+                      <button
+                        type="button"
+                        (click)="rejectStudentApplication(app.applicationId)"
+                        class="w-8 h-8 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition-colors border-0 cursor-pointer"
+                        title="Reject Application"
                       >
-                        Locked / Logged
-                      </span>
-                    }
-                  </td>
-                </tr>
-              }
-            } @else {
+                        <i class="pi pi-times text-xs font-bold"></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        (click)="approveStudentApplication(app.applicationId)"
+                        class="w-8 h-8 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors shadow-sm border-0 cursor-pointer"
+                        title="Verify & Approve Application"
+                      >
+                        <i class="pi pi-check text-xs font-bold"></i>
+                      </button>
+                    </div>
+                  } @else {
+                    <span
+                      class="text-xs text-slate-400 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/60 inline-block font-medium"
+                    >
+                      Locked
+                    </span>
+                  }
+                </td>
+              </tr>
+            } @empty {
               <tr>
                 <td colspan="6" class="p-12 text-center text-slate-400 text-sm">
                   <div class="flex flex-col items-center justify-center space-y-2">
                     <i class="pi pi-filter text-3xl text-slate-300"></i>
-                    <p class="font-bold text-slate-600">
-                      No matching student scholarship applications found
-                    </p>
+                    <p class="font-bold text-slate-600">No matching student applications found</p>
                     <p class="text-xs text-slate-400">
-                      Try adjusting your search terms, course, or status filter.
+                      Try adjusting your search query, course, or status filter.
                     </p>
-                    @if (isFilterActive) {
-                      <button
-                        type="button"
-                        (click)="handleClearFilters()"
-                        class="mt-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all cursor-pointer border-0"
-                      >
-                        Reset All Filters
-                      </button>
-                    }
                   </div>
                 </td>
               </tr>
@@ -680,77 +654,26 @@
         </table>
       </div>
 
-      <!-- Pagination Footer -->
+      <!-- Pagination -->
       <div
-        class="p-4 bg-slate-50/90 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600"
+        class="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-600"
       >
-        <div class="flex items-center gap-4">
-          <span class="font-semibold text-slate-700">
-            Showing <span class="font-mono font-bold text-slate-900">{{ startIndex }}</span> to
-            <span class="font-mono font-bold text-slate-900">{{ endIndex }}</span> of
-            <span class="font-mono font-bold text-slate-900">{{
-              filteredApplications.length
-            }}</span>
-            entries
-          </span>
-          <span
-            class="hidden md:flex items-center gap-1.5 text-slate-400 border-l border-slate-200 pl-4"
-          >
-            <i class="pi pi-file-excel text-emerald-600 text-xs"></i>
-            <span>NSP Database Sync</span>
-          </span>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-1.5">
-            <span class="text-slate-400 font-medium">Rows:</span>
-            <select
-              [(ngModel)]="itemsPerPage"
-              (ngModelChange)="onFilterChange()"
-              class="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 cursor-pointer"
-            >
-              <option [ngValue]="5">5 per page</option>
-              <option [ngValue]="10">10 per page</option>
-              <option [ngValue]="20">20 per page</option>
-            </select>
-          </div>
-
-          <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200">
+        <span>Showing {{ paginatedApps().length }} of {{ filteredApps().length }}</span>
+        <div class="flex gap-1">
+          @for (page of pageNumbers(); track page) {
             <button
               type="button"
-              (click)="currentPage = currentPage - 1"
-              [disabled]="validCurrentPage === 1"
-              class="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent text-slate-700 transition-colors cursor-pointer border-0 disabled:cursor-not-allowed"
-              title="Previous Page"
+              (click)="currentPage.set(page)"
+              class="w-7 h-7 rounded-lg text-xs font-bold border-0 cursor-pointer"
+              [ngClass]="
+                currentPage() === page
+                  ? 'bg-slate-900 text-white'
+                  : 'text-slate-600 hover:bg-slate-200'
+              "
             >
-              <i class="pi pi-chevron-left text-xs"></i>
+              {{ page }}
             </button>
-
-            @for (pageNum of pageNumbers; track pageNum) {
-              <button
-                type="button"
-                (click)="currentPage = pageNum"
-                class="w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer border-0"
-                [ngClass]="
-                  validCurrentPage === pageNum
-                    ? 'bg-slate-900 text-white'
-                    : 'text-slate-600 hover:bg-slate-100'
-                "
-              >
-                {{ pageNum }}
-              </button>
-            }
-
-            <button
-              type="button"
-              (click)="currentPage = currentPage + 1"
-              [disabled]="validCurrentPage === totalPages || filteredApplications.length === 0"
-              class="p-1.5 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent text-slate-700 transition-colors cursor-pointer border-0 disabled:cursor-not-allowed"
-              title="Next Page"
-            >
-              <i class="pi pi-chevron-right text-xs"></i>
-            </button>
-          </div>
+          }
         </div>
       </div>
     </div>

@@ -83,37 +83,6 @@ export class PortalService {
     { label: 'Money Distribute By Govt.', status: 'upcoming', date: 'Awaiting Approval' },
   ];
 
-  // College Admin workflow
-  collegeApplications: CollegeApplication[] = [
-    {
-      id: 'SCH-902',
-      name: 'Ananya Sharma',
-      course: 'B.Tech CSE',
-      scheme: 'Post-Matric National Scholarship',
-      status: 'Pending',
-      income: '₹2,40,000',
-      gpa: '9.2',
-    },
-    {
-      id: 'SCH-411',
-      name: 'Rahul Kumar',
-      course: 'B.Sc Physics',
-      scheme: 'Merit-cum-Means Scheme',
-      status: 'Pending',
-      income: '₹1,80,000',
-      gpa: '8.7',
-    },
-    {
-      id: 'SCH-704',
-      name: 'Priya Patel',
-      course: 'MBBS',
-      scheme: 'Central Sector Scheme',
-      status: 'Approved',
-      income: '₹4,20,000',
-      gpa: '9.5',
-    },
-  ];
-
   // Government Admin workflow
   selectedDeptScheme = 'All Schemes';
   systemAlertMessage = '';
@@ -150,19 +119,6 @@ export class PortalService {
     this.userRole = null;
     this.userMetadata = null;
     Notiflix.Loading.remove();
-  }
-
-  // College Actions
-  approveApplication(id: string) {
-    this.collegeApplications = this.collegeApplications.map((app) =>
-      app.id === id ? { ...app, status: 'Approved' } : app,
-    );
-  }
-
-  rejectApplication(id: string) {
-    this.collegeApplications = this.collegeApplications.map((app) =>
-      app.id === id ? { ...app, status: 'Rejected' } : app,
-    );
   }
 
   // Helper scroll

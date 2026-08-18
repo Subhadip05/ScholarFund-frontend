@@ -70,4 +70,10 @@ export class Apiservice {
       payload,
     );
   }
+
+  getApplicationsByInstituteId(instituteProfileId: number): Observable<ApiResponse<ApplicationResponse[]>> {
+    return this.client.get<ApiResponse<ApplicationResponse[]>>(
+      `${baseUrl}/applications/institute/${instituteProfileId}`
+    );
+  }
 }

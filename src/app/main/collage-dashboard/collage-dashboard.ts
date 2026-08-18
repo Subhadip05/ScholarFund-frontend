@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
 import { Apiservice } from '../../../shared/api/apiservice';
-import { Router } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -11,7 +10,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { MessageService } from 'primeng/api';
-import { CollegeApplication, InstituteProfileResponse } from '../../../shared/types';
+import {
+  ApplicationResponse,
+  ApplicationStatus,
+  InstituteProfileResponse,
+} from '../../../shared/types';
 import Notiflix from 'notiflix';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -58,13 +61,61 @@ export class CollageDashboard {
   };
 
   // Filter States
-  searchQuery: string = '';
-  statusFilter: 'All' | 'Pending' | 'Approved' | 'Rejected' = 'All';
-  courseFilter: string = 'All';
+  applications = signal<ApplicationResponse[]>([]);
+  searchQuery = signal<string>('');
+  courseFilter = signal<string>('All');
+  statusFilter = signal<string>('All');
+  currentPage = signal<number>(1);
+  itemsPerPage = signal<number>(5);
+  readonly ApplicationStatus = ApplicationStatus;
 
-  // Pagination States
-  currentPage: number = 1;
-  itemsPerPage: number = 5;
+  readonly statusConfig: Record<
+    string,
+    { label: string; class: string; activeClass: string; badgeClass: string }
+  > = {
+    All: {
+      label: 'All',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-slate-900 text-white shadow-sm',
+      badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+    },
+    SUBMITTED: {
+      label: 'Pending Review',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-amber-500 text-slate-950 shadow-sm',
+      badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
+    },
+    INSTITUTE_VERIFIED: {
+      label: 'Institute Verified',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-emerald-600 text-white shadow-sm',
+      badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    },
+    ADMIN_APPROVED: {
+      label: 'Govt Approved',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-emerald-700 text-white shadow-sm',
+      badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300',
+    },
+    INSTITUTE_REJECTED: {
+      label: 'Rejected',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-red-600 text-white shadow-sm',
+      badgeClass: 'bg-red-50 text-red-700 border-red-200',
+    },
+    ADMIN_REJECTED: {
+      label: 'Govt Rejected',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-red-700 text-white shadow-sm',
+      badgeClass: 'bg-red-50 text-red-800 border-red-300',
+    },
+    DISBURSED: {
+      label: 'Disbursed',
+      class: 'bg-slate-100 text-slate-600 hover:bg-slate-200',
+      activeClass: 'bg-teal-600 text-white shadow-sm',
+      badgeClass: 'bg-teal-50 text-teal-700 border-teal-200',
+    },
+  };
 
   ngOnInit(): void {
     this.initForm();
@@ -90,7 +141,9 @@ export class CollageDashboard {
       next: (res) => {
         if (res?.status === 200 && res?.data) {
           this.instituteDetails = res.data;
-          console.log(res?.data);
+          console.log('Fetching institute details response:', res?.data);
+          // this.fetchApplicationsByInstitute(res?.data?.profileId); //from api
+          this.fetchDemoApplications();
 
           this.isProfileSaved.set(true);
           const isVerified = Boolean(res.data.isVerifyByGovt);
@@ -112,6 +165,18 @@ export class CollageDashboard {
         this.isProfileSaved.set(false);
         console.error('Error fetching institute details:', err);
         setTimeout(() => Notiflix.Loading.remove(), 800);
+      },
+    });
+  }
+
+  fetchApplicationsByInstitute(instituteProfileId: any): void {
+    this.apiService.getApplicationsByInstituteId(instituteProfileId).subscribe({
+      next: (res) => {
+        this.applications.set(res.data || []);
+        console.log('Fetching applications list by institute:');
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Failed to load applications by institute.';
       },
     });
   }
@@ -255,99 +320,350 @@ export class CollageDashboard {
     });
   }
 
-  // --- Stats Counters ---
-  getPendingCount(): number {
-    return this.portalService.collegeApplications.filter((a) => a.status === 'Pending').length;
-  }
-
-  getApprovedCount(): number {
-    return this.portalService.collegeApplications.filter((a) => a.status === 'Approved').length;
-  }
-
-  getRejectedCount(): number {
-    return this.portalService.collegeApplications.filter((a) => a.status === 'Rejected').length;
-  }
-
-  // --- Dynamic Filters & Table Helpers ---
-  get uniqueCourses(): string[] {
-    const courses = Array.from(
-      new Set(this.portalService.collegeApplications.map((app) => app.course)),
-    ).filter(Boolean);
-    return ['All', ...courses.sort()];
-  }
-
-  get filteredApplications(): CollegeApplication[] {
-    return this.portalService.collegeApplications.filter((app) => {
-      const query = this.searchQuery.toLowerCase().trim();
-      const matchesSearch =
-        !query ||
-        app.name.toLowerCase().includes(query) ||
-        app.id.toLowerCase().includes(query) ||
-        app.course.toLowerCase().includes(query) ||
-        app.scheme.toLowerCase().includes(query);
-
-      const matchesStatus = this.statusFilter === 'All' ? true : app.status === this.statusFilter;
-      const matchesCourse = this.courseFilter === 'All' ? true : app.course === this.courseFilter;
-
-      return matchesSearch && matchesStatus && matchesCourse;
-    });
-  }
-
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.filteredApplications.length / this.itemsPerPage));
-  }
-
-  get validCurrentPage(): number {
-    return Math.min(this.currentPage, this.totalPages);
-  }
-
-  get paginatedApplications(): CollegeApplication[] {
-    const startIdx = (this.validCurrentPage - 1) * this.itemsPerPage;
-    return this.filteredApplications.slice(startIdx, startIdx + this.itemsPerPage);
-  }
-
-  get pageNumbers(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  }
-
-  get isFilterActive(): boolean {
-    return this.searchQuery !== '' || this.statusFilter !== 'All' || this.courseFilter !== 'All';
-  }
-
-  get startIndex(): number {
-    return this.filteredApplications.length === 0
-      ? 0
-      : (this.validCurrentPage - 1) * this.itemsPerPage + 1;
-  }
-
-  get endIndex(): number {
-    return Math.min(this.validCurrentPage * this.itemsPerPage, this.filteredApplications.length);
-  }
-
-  onFilterChange(): void {
-    this.currentPage = 1;
-  }
-
-  handleClearFilters(): void {
-    this.searchQuery = '';
-    this.statusFilter = 'All';
-    this.courseFilter = 'All';
-    this.currentPage = 1;
-  }
-
-  setStatusFilter(status: string): void {
-    this.statusFilter = status as 'All' | 'Pending' | 'Approved' | 'Rejected';
-    this.onFilterChange();
+  //Just demo application request data
+  fetchDemoApplications() {
+    this.applications.set([
+      {
+        applicationId: 2,
+        studentName: 'Subhadip Samanta',
+        instituteName: 'Haldia Institute of Technology',
+        courseName: 'B.Tech in Computer Science & Engineering',
+        academicYear: '2025-2026',
+        lastQualificationMarks: 90,
+        lastQualificationCourse: '10+2 (Higher Secondary Education)',
+        lastQualificationExamRollNo: 'WBCISD8090',
+        passOutBoardName: 'WBHSE',
+        annualIncome: 120000.0,
+        bankAccountNumber: '918273645012',
+        ifscCode: 'SBIN0003201',
+        status: ApplicationStatus.SUBMITTED,
+        incomeCertificateUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
+        hsMarksheetUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
+        bankPassbookUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
+        admissionReceiptUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        timeline: [
+          {
+            actionTaken: 'Application Submitted',
+            actionBy: 'Subhadip Samanta',
+            actorRole: 'STUDENT',
+            remarks: 'Student submitted the application successfully.',
+            actionTime: '2026-08-11T08:57:14.680426',
+          },
+        ],
+      },
+      {
+        applicationId: 3,
+        studentName: 'Priya Mukherjee',
+        instituteName: 'College of Engineering & Management, Kolaghat',
+        courseName: 'B.Tech in Information Technology',
+        academicYear: '2025-2026',
+        lastQualificationMarks: 86.5,
+        lastQualificationCourse: '10+2 (Higher Secondary Education)',
+        lastQualificationExamRollNo: 'WBCHSE2025-8841',
+        passOutBoardName: 'WBCHSE',
+        annualIncome: 95000.0,
+        bankAccountNumber: '501004392810',
+        ifscCode: 'HDFC0001042',
+        status: ApplicationStatus.INSTITUTE_VERIFIED,
+        incomeCertificateUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
+        hsMarksheetUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
+        bankPassbookUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
+        admissionReceiptUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        timeline: [
+          {
+            actionTaken: 'Application Submitted',
+            actionBy: 'Priya Mukherjee',
+            actorRole: 'STUDENT',
+            remarks: 'Fresh application submitted with all attachments.',
+            actionTime: '2026-08-12T10:15:30.120511',
+          },
+          {
+            actionTaken: 'Verified by Institute Nodal Officer',
+            actionBy: 'Dr. Biddut Jana',
+            actorRole: 'INSTITUTE',
+            remarks: 'Academic records and caste criteria verified successfully.',
+            actionTime: '2026-08-14T14:22:10.512390',
+          },
+        ],
+      },
+      {
+        applicationId: 4,
+        studentName: 'Sourav Ganguly',
+        instituteName: 'Jadavpur University',
+        courseName: 'M.Sc in Applied Mathematics',
+        academicYear: '2025-2026',
+        lastQualificationMarks: 82.4,
+        lastQualificationCourse: 'B.Sc (Mathematics Honours)',
+        lastQualificationExamRollNo: 'JU-MATH-2025-019',
+        passOutBoardName: 'Jadavpur University Autonomous',
+        annualIncome: 140000.0,
+        bankAccountNumber: '309812457811',
+        ifscCode: 'SBIN0000093',
+        status: ApplicationStatus.ADMIN_APPROVED,
+        incomeCertificateUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
+        hsMarksheetUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
+        bankPassbookUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
+        admissionReceiptUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        timeline: [
+          {
+            actionTaken: 'Application Submitted',
+            actionBy: 'Sourav Ganguly',
+            actorRole: 'STUDENT',
+            remarks: 'Direct post-graduate application submitted.',
+            actionTime: '2026-08-05T09:30:00.000000',
+          },
+          {
+            actionTaken: 'Verified by Institute Nodal Officer',
+            actionBy: 'Prof. Anirban Roy',
+            actorRole: 'INSTITUTE',
+            remarks: 'Marksheet roll matches University database.',
+            actionTime: '2026-08-08T11:45:00.000000',
+          },
+          {
+            actionTaken: 'Final Approval by State Welfare Directorate',
+            actionBy: 'Joint Secretary (Higher Education)',
+            actorRole: 'GOVT_NODAL_OFFICER',
+            remarks: 'Disbursement sanctioned under State Merit Scheme.',
+            actionTime: '2026-08-16T16:05:22.781204',
+          },
+        ],
+      },
+      {
+        applicationId: 5,
+        studentName: 'Ananya Sen',
+        instituteName: 'Heritage Institute of Technology',
+        courseName: 'B.Tech in Electronics & Communication',
+        academicYear: '2025-2026',
+        lastQualificationMarks: 58.0,
+        lastQualificationCourse: '10+2 (Higher Secondary Education)',
+        lastQualificationExamRollNo: 'CBSE-2025-90124',
+        passOutBoardName: 'CBSE',
+        annualIncome: 350000.0,
+        bankAccountNumber: '023410100049182',
+        ifscCode: 'PUNB0023400',
+        status: ApplicationStatus.INSTITUTE_REJECTED,
+        incomeCertificateUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
+        hsMarksheetUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
+        bankPassbookUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
+        admissionReceiptUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        timeline: [
+          {
+            actionTaken: 'Application Submitted',
+            actionBy: 'Ananya Sen',
+            actorRole: 'STUDENT',
+            remarks: 'Student submitted application.',
+            actionTime: '2026-08-13T12:00:00.000000',
+          },
+          {
+            actionTaken: 'Application Rejected',
+            actionBy: 'Dr. Debasis Pal',
+            actorRole: 'INSTITUTE',
+            remarks: 'Annual income exceeds the ₹2,50,000 threshold for this specific scheme.',
+            actionTime: '2026-08-15T15:30:19.412984',
+          },
+        ],
+      },
+      {
+        applicationId: 6,
+        studentName: 'Rohan Ghosh',
+        instituteName: 'Kalyani Government Engineering College',
+        courseName: 'B.Tech in Mechanical Engineering',
+        academicYear: '2025-2026',
+        lastQualificationMarks: 78.5,
+        lastQualificationCourse: '10+2 (Higher Secondary Education)',
+        lastQualificationExamRollNo: 'WBCHSE2025-4491',
+        passOutBoardName: 'WBCHSE',
+        annualIncome: 110000.0,
+        bankAccountNumber: '409182736192',
+        ifscCode: 'SBIN0001092',
+        status: ApplicationStatus.SUBMITTED,
+        incomeCertificateUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
+        hsMarksheetUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
+        bankPassbookUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
+        admissionReceiptUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        timeline: [
+          {
+            actionTaken: 'Application Submitted',
+            actionBy: 'Rohan Ghosh',
+            actorRole: 'STUDENT',
+            remarks: 'Application logged and waiting for institute nodal officer review.',
+            actionTime: '2026-08-17T09:12:44.312901',
+          },
+        ],
+      },
+      {
+        applicationId: 2,
+        studentName: 'Sayak Kar',
+        instituteName: 'Swamin Vivekananda University',
+        courseName: 'B.Tech in Computer Science & Engineering',
+        academicYear: '2025-2026',
+        lastQualificationMarks: 82,
+        lastQualificationCourse: '10+2 (Higher Secondary Education)',
+        lastQualificationExamRollNo: 'WBCISD8060',
+        passOutBoardName: 'WBHSE',
+        annualIncome: 110000.0,
+        bankAccountNumber: '9182736450788',
+        ifscCode: 'SBIN0003201',
+        status: ApplicationStatus.SUBMITTED,
+        incomeCertificateUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
+        hsMarksheetUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
+        bankPassbookUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
+        admissionReceiptUrl:
+          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        timeline: [
+          {
+            actionTaken: 'Application Submitted',
+            actionBy: 'Subhadip Samanta',
+            actorRole: 'STUDENT',
+            remarks: 'Student submitted the application successfully.',
+            actionTime: '2026-08-11T08:57:14.680426',
+          },
+        ],
+      },
+    ]);
   }
 
   getStatusCount(status: string): number {
     if (status === 'All') {
-      return this.portalService.collegeApplications.length;
+      return this.applications().length;
     }
-    return this.portalService.collegeApplications.filter((a) => a.status === status).length;
+    return this.applications().filter((a) => a.status === status).length;
   }
 
-  selectApplication(app: CollegeApplication): void {
+  courses = computed(() => [
+    'All',
+    ...new Set(
+      this.applications()
+        .map((a) => a.courseName)
+        .filter(Boolean),
+    ),
+  ]);
+
+  // 2. Filtered Dataset
+  filteredApps = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    const course = this.courseFilter();
+    const status = this.statusFilter();
+
+    return this.applications().filter((app) => {
+      const matchSearch =
+        !query ||
+        app.studentName.toLowerCase().includes(query) ||
+        String(app.applicationId).includes(query);
+      const matchCourse = course === 'All' || app.courseName === course;
+      const matchStatus = status === 'All' || app.status === status;
+      return matchSearch && matchCourse && matchStatus;
+    });
+  });
+
+  // 3. Pagination math
+  totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredApps().length / this.itemsPerPage())),
+  );
+  pageNumbers = computed(() => Array.from({ length: this.totalPages() }, (_, i) => i + 1));
+  paginatedApps = computed(() => {
+    const start = (this.currentPage() - 1) * this.itemsPerPage();
+    return this.filteredApps().slice(start, start + this.itemsPerPage());
+  });
+
+  // Quick Action Handlers
+  updateStatus(appId: number, newStatus: ApplicationStatus): void {
+    this.applications.update((list) =>
+      list.map((item) => (item.applicationId === appId ? { ...item, status: newStatus } : item)),
+    );
+  }
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.courseFilter.set('All');
+    this.statusFilter.set('All');
+    this.currentPage.set(1);
+  }
+
+  getPendingCount = computed(
+    () => this.applications().filter((a) => a.status === 'SUBMITTED').length,
+  );
+
+  getApprovedCount = computed(
+    () =>
+      this.applications().filter(
+        (a) => a.status === 'INSTITUTE_VERIFIED' || a.status === 'ADMIN_APPROVED',
+      ).length,
+  );
+
+  getRejectedCount = computed(
+    () =>
+      this.applications().filter(
+        (a) => a.status === 'INSTITUTE_REJECTED' || a.status === 'ADMIN_REJECTED',
+      ).length,
+  );
+
+  selectApplication(app: ApplicationResponse): void {
     console.log('Selected student application:', app);
+  }
+
+  approveStudentApplication(appId: number): void {
+    Notiflix.Confirm.show(
+      'Verify Application',
+      'Are you sure you want to verify and forward this application to Government Officers?',
+      'Verify & Approve',
+      'Cancel',
+      () => {
+        const target = this.applications().find((a) => a.applicationId === appId);
+        if (target) {
+          target.status = ApplicationStatus.INSTITUTE_VERIFIED;
+          this._messageService.add({
+            severity: 'success',
+            summary: 'Application Verified',
+            detail: `Application #${appId} verified and forwarded.`,
+          });
+        }
+      },
+    );
+  }
+
+  rejectStudentApplication(appId: number): void {
+    Notiflix.Confirm.show(
+      'Reject Application',
+      'Are you sure you want to reject this scholarship application?',
+      'Reject',
+      'Cancel',
+      () => {
+        const target = this.applications().find((a) => a.applicationId === appId);
+        if (target) {
+          target.status = ApplicationStatus.INSTITUTE_REJECTED;
+          this._messageService.add({
+            severity: 'warn',
+            summary: 'Application Rejected',
+            detail: `Application #${appId} has been marked as rejected.`,
+          });
+        }
+      },
+      () => {},
+      { okButtonBackground: '#ef4444' },
+    );
   }
 }

@@ -133,7 +133,7 @@ export interface ApplicationSubmitRequest {
   instituteId: number;
   courseName: string;
   academicYear: string;
-  lastQualificationMarks: string;
+  lastQualificationMarks: number;
   lastQualificationCourse: string;
   lastQualificationExamRollNo: string;
   passOutBoardName: string;
@@ -148,12 +148,12 @@ export interface ApplicationSubmitRequest {
 }
 
 export enum ApplicationStatus {
-  SUBMITTED,
-  INSTITUTE_VERIFIED,
-  INSTITUTE_REJECTED,
-  ADMIN_APPROVED,
-  ADMIN_REJECTED,
-  DISBURSED,
+  SUBMITTED = 'SUBMITTED',
+  INSTITUTE_VERIFIED = 'INSTITUTE_VERIFIED',
+  INSTITUTE_REJECTED = 'INSTITUTE_REJECTED',
+  ADMIN_APPROVED = 'ADMIN_APPROVED',
+  ADMIN_REJECTED = 'ADMIN_REJECTED',
+  DISBURSED = 'DISBURSED',
 }
 
 export interface ApplicationHistoryDto {
@@ -169,7 +169,7 @@ export interface ApplicationResponse {
   instituteName: string;
   courseName: string;
   academicYear: string;
-  lastQualificationMarks: string;
+  lastQualificationMarks: number;
   lastQualificationCourse: string;
   lastQualificationExamRollNo: string;
   passOutBoardName: string;
