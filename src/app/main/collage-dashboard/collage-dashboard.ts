@@ -69,6 +69,10 @@ export class CollageDashboard {
   itemsPerPage = signal<number>(5);
   readonly ApplicationStatus = ApplicationStatus;
 
+  isModalOpen = signal<boolean>(false);
+  selectedApp = signal<ApplicationResponse | null>(null);
+  modalRemarks = signal<string>('');
+
   readonly statusConfig: Record<
     string,
     { label: string; class: string; activeClass: string; badgeClass: string }
@@ -142,8 +146,8 @@ export class CollageDashboard {
         if (res?.status === 200 && res?.data) {
           this.instituteDetails = res.data;
           console.log('Fetching institute details response:', res?.data);
-          // this.fetchApplicationsByInstitute(res?.data?.profileId); //from api
-          this.fetchDemoApplications();
+          this.fetchApplicationsByInstitute(res?.data?.profileId); //from api
+          // this.fetchDemoApplications();
 
           this.isProfileSaved.set(true);
           const isVerified = Boolean(res.data.isVerifyByGovt);
@@ -621,49 +625,95 @@ export class CollageDashboard {
       ).length,
   );
 
-  selectApplication(app: ApplicationResponse): void {
-    console.log('Selected student application:', app);
-  }
+  updateApplicationStatus(appId: number, action: 'APPROVE' | 'REJECT'): void {
+    const isApprove = action === 'APPROVE';
+    const targetStatus = isApprove
+      ? ApplicationStatus.INSTITUTE_VERIFIED
+      : ApplicationStatus.INSTITUTE_REJECTED;
 
-  approveStudentApplication(appId: number): void {
+    const title = isApprove ? 'Verify Application' : 'Reject Application';
+    const message = isApprove
+      ? 'Are you sure you want to verify and forward this application to Government Nodal Officers?'
+      : 'Are you sure you want to reject this student application?';
+    const confirmBtnText = isApprove ? 'Verify & Approve' : 'Reject';
+    const remarks = this.modalRemarks().trim();
+
     Notiflix.Confirm.show(
-      'Verify Application',
-      'Are you sure you want to verify and forward this application to Government Officers?',
-      'Verify & Approve',
+      title,
+      message,
+      confirmBtnText,
       'Cancel',
       () => {
-        const target = this.applications().find((a) => a.applicationId === appId);
-        if (target) {
-          target.status = ApplicationStatus.INSTITUTE_VERIFIED;
-          this._messageService.add({
-            severity: 'success',
-            summary: 'Application Verified',
-            detail: `Application #${appId} verified and forwarded.`,
-          });
-        }
-      },
-    );
-  }
+        this.applications.update((list) =>
+          list.map((item) =>
+            item.applicationId === appId ? { ...item, status: targetStatus } : item,
+          ),
+        );
 
-  rejectStudentApplication(appId: number): void {
-    Notiflix.Confirm.show(
-      'Reject Application',
-      'Are you sure you want to reject this scholarship application?',
-      'Reject',
-      'Cancel',
-      () => {
-        const target = this.applications().find((a) => a.applicationId === appId);
-        if (target) {
-          target.status = ApplicationStatus.INSTITUTE_REJECTED;
-          this._messageService.add({
-            severity: 'warn',
-            summary: 'Application Rejected',
-            detail: `Application #${appId} has been marked as rejected.`,
-          });
-        }
+        this._messageService.add({
+          severity: isApprove ? 'success' : 'warn',
+          summary: isApprove ? 'Application Verified' : 'Application Rejected',
+          detail: isApprove
+            ? `Application verified and forwarded.`
+            : `Application has been marked as rejected.`,
+        });
+
+        const payload = {
+          statusAction: targetStatus,
+          actionRemarks: remarks,
+        };
+        console.log('Action Payload :', payload, ' and id: ', appId);
+
+        // return;
+        Notiflix.Loading.pulse('Updating status...', {});
+        this.apiService.updateApplicationStatus(appId, payload).subscribe({
+          next: (res) => {
+            Notiflix.Loading.remove();
+            console.log('Institute action response :', res);
+
+            this.applications.update((list) =>
+              list.map((item) =>
+                item.applicationId === appId ? { ...item, status: targetStatus } : item,
+              ),
+            );
+
+            this._messageService.add({
+              severity: isApprove ? 'success' : 'warn',
+              summary: isApprove ? 'Application Verified' : 'Application Rejected',
+              detail: `Application successfully updated.`,
+            });
+
+            this.closeModal();
+            this.fetchApplicationsByInstitute(this.instituteDetails?.profileId);
+          },
+          error: (err) => {
+            Notiflix.Loading.remove();
+            this._messageService.add({
+              severity: 'error',
+              summary: 'Operation Failed',
+              detail: err?.error?.message || 'Failed to update application status.',
+            });
+          },
+        });
       },
       () => {},
-      { okButtonBackground: '#ef4444' },
+      {
+        okButtonBackground: isApprove ? '#059669' : '#ef4444',
+      },
     );
+  }
+
+  selectApplication(app: ApplicationResponse): void {
+    console.log('Selected student application:', app);
+
+    this.selectedApp.set(app);
+    this.modalRemarks.set('');
+    this.isModalOpen.set(true);
+  }
+
+  closeModal(): void {
+    this.isModalOpen.set(false);
+    this.selectedApp.set(null);
+    this.modalRemarks.set('');
   }
 }

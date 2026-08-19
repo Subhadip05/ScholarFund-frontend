@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import {
   ApiResponse,
   ApplicationResponse,
+  ApplicationStatus,
+  ApplicationStatusUpdateRequest,
   ApplicationSubmitRequest,
   DocumentUploadResponse,
   InstituteProfileDto,
@@ -53,7 +55,9 @@ export class Apiservice {
     );
   }
 
-  submitApplication(payload: ApplicationSubmitRequest): Observable<ApiResponse<ApplicationResponse>> {
+  submitApplication(
+    payload: ApplicationSubmitRequest,
+  ): Observable<ApiResponse<ApplicationResponse>> {
     return this.client.post<ApiResponse<ApplicationResponse>>(
       `${baseUrl}/applications/submit`,
       payload,
@@ -61,19 +65,35 @@ export class Apiservice {
   }
 
   getInstituteProfile() {
-    return this.client.get<ApiResponse<InstituteProfileResponse>>(`${baseUrl}/institute/get-profile`);
+    return this.client.get<ApiResponse<InstituteProfileResponse>>(
+      `${baseUrl}/institute/get-profile`,
+    );
   }
 
-  saveInstituteProfile(payload: InstituteProfileDto): Observable<ApiResponse<InstituteProfileResponse>> {
+  saveInstituteProfile(
+    payload: InstituteProfileDto,
+  ): Observable<ApiResponse<InstituteProfileResponse>> {
     return this.client.post<ApiResponse<InstituteProfileResponse>>(
       `${baseUrl}/institute/save-profile`,
       payload,
     );
   }
 
-  getApplicationsByInstituteId(instituteProfileId: number): Observable<ApiResponse<ApplicationResponse[]>> {
+  getApplicationsByInstituteId(
+    instituteProfileId: number,
+  ): Observable<ApiResponse<ApplicationResponse[]>> {
     return this.client.get<ApiResponse<ApplicationResponse[]>>(
-      `${baseUrl}/applications/institute/${instituteProfileId}`
+      `${baseUrl}/applications/institute/${instituteProfileId}`,
+    );
+  }
+
+  updateApplicationStatus(
+    applicationId: number,
+    request: ApplicationStatusUpdateRequest
+  ): Observable<ApiResponse<ApplicationResponse>> {
+    return this.client.put<ApiResponse<ApplicationResponse>>(
+      `${baseUrl}/applications/${applicationId}/update-status`,
+      request
     );
   }
 }

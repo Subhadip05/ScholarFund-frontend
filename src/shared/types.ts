@@ -208,3 +208,8 @@ export interface InstituteProfileResponse {
   address: string;
   affiliationCertificateUrl: string;
 }
+
+export interface ApplicationStatusUpdateRequest {
+  statusAction: ApplicationStatus;
+  actionRemarks?: string;
+}
