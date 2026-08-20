@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import {
   ReactiveFormsModule,
-  FormControl,
   FormBuilder,
   FormGroup,
   Validators,
@@ -17,13 +16,13 @@ import { TimerUtil } from '../../../shared/utils/timer.util';
 import { VerifyOtpDto } from '../../../shared/types';
 
 @Component({
-  selector: 'app-modals',
+  selector: 'app-auth-modal',
   imports: [CommonModule, ReactiveFormsModule, ToastModule],
-  templateUrl: './modals.html',
-  styleUrl: './modals.css',
+  templateUrl: './auth-modal.html',
+  styleUrl: './auth-modal.css',
   providers: [MessageService],
 })
-export class Modals {
+export class AuthModal {
   public portalService = inject(PortalService);
   private _authService = inject(Authservice);
   private _fb = inject(FormBuilder);

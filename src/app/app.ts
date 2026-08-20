@@ -4,7 +4,7 @@ import { Navbar } from './layout/navbar/navbar';
 import { Footer } from './layout/footer/footer';
 import { PortalService } from '../shared/portal.service';
 import { CommonModule } from '@angular/common';
-import { Modals } from './main/modals/modals';
+import { AuthModal } from './main/auth-modal/auth-modal';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ import { Modals } from './main/modals/modals';
     CommonModule,
     Navbar,
     Footer,
-    Modals,
+    AuthModal,
     RouterOutlet
 ],
   templateUrl: './app.html',
