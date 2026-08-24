@@ -1,104 +1,169 @@
 <div class="space-y-6 animate-fadeIn">
-  <!-- Statistics Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Total Allocation</span>
-      <span class="text-2xl font-extrabold text-slate-800 mt-2 block">₹120.00 Cr</span>
-      <div class="text-[10px] text-slate-500 mt-1">Union Budget Allocation 2026</div>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Amount Disbursed</span>
-      <span class="text-2xl font-extrabold text-emerald-600 mt-2 block">₹84.60 Cr</span>
-      <div class="text-[10px] text-slate-500 mt-1">Direct Bank Transfer</div>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">Verified Applications</span>
-      <span class="text-2xl font-extrabold text-blue-600 mt-2 block">512,940</span>
-      <div class="text-[10px] text-slate-500 mt-1">OTP verified matches</div>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-      <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block">System Integrity</span>
-      <span class="text-2xl font-extrabold text-slate-800 mt-2 block flex items-center justify-center gap-1">
-        <i class="pi pi-shield text-emerald-600 text-lg mr-1"></i>
-        <span>99.9%</span>
-      </span>
-      <div class="text-[10px] text-slate-500 mt-1">Zero leak audit status</div>
-    </div>
-  </div>
-
-  <!-- Disbursal Controls & Ministry Overview -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Ledger selection -->
-    <div class="lg:col-span-1 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-      <h3 class="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-        <i class="pi pi-building text-indigo-600"></i>
-        <span>Ministry Allotment</span>
-      </h3>
-      <div class="space-y-2">
-        <button
-          *ngFor="let scheme of ministryList"
-          (click)="selectScheme(scheme)"
-          [ngClass]="{
-            'bg-slate-900 text-white': portalService.selectedDeptScheme === scheme,
-            'bg-slate-50 text-slate-600 hover:bg-slate-100': portalService.selectedDeptScheme !== scheme
-          }"
-          class="w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer border-0"
-        >
-          {{ scheme }}
-        </button>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Overview Metric 1: Application Approval Desk -->
+    <div
+      (click)="onSelectTab('APPLICATIONS')"
+      [class]="
+        currentTab() === 'APPLICATIONS'
+          ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-500/20'
+          : 'bg-white/80 border-slate-200 hover:border-slate-300 shadow-xs'
+      "
+      class="p-4 rounded-xl border transition-all cursor-pointer"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-700 flex items-center">
+          <i class="pi pi-file-check mr-1.5 text-blue-600 text-sm leading-none"></i>
+          1. Application Approval
+        </span>
+        @if (service.pendingApprovalsCount() > 0) {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 leading-none"
+          >
+            {{ service.pendingApprovalsCount() }} Pending Review
+          </span>
+        } @else {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 leading-none"
+          >
+            All Reviewed
+          </span>
+        }
+      </div>
+      <div class="mt-2 flex items-baseline justify-between">
+        <div class="text-xl font-black text-slate-900 font-mono">
+          {{ service.applications().length }}
+          <span class="text-xs font-normal text-slate-500">Total Applicants</span>
+        </div>
+        <div class="text-xs text-blue-700 font-bold font-mono">₹60,000 / grant</div>
       </div>
     </div>
 
-    <!-- Disbursal Controls & System Announcements -->
-    <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-      <div>
-        <h3 class="text-base font-bold text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-          <i class="pi pi-chart-line text-blue-600"></i>
-          <span>Direct Bank Transfer Action Room</span>
-        </h3>
+    <!-- Overview Metric 2: Institute Verification Desk -->
+    <div
+      (click)="onSelectTab('INSTITUTES')"
+      [class]="
+        currentTab() === 'INSTITUTES'
+          ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-500/20'
+          : 'bg-white/80 border-slate-200 hover:border-slate-300 shadow-xs'
+      "
+      class="p-4 rounded-xl border transition-all cursor-pointer"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-700 flex items-center">
+          <i class="pi pi-building-columns mr-1.5 text-amber-600 text-sm leading-none"></i>
+          2. Institute
+        </span>
+        @if (service.pendingInstitutesCount() > 0) {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-900 border border-rose-300 leading-none"
+          >
+            {{ service.pendingInstitutesCount() }} Need Clearance
+          </span>
+        } @else {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 leading-none"
+          >
+            100% Accredited
+          </span>
+        }
+      </div>
+      <div class="mt-2 flex items-baseline justify-between">
+        <div class="text-xl font-black text-slate-900 font-mono">
+          {{ service.institutes().length }}
+          <span class="text-xs font-normal text-slate-500">Registered</span>
+        </div>
+        <div class="text-xs text-slate-500">AISHE / UGC Verified</div>
+      </div>
+    </div>
 
-        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 mt-4">
-          <div class="flex justify-between items-center mb-2">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Central Release Lever</span>
-            <span
-              [ngClass]="{
-                'bg-emerald-100 text-emerald-800': portalService.disbursalApprovedStatus,
-                'bg-red-100 text-red-800': !portalService.disbursalApprovedStatus
-              }"
-              class="px-2 py-0.5 rounded-full text-[10px] font-extrabold"
-            >
-              {{ portalService.disbursalApprovedStatus ? "ACTIVE" : "PAUSED" }}
-            </span>
-          </div>
-          <p class="text-xs text-slate-500 mb-4">
-            When active, the portal automatically schedules institutional payouts to verified student bank accounts.
-          </p>
-
-          <div class="flex flex-wrap items-center gap-4">
-            <button
-              (click)="toggleDisbursal()"
-              [ngClass]="{
-                'bg-red-600 hover:bg-red-700': portalService.disbursalApprovedStatus,
-                'bg-emerald-600 hover:bg-emerald-700': !portalService.disbursalApprovedStatus
-              }"
-              class="px-5 py-2.5 rounded-xl text-white font-bold text-xs transition-all flex items-center gap-1 cursor-pointer border-0"
-            >
-              <span>{{ portalService.disbursalApprovedStatus ? "Pause Disbursal Release" : "Release Scheduled Payments" }}</span>
-            </button>
-            <span *ngIf="portalService.systemAlertMessage" class="text-[11px] font-bold text-blue-600 leading-tight">
-              {{ portalService.systemAlertMessage }}
-            </span>
-          </div>
+    <!-- Overview Metric 3: Money Disbursed Desk -->
+    <div
+      (click)="onSelectTab('DISBURSEMENTS')"
+      [class]="
+        currentTab() === 'DISBURSEMENTS'
+          ? 'bg-white border-purple-600 shadow-md ring-2 ring-purple-500/20'
+          : 'bg-white/80 border-slate-200 hover:border-slate-300 shadow-xs'
+      "
+      class="p-4 rounded-xl border transition-all cursor-pointer"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-700 flex items-center">
+          <i class="pi pi-send mr-1.5 text-purple-600 text-sm leading-none"></i>
+          3. Money Disbursed
+        </span>
+        @if (service.readyForDisburseCount() > 0) {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-300 leading-none"
+          >
+            {{ service.readyForDisburseCount() }} Ready for DBT
+          </span>
+        } @else {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-700 leading-none"
+          >
+            Queue Clear
+          </span>
+        }
+      </div>
+      <div class="mt-2 flex items-baseline justify-between">
+        <div class="text-xl font-black text-purple-950 font-mono">
+          {{ formatCurrency(service.totalDisbursedAmount()) }}
+        </div>
+        <div class="text-xs text-slate-500 font-mono">
+          {{ service.totalDisbursedCount() }} Beneficiaries
         </div>
       </div>
-
-      <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-        <span>Audit Trail: Direct Audit Complete (2026 cycle)</span>
-        <a href="#" class="text-blue-600 hover:underline flex items-center gap-1 no-underline">
-          <span>Download compliance report</span>
-          <i class="pi pi-external-link text-[10px]"></i>
-        </a>
-      </div>
     </div>
   </div>
+
+  <!-- Main View Tabs -->
+  @if (currentTab() === 'APPLICATIONS') {
+    <app-applications-view
+      [applications]="service.applications()"
+      (openApplication)="selectedAppForDetail.set($event)"
+      (viewDocument)="openDocViewer($event.app, null, $event.type)"
+    ></app-applications-view>
+  }
+
+  @if (currentTab() === 'INSTITUTES') {
+    <app-institutes-view
+      [institutes]="service.institutes()"
+      (openInstitute)="selectedInstituteForDetail.set($event)"
+      (viewCertificate)="openDocViewer(null, $event, 'AFFILIATION_CERTIFICATE')"
+    ></app-institutes-view>
+  }
+
+  @if (currentTab() === 'DISBURSEMENTS') {
+    <app-disbursement-view
+      [applications]="service.applications()"
+      (openApplication)="selectedAppForDetail.set($event)"
+      (openBatchDisburse)="openBatchModal($event)"
+    ></app-disbursement-view>
+  }
+
+  <app-application-detail-modal
+    [application]="selectedAppForDetail()"
+    (close)="selectedAppForDetail.set(null)"
+    (viewDocument)="openDocViewer(selectedAppForDetail(), null, $event)"
+  ></app-application-detail-modal>
+
+  <app-institute-detail-modal
+    [institute]="selectedInstituteForDetail()"
+    (close)="selectedInstituteForDetail.set(null)"
+    (viewCertificate)="openDocViewer(null, selectedInstituteForDetail(), 'AFFILIATION_CERTIFICATE')"
+  ></app-institute-detail-modal>
+
+  <app-document-viewer-modal
+    [isOpen]="isDocViewerOpen()"
+    [documentType]="docViewerType()"
+    [application]="docViewerApp()"
+    [institute]="docViewerInst()"
+    (close)="isDocViewerOpen.set(false)"
+  ></app-document-viewer-modal>
+
+  <app-batch-disburse-modal
+    [isOpen]="isBatchDisburseOpen()"
+    [applications]="batchDisburseApps()"
+    (close)="isBatchDisburseOpen.set(false)"
+  ></app-batch-disburse-modal>
 </div>

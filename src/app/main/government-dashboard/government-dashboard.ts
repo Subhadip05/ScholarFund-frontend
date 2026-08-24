@@ -1,40 +1,68 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, input, model, output, signal } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
+import { DocType, InstituteDto, MainTab, ScholarshipApplicationDto } from '../../../shared/types';
+import { formatCurrency } from '../../../shared/utils/formatters';
+import { ApplicationsViewComponent } from "../govt-admin-module/applications-view.component";
+import { InstitutesViewComponent } from "../govt-admin-module/institutes-view.component";
+import { DisbursementViewComponent } from "../govt-admin-module/disbursement-view.component";
+import { ApplicationDetailModalComponent } from "../govt-admin-module/application-detail-modal.component";
+import { InstituteDetailModalComponent } from "../govt-admin-module/institute-detail-modal.component";
+import { DocumentViewerModalComponent } from "../govt-admin-module/document-viewer-modal.component";
+import { BatchDisburseModalComponent } from "../govt-admin-module/batch-disburse-modal.component";
 
 @Component({
   selector: 'app-government-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, ApplicationsViewComponent, InstitutesViewComponent, DisbursementViewComponent, ApplicationDetailModalComponent, InstituteDetailModalComponent, DocumentViewerModalComponent, BatchDisburseModalComponent],
   templateUrl: './government-dashboard.html',
   styleUrl: './government-dashboard.css',
 })
-export class GovernmentDashboard implements OnInit {
-  public portalService = inject(PortalService);
+export class GovernmentDashboard {
+  public service = inject(PortalService);
 
-  ministryList = [
-    'All Schemes',
-    'Ministry of Education (MoE)',
-    'Ministry of Social Justice & Empowerment',
-    'Ministry of Minority Affairs (MoMA)',
-    'Ministry of Tribal Affairs',
-  ];
+  readonly currentTab = model<MainTab>('APPLICATIONS');
+  readonly tabChange = output<MainTab>();
+  readonly formatCurrency = formatCurrency;
 
-  ngOnInit(): void {
-    console.log('Govt Admin Dashboard Page Working...');
+  // View Event Outputs for Modals
+  readonly openApplication = output<ScholarshipApplicationDto>();
+  readonly openInstitute = output<InstituteDto>();
+  readonly openBatchDisburse = output<ScholarshipApplicationDto[]>();
+  readonly viewDocument = output<{
+    app: ScholarshipApplicationDto | null;
+    inst: InstituteDto | null;
+    type: DocType;
+  }>();
+
+  onSelectTab(tab: MainTab) {
+    console.log("tab selected: ", tab);
+    this.currentTab.set(tab);
   }
 
-  selectScheme(scheme: string) {
-    this.portalService.selectedDeptScheme = scheme;
+  readonly selectedAppForDetail = signal<ScholarshipApplicationDto | null>(null);
+  readonly selectedInstituteForDetail = signal<InstituteDto | null>(null);
+  readonly isBatchDisburseOpen = signal<boolean>(false);
+  readonly batchDisburseApps = signal<ScholarshipApplicationDto[]>([]);
+
+  // Document Viewer Modal State
+  readonly isDocViewerOpen = signal<boolean>(false);
+  readonly docViewerType = signal<DocType>('INCOME');
+  readonly docViewerApp = signal<ScholarshipApplicationDto | null>(null);
+  readonly docViewerInst = signal<InstituteDto | null>(null);
+
+  openDocViewer(
+    app: ScholarshipApplicationDto | null,
+    inst: InstituteDto | null,
+    type: DocType
+  ) {
+    this.docViewerApp.set(app);
+    this.docViewerInst.set(inst);
+    this.docViewerType.set(type);
+    this.isDocViewerOpen.set(true);
   }
 
-  toggleDisbursal() {
-    const nextStatus = !this.portalService.disbursalApprovedStatus;
-    this.portalService.disbursalApprovedStatus = nextStatus;
-    if (nextStatus) {
-      this.portalService.systemAlertMessage =
-        'Direct bank transfer releases initialized successfully. System dispatch pending.';
-    } else {
-      this.portalService.systemAlertMessage = 'Releases paused. Verification cycle logged.';
-    }
+  openBatchModal(apps: ScholarshipApplicationDto[]) {
+    this.batchDisburseApps.set(apps);
+    this.isBatchDisburseOpen.set(true);
   }
 }

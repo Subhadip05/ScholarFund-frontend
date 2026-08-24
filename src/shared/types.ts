@@ -2,6 +2,9 @@ export type ModalType =
   'student-login' | 'register' | 'college-login' | 'govt-login' | 'eligibility-checker' | null;
 export type UserRole = 'student' | 'college-admin' | 'GOVT' | null;
 
+export type MainTab = 'APPLICATIONS' | 'INSTITUTES' | 'DISBURSEMENTS';
+export type DocType = 'INCOME' | 'MARKSHEET' | 'BANK_PASSBOOK' | 'ADMISSION_RECEIPT' | 'AFFILIATION_CERTIFICATE';
+
 export interface ScholarshipScheme {
   id: string;
   name: string;
@@ -212,4 +215,96 @@ export interface InstituteProfileResponse {
 export interface ApplicationStatusUpdateRequest {
   statusAction: ApplicationStatus;
   actionRemarks?: string;
+}
+
+export interface ScholarshipApplicationDto {
+  applicationId: number; // Long
+  studentName: string;
+  instituteName: string;
+  courseName: string;
+  academicYear: string;
+  lastQualificationMarks: number; // Double
+  lastQualificationCourse: string;
+  lastQualificationExamRollNo: string;
+  passOutBoardName: string;
+  annualIncome: number; // Double
+  bankAccountNumber: string;
+  ifscCode: string;
+  status: ApplicationStatus;
+
+  // AWS Presigned URLs for frontend display
+  incomeCertificateUrl: string;
+  hsMarksheetUrl: string;
+  bankPassbookUrl: string;
+  admissionReceiptUrl: string;
+
+  timeline: ApplicationHistoryDto[];
+
+  // Additional metadata for govt administrative operations
+  sanctionAmount?: number;
+  bankName?: string;
+  branchName?: string;
+  disbursementDate?: string;
+  utrNumber?: string;
+  category?: 'General' | 'OBC' | 'SC' | 'ST' | 'EWS' | 'Minority';
+  gender?: 'Male' | 'Female' | 'Other';
+  studentEmail?: string;
+  studentPhone?: string;
+  district?: string;
+  state?: string;
+  applicationDate?: string;
+  instituteCollegeCode?: string;
+}
+
+export interface InstituteDto {
+  profileId: number; // Long
+  email: string;
+  officerName: string;
+  officerPhoneNo: string;
+  isVerifyByGovt: boolean;
+  instituteName: string;
+  collegeCode: string;
+  universityAffiliation: string;
+  principalName: string;
+  address: string;
+  affiliationCertificateUrl: string;
+
+  // Additional helper fields
+  registeredDate?: string;
+  aisheCode?: string;
+  instituteType?: 'GOVERNMENT' | 'GOVT_AIDED' | 'PRIVATE' | 'CENTRAL_UNIVERSITY';
+  verificationRemarks?: string;
+  verifiedAt?: string;
+  verifiedBy?: string;
+  district?: string;
+  state?: string;
+  contactNumber?: string;
+  totalApplicationsCount?: number;
+  approvedApplicationsCount?: number;
+}
+export interface AdminUser {
+  name: string;
+  designation: string;
+  department: string;
+  officerId: string;
+  securityLevel: string;
+  email: string;
+}
+
+export interface ApproveApplicationRequest {
+  applicationId: number;
+  sanctionAmount: number;
+  remarks?: string;
+}
+export interface RejectApplicationRequest {
+  applicationId: number;
+  reason: string;
+}
+export interface VerifyInstituteRequest {
+  profileId: number;
+  remarks?: string;
+}
+export interface RevokeInstituteRequest {
+  profileId: number;
+  remarks?: string;
 }
