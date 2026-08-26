@@ -282,14 +282,6 @@ export interface InstituteDto {
   totalApplicationsCount?: number;
   approvedApplicationsCount?: number;
 }
-export interface AdminUser {
-  name: string;
-  designation: string;
-  department: string;
-  officerId: string;
-  securityLevel: string;
-  email: string;
-}
 
 export interface ApproveApplicationRequest {
   applicationId: number;

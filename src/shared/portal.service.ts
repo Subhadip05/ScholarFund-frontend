@@ -7,7 +7,6 @@ import {
   ApplicationStatus,
   InstituteDto,
   ScholarshipApplicationDto,
-  AdminUser,
   ApproveApplicationRequest,
   RejectApplicationRequest,
   VerifyInstituteRequest,
@@ -35,15 +34,6 @@ export class PortalService {
 
   userRole: UserRole = null;
   userMetadata: any = null;
-
-  mockAdminUser: AdminUser = {
-    name: 'Dr. Rameshwar V. Joshi, IAS',
-    designation: 'Director General of Scholarships & DBT Mission',
-    department: 'Department of Higher Education, Ministry of Education',
-    officerId: 'GOV-IND-SCH-84920',
-    securityLevel: 'Level 14 (Apex Treasury & Disbursal Authority)',
-    email: 'rameshwar.joshi.ias@scholarfund.gov.in',
-  };
 
   // Scholarship Database
   scholarshipSchemes: ScholarshipScheme[] = [
@@ -964,7 +954,6 @@ export class PortalService {
   disbursalApprovedStatus = false;
 
    // Reactive State Signals
-  readonly adminUser = signal<AdminUser>(this.mockAdminUser);
   readonly applications = signal<ScholarshipApplicationDto[]>(this.loadApplicationsFromStorage());
   readonly institutes = signal<InstituteDto[]>(this.loadInstitutesFromStorage());
   readonly isLoading = signal<boolean>(false);
@@ -1058,7 +1047,6 @@ export class PortalService {
     remarks?: string,
   ): Observable<boolean> {
     const finalAmount = sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT;
-    const officerName = this.adminUser().name;
     const now = new Date().toISOString();
 
     const payload: ApproveApplicationRequest = {
@@ -1080,7 +1068,6 @@ export class PortalService {
             ...app.timeline,
             {
               actionTaken: 'Govt Sanction Approved',
-              actionBy: officerName,
               actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
               remarks: payload.remarks || '',
               actionTime: now,
@@ -1091,7 +1078,7 @@ export class PortalService {
       return app;
     });
 
-    this.saveApplications(updated);
+    // this.saveApplications(updated);
 
     // If connected to remote backend, forward to API
 
@@ -1102,7 +1089,6 @@ export class PortalService {
   // 2. Govt Admin Rejects Scholarship Application
   // =========================================================================
   rejectApplication(applicationId: number, reason: string): Observable<boolean> {
-    const officerName = this.adminUser().name;
     const now = new Date().toISOString();
 
     const payload: RejectApplicationRequest = {
@@ -1120,7 +1106,6 @@ export class PortalService {
             ...app.timeline,
             {
               actionTaken: 'Govt Admin Rejected',
-              actionBy: officerName,
               actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
               remarks: payload.reason,
               actionTime: now,
@@ -1131,7 +1116,7 @@ export class PortalService {
       return app;
     });
 
-    this.saveApplications(updated);
+    // this.saveApplications(updated);
 
     return of(true);
   }
@@ -1216,7 +1201,6 @@ export class PortalService {
   // 5. Govt Verifies & Clears Institute Accreditation
   // =========================================================================
   verifyInstitute(profileId: number, remarks?: string): Observable<boolean> {
-    const officerName = this.adminUser().name;
     const now = new Date().toISOString();
 
     const payload: VerifyInstituteRequest = {
@@ -1232,14 +1216,13 @@ export class PortalService {
           ...inst,
           isVerifyByGovt: true,
           verifiedAt: now,
-          verifiedBy: officerName,
           verificationRemarks: payload.remarks,
         };
       }
       return inst;
     });
 
-    this.saveInstitutes(updated);
+    // this.saveInstitutes(updated);
     //API Error verifying institute
 
     return of(true);

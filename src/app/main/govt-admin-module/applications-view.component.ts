@@ -1,10 +1,17 @@
-import { Component, input, output, signal, computed, inject } from '@angular/core';
+import { Component, input, output, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../shared/pagination/pagination.component';
 import { PortalService } from '../../../shared/portal.service';
 import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../shared/types';
-import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig } from '../../../shared/utils/formatters';
+import {
+  FIXED_SCHOLARSHIP_AMOUNT,
+  formatCurrency,
+  formatDate,
+  getStatusConfig,
+} from '../../../shared/utils/formatters';
+import { Apiservice } from '../../../shared/api/apiservice';
+import Notiflix from 'notiflix';
 
 @Component({
   selector: 'app-applications-view',
@@ -13,7 +20,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
   template: `
     <div class="space-y-4">
       <!-- Status Tabs Navigation Bar -->
-      <div class="bg-white rounded-xl border border-slate-200 p-1.5 shadow-xs flex items-center overflow-x-auto gap-1">
+      <div
+        class="bg-white rounded-xl border border-slate-200 p-1.5 shadow-xs flex items-center overflow-x-auto gap-1"
+      >
         <button
           (click)="handleStatusTabChange('ALL')"
           [class]="
@@ -106,7 +115,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
       </div>
 
       <!-- Filter and Search Bar -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-xs"
+      >
         <div class="relative">
           <i class="pi pi-search absolute left-3 top-3 text-slate-400 text-xs"></i>
           <input
@@ -160,7 +171,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
 
       <!-- Bulk Action Banner if selected -->
       @if (selectedAppIds().length > 0) {
-        <div class="bg-blue-900 text-white p-3 rounded-xl flex items-center justify-between shadow-md animate-in fade-in duration-150">
+        <div
+          class="bg-blue-900 text-white p-3 rounded-xl flex items-center justify-between shadow-md animate-in fade-in duration-150"
+        >
           <div class="text-xs font-semibold flex items-center space-x-2">
             <i class="pi pi-check-circle text-sm text-blue-300"></i>
             <span>{{ selectedAppIds().length }} applications selected</span>
@@ -218,7 +231,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
               } @else {
                 @for (app of paginatedApplications(); track app.applicationId) {
                   <tr
-                    [class]="isSelected(app.applicationId) ? 'bg-blue-50/40' : 'hover:bg-slate-50/80'"
+                    [class]="
+                      isSelected(app.applicationId) ? 'bg-blue-50/40' : 'hover:bg-slate-50/80'
+                    "
                     class="transition-colors"
                   >
                     <!-- Checkbox -->
@@ -250,7 +265,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
                         {{ app.studentName }}
                       </div>
                       <div class="flex items-center space-x-1.5 mt-1">
-                        <span class="text-[10px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 leading-none">
+                        <span
+                          class="text-[10px] font-semibold text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 leading-none"
+                        >
                           {{ app.category || 'General' }}
                         </span>
                         <span class="text-[10px] text-slate-400">
@@ -261,10 +278,16 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
 
                     <!-- Institute & Course -->
                     <td class="p-3.5 align-top max-w-[220px]">
-                      <div class="font-semibold text-slate-900 text-xs leading-snug truncate" [title]="app.instituteName">
+                      <div
+                        class="font-semibold text-slate-900 text-xs leading-snug truncate"
+                        [title]="app.instituteName"
+                      >
                         {{ app.instituteName }}
                       </div>
-                      <div class="text-[11px] text-slate-500 mt-0.5 truncate" [title]="app.courseName">
+                      <div
+                        class="text-[11px] text-slate-500 mt-0.5 truncate"
+                        [title]="app.courseName"
+                      >
                         {{ app.courseName }}
                       </div>
                     </td>
@@ -272,7 +295,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
                     <!-- Marks % -->
                     <td class="p-3.5 align-top">
                       <div
-                        [class]="app.lastQualificationMarks >= 60 ? 'text-emerald-800' : 'text-rose-700'"
+                        [class]="
+                          app.lastQualificationMarks >= 60 ? 'text-emerald-800' : 'text-rose-700'
+                        "
                         class="font-mono font-bold text-xs"
                       >
                         {{ app.lastQualificationMarks }}%
@@ -334,8 +359,14 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
 
                     <!-- Status -->
                     <td class="p-3.5 align-top">
-                      <span [class]="getStatusConfig(app.status).badgeClass" class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap">
-                        <span [class]="getStatusConfig(app.status).dotClass" class="w-1.5 h-1.5 rounded-full mr-1.5"></span>
+                      <span
+                        [class]="getStatusConfig(app.status).badgeClass"
+                        class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border whitespace-nowrap"
+                      >
+                        <span
+                          [class]="getStatusConfig(app.status).dotClass"
+                          class="w-1.5 h-1.5 rounded-full mr-1.5"
+                        ></span>
                         {{ getStatusConfig(app.status).label }}
                       </span>
                     </td>
@@ -395,8 +426,9 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate, getStatusConfig }
     </div>
   `,
 })
-export class ApplicationsViewComponent {
+export class ApplicationsViewComponent implements OnInit {
   readonly service = inject(PortalService);
+  private apiService = inject(Apiservice);
   readonly applications = input.required<ScholarshipApplicationDto[]>();
   readonly openApplication = output<ScholarshipApplicationDto>();
   readonly viewDocument = output<{ app: ScholarshipApplicationDto; type: DocType }>();
@@ -415,6 +447,24 @@ export class ApplicationsViewComponent {
   readonly formatCurrency = formatCurrency;
   readonly formatDate = formatDate;
 
+  ngOnInit(): void {
+    this.fetchApplications();
+  }
+
+  fetchApplications(statusFilter?: ApplicationStatus): void {
+    Notiflix.Loading.pulse('Fetching applications...');
+    this.apiService.getApplicationsList(statusFilter).subscribe({
+      next: (res) => {
+        console.log('Fetching application list response', res);
+        Notiflix.Loading.remove();
+      },
+      error: (err) => {
+        console.log(err);
+        Notiflix.Loading.remove();
+      },
+    });
+  }
+
   readonly distinctInstitutes = computed(() => {
     return Array.from(new Set(this.applications().map((a) => a.instituteName))).sort();
   });
@@ -422,7 +472,8 @@ export class ApplicationsViewComponent {
   readonly statusCounts = computed(() => {
     const list = this.applications();
     return {
-      INSTITUTE_VERIFIED: list.filter((a) => a.status === ApplicationStatus.INSTITUTE_VERIFIED).length,
+      INSTITUTE_VERIFIED: list.filter((a) => a.status === ApplicationStatus.INSTITUTE_VERIFIED)
+        .length,
       ADMIN_APPROVED: list.filter((a) => a.status === ApplicationStatus.ADMIN_APPROVED).length,
       DISBURSED: list.filter((a) => a.status === ApplicationStatus.DISBURSED).length,
       ADMIN_REJECTED: list.filter((a) => a.status === ApplicationStatus.ADMIN_REJECTED).length,
@@ -437,18 +488,29 @@ export class ApplicationsViewComponent {
       }
 
       // 2. Institute filter
-      if (this.selectedInstituteFilter() !== 'ALL' && app.instituteName !== this.selectedInstituteFilter()) {
+      if (
+        this.selectedInstituteFilter() !== 'ALL' &&
+        app.instituteName !== this.selectedInstituteFilter()
+      ) {
         return false;
       }
 
       // 3. Marks filter
       if (this.marksFilter() === 'ABOVE_80' && app.lastQualificationMarks < 80) return false;
-      if (this.marksFilter() === 'BETWEEN_60_80' && (app.lastQualificationMarks < 60 || app.lastQualificationMarks >= 80)) return false;
+      if (
+        this.marksFilter() === 'BETWEEN_60_80' &&
+        (app.lastQualificationMarks < 60 || app.lastQualificationMarks >= 80)
+      )
+        return false;
       if (this.marksFilter() === 'BELOW_60' && app.lastQualificationMarks >= 60) return false;
 
       // 4. Income filter
       if (this.incomeFilter() === 'BELOW_1L' && app.annualIncome > 100000) return false;
-      if (this.incomeFilter() === 'BETWEEN_1L_2_5L' && (app.annualIncome <= 100000 || app.annualIncome > 250000)) return false;
+      if (
+        this.incomeFilter() === 'BETWEEN_1L_2_5L' &&
+        (app.annualIncome <= 100000 || app.annualIncome > 250000)
+      )
+        return false;
       if (this.incomeFilter() === 'ABOVE_2_5L' && app.annualIncome <= 250000) return false;
 
       // 5. Search query
@@ -468,7 +530,9 @@ export class ApplicationsViewComponent {
     });
   });
 
-  readonly totalPages = computed(() => Math.ceil(this.filteredApplications().length / this.pageSize()) || 1);
+  readonly totalPages = computed(
+    () => Math.ceil(this.filteredApplications().length / this.pageSize()) || 1,
+  );
 
   readonly paginatedApplications = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
@@ -512,7 +576,7 @@ export class ApplicationsViewComponent {
 
   toggleSelect(id: number) {
     this.selectedAppIds.update((ids) =>
-      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
+      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
     );
   }
 
@@ -527,7 +591,9 @@ export class ApplicationsViewComponent {
 
   bulkApprove() {
     const selected = this.applications().filter(
-      (a) => this.selectedAppIds().includes(a.applicationId) && a.status === ApplicationStatus.INSTITUTE_VERIFIED
+      (a) =>
+        this.selectedAppIds().includes(a.applicationId) &&
+        a.status === ApplicationStatus.INSTITUTE_VERIFIED,
     );
     if (selected.length === 0) return;
 
@@ -535,7 +601,7 @@ export class ApplicationsViewComponent {
       this.service.approveApplication(
         app.applicationId,
         FIXED_SCHOLARSHIP_AMOUNT,
-        'Bulk Govt Sanction order approved under Directorate technical/higher education scheme.'
+        'Bulk Govt Sanction order approved under Directorate technical/higher education scheme.',
       );
     });
     this.selectedAppIds.set([]);
@@ -545,7 +611,7 @@ export class ApplicationsViewComponent {
     this.service.approveApplication(
       id,
       FIXED_SCHOLARSHIP_AMOUNT,
-      'Direct one-time scholarship sanction granted by Directorate.'
+      'Direct one-time scholarship sanction granted by Directorate.',
     );
   }
 

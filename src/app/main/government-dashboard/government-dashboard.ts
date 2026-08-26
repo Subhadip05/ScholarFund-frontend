@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input, model, output, signal } from '@angular/core';
+import { Component, inject, model, output, signal } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
 import { DocType, InstituteDto, MainTab, ScholarshipApplicationDto } from '../../../shared/types';
 import { formatCurrency } from '../../../shared/utils/formatters';

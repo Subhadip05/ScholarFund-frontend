@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   ApiResponse,
   ApplicationResponse,
@@ -89,11 +89,29 @@ export class Apiservice {
 
   updateApplicationStatus(
     applicationId: number,
-    request: ApplicationStatusUpdateRequest
+    request: ApplicationStatusUpdateRequest,
   ): Observable<ApiResponse<ApplicationResponse>> {
     return this.client.put<ApiResponse<ApplicationResponse>>(
       `${baseUrl}/applications/${applicationId}/update-status`,
-      request
+      request,
+    );
+  }
+
+  getApplicationsList(status?: ApplicationStatus): Observable<ApiResponse<ApplicationResponse[]>> {
+    let params = new HttpParams();
+
+    if (status) {
+      params = params.set('status', status);
+    }
+
+    return this.client.get<ApiResponse<ApplicationResponse[]>>(`${baseUrl}/applications`, {
+      params,
+    });
+  }
+
+  getUnverifiedInstitutes(): Observable<ApiResponse<InstituteProfileResponse[]>> {
+    return this.client.get<ApiResponse<InstituteProfileResponse[]>>(
+      `${baseUrl}/admin/institutes/unverified-list`,
     );
   }
 }
