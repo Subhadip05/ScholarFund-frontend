@@ -114,4 +114,11 @@ export class Apiservice {
       `${baseUrl}/admin/institutes/unverified-list`,
     );
   }
+
+  verifyInstitute(instituteId: number): Observable<ApiResponse<string | null>> {
+    return this.client.put<ApiResponse<string | null>>(
+      `${baseUrl}/verify-institute/${instituteId}`,
+      {}
+    );
+  }
 }

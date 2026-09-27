@@ -158,6 +158,57 @@ export enum ApplicationStatus {
   ADMIN_REJECTED = 'ADMIN_REJECTED',
   DISBURSED = 'DISBURSED',
 }
+export interface StatusActionMeta {
+  title: string;
+  message: string;
+  confirmText: string;
+  buttonColor: string;
+  severity: 'success' | 'warn' | 'error' | 'info';
+  successSummary: string;
+}
+
+export const STATUS_ACTION_CONFIG: Partial<Record<ApplicationStatus, StatusActionMeta>> = {
+  [ApplicationStatus.INSTITUTE_VERIFIED]: {
+    title: 'Verify Application',
+    message: 'Are you sure you want to verify and forward this application to Government Nodal Officers?',
+    confirmText: 'Verify & Approve',
+    buttonColor: '#059669',
+    severity: 'success',
+    successSummary: 'Application Verified',
+  },
+  [ApplicationStatus.INSTITUTE_REJECTED]: {
+    title: 'Reject Application',
+    message: 'Are you sure you want to reject this student application?',
+    confirmText: 'Reject',
+    buttonColor: '#ef4444',
+    severity: 'warn',
+    successSummary: 'Application Rejected',
+  },
+  [ApplicationStatus.ADMIN_APPROVED]: {
+    title: 'Grant Sanction Clearance',
+    message: 'Approve and clear this application for direct benefit disbursement?',
+    confirmText: 'Sanction Grant',
+    buttonColor: '#2563eb',
+    severity: 'success',
+    successSummary: 'Sanction Approved',
+  },
+  [ApplicationStatus.ADMIN_REJECTED]: {
+    title: 'Government Rejection',
+    message: 'Reject this application at the State Directorate clearance level?',
+    confirmText: 'Reject Application',
+    buttonColor: '#dc2626',
+    severity: 'error',
+    successSummary: 'Application Disqualified',
+  },
+  [ApplicationStatus.DISBURSED]: {
+    title: 'Confirm DBT Release',
+    message: 'Execute direct treasury disbursement for this candidate?',
+    confirmText: 'Mark Disbursed',
+    buttonColor: '#7c3aed',
+    severity: 'info',
+    successSummary: 'Disbursement Released',
+  },
+};
 
 export interface ApplicationHistoryDto {
   actionTaken: string;

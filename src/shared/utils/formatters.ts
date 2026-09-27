@@ -59,7 +59,7 @@ export const getStatusConfig = (status: ApplicationStatus): StatusConfig => {
       };
     case ApplicationStatus.INSTITUTE_VERIFIED:
       return {
-        label: 'Pending Govt Sanction Review',
+        label: 'Pending Govt Sanction',
         badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
         dotClass: 'bg-amber-600 animate-pulse',
         description: 'Approved by Institute. Awaiting Directorate sanction approval.',

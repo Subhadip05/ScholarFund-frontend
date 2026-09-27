@@ -11,12 +11,14 @@ import {
   RejectApplicationRequest,
   VerifyInstituteRequest,
   RevokeInstituteRequest,
+  STATUS_ACTION_CONFIG,
 } from './types';
 import { Authservice } from './auth/authservice';
 import Notiflix from 'notiflix';
 import { HttpClient } from '@angular/common/http';
 import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, generateUTR } from './utils/formatters';
 import { Observable, of } from 'rxjs';
+import { Apiservice } from './api/apiservice';
 
 const STORAGE_KEY_APPS = 'scholarfund_govt_applications';
 const STORAGE_KEY_INSTS = 'scholarfund_govt_institutes';
@@ -26,6 +28,7 @@ const STORAGE_KEY_INSTS = 'scholarfund_govt_institutes';
 })
 export class PortalService {
   private authservice = inject(Authservice);
+  private apiService = inject(Apiservice);
   private readonly http = inject(HttpClient);
 
   isScrolled = false;
@@ -907,7 +910,6 @@ export class PortalService {
     },
   ];
 
-
   // =========================================================================
   // LocalStorage Helpers
   // =========================================================================
@@ -953,11 +955,10 @@ export class PortalService {
   systemAlertMessage = '';
   disbursalApprovedStatus = false;
 
-   // Reactive State Signals
+  // Reactive State Signals
   readonly applications = signal<ScholarshipApplicationDto[]>(this.loadApplicationsFromStorage());
   readonly institutes = signal<InstituteDto[]>(this.loadInstitutesFromStorage());
   readonly isLoading = signal<boolean>(false);
-
 
   constructor() {
     this.userRole = sessionStorage.getItem('user_role') as UserRole;
@@ -1068,6 +1069,7 @@ export class PortalService {
             ...app.timeline,
             {
               actionTaken: 'Govt Sanction Approved',
+              actionBy: 'Govt Admin',
               actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
               remarks: payload.remarks || '',
               actionTime: now,
@@ -1078,7 +1080,7 @@ export class PortalService {
       return app;
     });
 
-    // this.saveApplications(updated);
+    this.saveApplications(updated);
 
     // If connected to remote backend, forward to API
 
@@ -1106,6 +1108,7 @@ export class PortalService {
             ...app.timeline,
             {
               actionTaken: 'Govt Admin Rejected',
+              actionBy: 'Govt Admin',
               actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
               remarks: payload.reason,
               actionTime: now,
@@ -1116,7 +1119,7 @@ export class PortalService {
       return app;
     });
 
-    // this.saveApplications(updated);
+    this.saveApplications(updated);
 
     return of(true);
   }
@@ -1222,7 +1225,7 @@ export class PortalService {
       return inst;
     });
 
-    // this.saveInstitutes(updated);
+    this.saveInstitutes(updated);
     //API Error verifying institute
 
     return of(true);
@@ -1252,6 +1255,57 @@ export class PortalService {
     //API Error revoking institute
 
     return of(true);
+  }
+
+  updateApplicationStatus(appId: number, targetStatus: ApplicationStatus,remarks: string): void {
+    const config = STATUS_ACTION_CONFIG[targetStatus];
+    if (!config) return;
+
+    Notiflix.Confirm.show(
+      config.title,
+      config.message,
+      config.confirmText,
+      'Cancel',
+      () => {
+        Notiflix.Loading.pulse('Updating status...', {});
+
+        const payload = {
+          statusAction: targetStatus,
+          actionRemarks: remarks.trim(),
+        };
+        
+        this.apiService.updateApplicationStatus(appId, payload).subscribe({
+          next: (res) => {
+            Notiflix.Loading.remove();
+
+            // Immutably update the signal
+            this.applications.update((list) =>
+              list.map((item) =>
+                item.applicationId === appId ? { ...item, status: targetStatus } : item
+              )
+            );
+
+            // this._messageService.add({
+            //   severity: config.severity,
+            //   summary: config.successSummary,
+            //   detail: res.message || `Application #${appId} status updated.`,
+            // });
+
+            this.closeModal();
+          },
+          error: (err) => {
+            Notiflix.Loading.remove();
+            // this._messageService.add({
+            //   severity: 'error',
+            //   summary: 'Operation Failed',
+            //   detail: err?.error?.message || 'Failed to update application status.',
+            // });
+          },
+        });
+      },
+      () => {},
+      { okButtonBackground: config.buttonColor }
+    );
   }
 
   // =========================================================================
