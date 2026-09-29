@@ -1,8 +1,8 @@
 import { Component, input, output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PortalService } from '../../../shared/portal.service';
-import { InstituteDto } from '../../../shared/types';
-import { formatDate } from '../../../shared/utils/formatters';
+import { PortalService } from '../../../../shared/portal.service';
+import { InstituteDto } from '../../../../shared/types';
+import { formatDate } from '../../../../shared/utils/formatters';
 
 @Component({
   selector: 'app-institute-detail-modal',

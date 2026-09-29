@@ -1,7 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InstituteDto, ScholarshipApplicationDto } from '../../../shared/types';
-import { formatCurrency, formatDateOnly } from '../../../shared/utils/formatters';
+import { InstituteDto, ScholarshipApplicationDto } from '../../../../shared/types';
+import { formatCurrency, formatDateOnly } from '../../../../shared/utils/formatters';
 
 export type DocType =
   'INCOME' | 'MARKSHEET' | 'BANK_PASSBOOK' | 'ADMISSION_RECEIPT' | 'AFFILIATION_CERTIFICATE';

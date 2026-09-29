@@ -1,10 +1,10 @@
 import { Component, input, output, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PaginationComponent } from '../../../shared/pagination/pagination.component';
-import { PortalService } from '../../../shared/portal.service';
-import { InstituteDto } from '../../../shared/types';
-import { Apiservice } from '../../../shared/api/apiservice';
+import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
+import { PortalService } from '../../../../shared/portal.service';
+import { InstituteDto } from '../../../../shared/types';
+import { Apiservice } from '../../../../shared/api/apiservice';
 import Notiflix from 'notiflix';
 
 @Component({

@@ -1,14 +1,14 @@
 import { Component, input, output, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PortalService } from '../../../shared/portal.service';
-import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../shared/types';
+import { PortalService } from '../../../../shared/portal.service';
+import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
   formatCurrency,
   formatDate,
   getStatusConfig,
-} from '../../../shared/utils/formatters';
+} from '../../../../shared/utils/formatters';
 
 @Component({
   selector: 'app-application-detail-modal',

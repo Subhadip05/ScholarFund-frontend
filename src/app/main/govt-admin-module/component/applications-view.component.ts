@@ -1,16 +1,16 @@
 import { Component, input, output, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PaginationComponent } from '../../../shared/pagination/pagination.component';
-import { PortalService } from '../../../shared/portal.service';
-import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../shared/types';
+import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
+import { PortalService } from '../../../../shared/portal.service';
+import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
   formatCurrency,
   formatDate,
   getStatusConfig,
-} from '../../../shared/utils/formatters';
-import { Apiservice } from '../../../shared/api/apiservice';
+} from '../../../../shared/utils/formatters';
+import { Apiservice } from '../../../../shared/api/apiservice';
 import Notiflix from 'notiflix';
 
 @Component({

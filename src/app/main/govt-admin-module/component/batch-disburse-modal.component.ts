@@ -1,12 +1,12 @@
 import { Component, input, output, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PortalService } from '../../../shared/portal.service';
-import { ScholarshipApplicationDto } from '../../../shared/types';
+import { PortalService } from '../../../../shared/portal.service';
+import { ScholarshipApplicationDto } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
   formatCurrency,
   generateUTR,
-} from '../../../shared/utils/formatters';
+} from '../../../../shared/utils/formatters';
 
 interface DisburseResult {
   id: number;

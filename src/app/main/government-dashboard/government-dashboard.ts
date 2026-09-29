@@ -3,19 +3,30 @@ import { Component, inject, model, output, signal } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
 import { DocType, InstituteDto, MainTab, ScholarshipApplicationDto } from '../../../shared/types';
 import { formatCurrency } from '../../../shared/utils/formatters';
-import { ApplicationsViewComponent } from "../govt-admin-module/applications-view.component";
-import { InstitutesViewComponent } from "../govt-admin-module/institutes-view.component";
-import { DisbursementViewComponent } from "../govt-admin-module/disbursement-view.component";
-import { ApplicationDetailModalComponent } from "../govt-admin-module/application-detail-modal.component";
-import { InstituteDetailModalComponent } from "../govt-admin-module/institute-detail-modal.component";
-import { DocumentViewerModalComponent } from "../govt-admin-module/document-viewer-modal.component";
-import { BatchDisburseModalComponent } from "../govt-admin-module/batch-disburse-modal.component";
+import { GovtAdminStore } from '../govt-admin-module/service/govt-admin-store';
+import { ApplicationDetailModalComponent } from '../govt-admin-module/component/application-detail-modal.component';
+import { ApplicationsViewComponent } from '../govt-admin-module/component/applications-view.component';
+import { BatchDisburseModalComponent } from '../govt-admin-module/component/batch-disburse-modal.component';
+import { DisbursementViewComponent } from '../govt-admin-module/component/disbursement-view.component';
+import { DocumentViewerModalComponent } from '../govt-admin-module/component/document-viewer-modal.component';
+import { InstituteDetailModalComponent } from '../govt-admin-module/component/institute-detail-modal.component';
+import { InstitutesViewComponent } from '../govt-admin-module/component/institutes-view.component';
 
 @Component({
   selector: 'app-government-dashboard',
-  imports: [CommonModule, ApplicationsViewComponent, InstitutesViewComponent, DisbursementViewComponent, ApplicationDetailModalComponent, InstituteDetailModalComponent, DocumentViewerModalComponent, BatchDisburseModalComponent],
+  imports: [
+    CommonModule,
+    ApplicationsViewComponent,
+    InstitutesViewComponent,
+    DisbursementViewComponent,
+    ApplicationDetailModalComponent,
+    InstituteDetailModalComponent,
+    DocumentViewerModalComponent,
+    BatchDisburseModalComponent,
+  ],
   templateUrl: './government-dashboard.html',
   styleUrl: './government-dashboard.css',
+  providers: [GovtAdminStore],
 })
 export class GovernmentDashboard {
   public service = inject(PortalService);
@@ -35,7 +46,7 @@ export class GovernmentDashboard {
   }>();
 
   onSelectTab(tab: MainTab) {
-    console.log("tab selected: ", tab);
+    console.log('tab selected: ', tab);
     this.currentTab.set(tab);
   }
 
@@ -50,11 +61,7 @@ export class GovernmentDashboard {
   readonly docViewerApp = signal<ScholarshipApplicationDto | null>(null);
   readonly docViewerInst = signal<InstituteDto | null>(null);
 
-  openDocViewer(
-    app: ScholarshipApplicationDto | null,
-    inst: InstituteDto | null,
-    type: DocType
-  ) {
+  openDocViewer(app: ScholarshipApplicationDto | null, inst: InstituteDto | null, type: DocType) {
     this.docViewerApp.set(app);
     this.docViewerInst.set(inst);
     this.docViewerType.set(type);

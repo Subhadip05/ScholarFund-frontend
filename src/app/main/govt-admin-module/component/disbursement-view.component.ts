@@ -1,10 +1,10 @@
 import { Component, input, output, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PaginationComponent } from '../../../shared/pagination/pagination.component';
-import { PortalService } from '../../../shared/portal.service';
-import { ApplicationStatus, ScholarshipApplicationDto } from '../../../shared/types';
-import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate } from '../../../shared/utils/formatters';
+import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
+import { PortalService } from '../../../../shared/portal.service';
+import { ApplicationStatus, ScholarshipApplicationDto } from '../../../../shared/types';
+import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate } from '../../../../shared/utils/formatters';
 
 @Component({
   selector: 'app-disbursement-view',
