@@ -2,10 +2,10 @@ import { Component, input, output, signal, computed, inject, OnInit } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
-import { PortalService } from '../../../../shared/portal.service';
 import { InstituteDto } from '../../../../shared/types';
 import { Apiservice } from '../../../../shared/api/apiservice';
 import Notiflix from 'notiflix';
+import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
   selector: 'app-institutes-view',
@@ -306,7 +306,7 @@ import Notiflix from 'notiflix';
   `,
 })
 export class InstitutesViewComponent implements OnInit {
-  readonly service = inject(PortalService);
+  readonly service = inject(GovtAdminStore);
   private apiService = inject(Apiservice);
   readonly institutes = input.required<InstituteDto[]>();
   readonly openInstitute = output<InstituteDto>();

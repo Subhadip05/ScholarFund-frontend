@@ -2,9 +2,9 @@ import { Component, input, output, signal, computed, inject } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
-import { PortalService } from '../../../../shared/portal.service';
 import { ApplicationStatus, ScholarshipApplicationDto } from '../../../../shared/types';
 import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate } from '../../../../shared/utils/formatters';
+import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
   selector: 'app-disbursement-view',
@@ -265,7 +265,7 @@ import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate } from '../../../.
   `,
 })
 export class DisbursementViewComponent {
-  readonly service = inject(PortalService);
+  readonly service = inject(GovtAdminStore);
   readonly applications = input.required<ScholarshipApplicationDto[]>();
   readonly openApplication = output<ScholarshipApplicationDto>();
   readonly openBatchDisburse = output<ScholarshipApplicationDto[]>();

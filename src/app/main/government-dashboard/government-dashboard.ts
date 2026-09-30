@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, model, output, signal } from '@angular/core';
-import { PortalService } from '../../../shared/portal.service';
 import { DocType, InstituteDto, MainTab, ScholarshipApplicationDto } from '../../../shared/types';
 import { formatCurrency } from '../../../shared/utils/formatters';
 import { GovtAdminStore } from '../govt-admin-module/service/govt-admin-store';
@@ -29,7 +28,7 @@ import { InstitutesViewComponent } from '../govt-admin-module/component/institut
   providers: [GovtAdminStore],
 })
 export class GovernmentDashboard {
-  public service = inject(PortalService);
+  public service = inject(GovtAdminStore);
 
   readonly currentTab = model<MainTab>('APPLICATIONS');
   readonly tabChange = output<MainTab>();

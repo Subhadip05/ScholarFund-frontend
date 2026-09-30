@@ -1,7 +1,6 @@
 import { Component, input, output, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PortalService } from '../../../../shared/portal.service';
 import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
@@ -9,6 +8,7 @@ import {
   formatDate,
   getStatusConfig,
 } from '../../../../shared/utils/formatters';
+import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
   selector: 'app-application-detail-modal',
@@ -665,7 +665,7 @@ import {
   `,
 })
 export class ApplicationDetailModalComponent {
-  readonly service = inject(PortalService);
+  readonly service = inject(GovtAdminStore);
   readonly application = input<ScholarshipApplicationDto | null>(null);
   readonly close = output<void>();
   readonly viewDocument = output<DocType>();

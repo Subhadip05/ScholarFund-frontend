@@ -1,12 +1,12 @@
 import { Component, input, output, signal, effect, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PortalService } from '../../../../shared/portal.service';
 import { ScholarshipApplicationDto } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
   formatCurrency,
   generateUTR,
 } from '../../../../shared/utils/formatters';
+import { GovtAdminStore } from '../service/govt-admin-store';
 
 interface DisburseResult {
   id: number;
@@ -253,7 +253,7 @@ interface DisburseResult {
   `,
 })
 export class BatchDisburseModalComponent {
-  readonly service = inject(PortalService);
+  readonly service = inject(GovtAdminStore);
   readonly isOpen = input<boolean>(false);
   readonly applications = input<ScholarshipApplicationDto[]>([]);
   readonly close = output<void>();

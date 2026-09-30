@@ -2,7 +2,6 @@ import { Component, input, output, signal, computed, inject, OnInit } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
-import { PortalService } from '../../../../shared/portal.service';
 import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
@@ -12,6 +11,7 @@ import {
 } from '../../../../shared/utils/formatters';
 import { Apiservice } from '../../../../shared/api/apiservice';
 import Notiflix from 'notiflix';
+import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
   selector: 'app-applications-view',
@@ -427,7 +427,7 @@ import Notiflix from 'notiflix';
   `,
 })
 export class ApplicationsViewComponent implements OnInit {
-  readonly service = inject(PortalService);
+  readonly service = inject(GovtAdminStore);
   private apiService = inject(Apiservice);
   readonly applications = input.required<ScholarshipApplicationDto[]>();
   readonly openApplication = output<ScholarshipApplicationDto>();
