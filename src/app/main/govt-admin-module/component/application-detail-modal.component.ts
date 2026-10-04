@@ -709,7 +709,12 @@ export class ApplicationDetailModalComponent {
   submitApprove() {
     const app = this.application();
     if (!app) return;
-    this.service.approveApplication(app.applicationId, FIXED_SCHOLARSHIP_AMOUNT, this.remarks);
+    this.service.applicationStatusUpdate(
+      app.applicationId,
+      ApplicationStatus.ADMIN_APPROVED,
+      this.remarks,
+    );
+    // this.service.approveApplication(app.applicationId, FIXED_SCHOLARSHIP_AMOUNT, this.remarks);
     this.showApproveForm.set(false);
     this.onClose();
   }
@@ -717,7 +722,12 @@ export class ApplicationDetailModalComponent {
   submitReject() {
     const app = this.application();
     if (!app) return;
-    this.service.rejectApplication(app.applicationId, this.rejectReason);
+    // this.service.rejectApplication(app.applicationId, this.rejectReason);
+    this.service.applicationStatusUpdate(
+      app.applicationId,
+      ApplicationStatus.ADMIN_REJECTED,
+      this.rejectReason,
+    );
     this.showRejectForm.set(false);
     this.onClose();
   }

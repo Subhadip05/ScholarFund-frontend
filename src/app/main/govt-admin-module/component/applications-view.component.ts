@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
 import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../../shared/types';
 import {
-  FIXED_SCHOLARSHIP_AMOUNT,
   formatCurrency,
   formatDate,
   getStatusConfig,
@@ -598,21 +597,26 @@ export class ApplicationsViewComponent implements OnInit {
     if (selected.length === 0) return;
 
     selected.forEach((app) => {
-      this.service.approveApplication(
-        app.applicationId,
-        FIXED_SCHOLARSHIP_AMOUNT,
-        'Bulk Govt Sanction order approved under Directorate technical/higher education scheme.',
-      );
+      // this.service.approveApplication(
+      //   app.applicationId,
+      //   FIXED_SCHOLARSHIP_AMOUNT,
+      //   'Bulk Govt Sanction order approved under Directorate technical/higher education scheme.',
+      // );
     });
     this.selectedAppIds.set([]);
   }
 
   approveSingle(id: number) {
-    this.service.approveApplication(
+    this.service.applicationStatusUpdate(
       id,
-      FIXED_SCHOLARSHIP_AMOUNT,
+      ApplicationStatus.ADMIN_APPROVED,
       'Direct one-time scholarship sanction granted by Directorate.',
     );
+    // this.service.approveApplication(
+    //   id,
+    //   FIXED_SCHOLARSHIP_AMOUNT,
+    //   'Direct one-time scholarship sanction granted by Directorate.',
+    // );
   }
 
   disburseSingle(id: number) {

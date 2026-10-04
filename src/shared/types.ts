@@ -3,7 +3,8 @@ export type ModalType =
 export type UserRole = 'student' | 'college-admin' | 'GOVT' | null;
 
 export type MainTab = 'APPLICATIONS' | 'INSTITUTES' | 'DISBURSEMENTS';
-export type DocType = 'INCOME' | 'MARKSHEET' | 'BANK_PASSBOOK' | 'ADMISSION_RECEIPT' | 'AFFILIATION_CERTIFICATE';
+export type DocType =
+  'INCOME' | 'MARKSHEET' | 'BANK_PASSBOOK' | 'ADMISSION_RECEIPT' | 'AFFILIATION_CERTIFICATE';
 
 export interface ScholarshipScheme {
   id: string;
@@ -170,7 +171,8 @@ export interface StatusActionMeta {
 export const STATUS_ACTION_CONFIG: Partial<Record<ApplicationStatus, StatusActionMeta>> = {
   [ApplicationStatus.INSTITUTE_VERIFIED]: {
     title: 'Verify Application',
-    message: 'Are you sure you want to verify and forward this application to Government Nodal Officers?',
+    message:
+      'Are you sure you want to verify and forward this application to Government Nodal Officers?',
     confirmText: 'Verify & Approve',
     buttonColor: '#059669',
     severity: 'success',
@@ -334,15 +336,11 @@ export interface InstituteDto {
   approvedApplicationsCount?: number;
 }
 
-export interface ApproveApplicationRequest {
-  applicationId: number;
-  sanctionAmount: number;
-  remarks?: string;
+export interface ApplicationStatusUpdateRequest {
+  statusAction: ApplicationStatus;
+  actionRemarks?: string;
 }
-export interface RejectApplicationRequest {
-  applicationId: number;
-  reason: string;
-}
+
 export interface VerifyInstituteRequest {
   profileId: number;
   remarks?: string;

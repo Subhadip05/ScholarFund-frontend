@@ -6,8 +6,7 @@ import {
   STATUS_ACTION_CONFIG,
   RevokeInstituteRequest,
   VerifyInstituteRequest,
-  ApproveApplicationRequest,
-  RejectApplicationRequest,
+  ApplicationStatusUpdateRequest,
 } from '../../../../shared/types';
 import {
   FIXED_SCHOLARSHIP_AMOUNT,
@@ -839,15 +838,10 @@ export class GovtAdminStore {
     },
   ];
 
-  // Government Admin workflow
-  selectedDeptScheme = 'All Schemes';
-  systemAlertMessage = '';
-  disbursalApprovedStatus = false;
-
   // Reactive State Signals
   readonly applications = signal<ScholarshipApplicationDto[]>(this.initialApplications);
   readonly institutes = signal<InstituteDto[]>(this.initialInstitutes);
-  readonly isLoading = signal<boolean>(false);
+  readonly modalRemarks = signal<string>('');
 
   private saveApplications(apps: ScholarshipApplicationDto[]) {
     this.applications.set(apps);
@@ -882,85 +876,74 @@ export class GovtAdminStore {
   );
 
   // 1. Govt Admin Approves Scholarship Application (Fixed ₹60k Grant)
-  approveApplication(
-    applicationId: number,
-    sanctionAmount?: number,
-    remarks?: string,
-  ): Observable<boolean> {
-    const finalAmount = sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT;
-    const now = new Date().toISOString();
+  // approveApplication(applicationId: number, remarks?: string): Observable<boolean> {
+  //   const now = new Date().toISOString();
 
-    const payload: ApproveApplicationRequest = {
-      applicationId,
-      sanctionAmount: finalAmount,
-      remarks:
-        remarks ||
-        `Scholarship grant sanctioned for ₹${finalAmount}. Queued for electronic DBT transfer.`,
-    };
+  //   const payload = {
+  //     applicationId,
+  //     statusAction: ApplicationStatus.ADMIN_APPROVED,
+  //     remarks:
+  //       remarks || `Scholarship grant sanctioned for ₹60k. Queued for electronic DBT transfer.`,
+  //   };
 
-    // Update local reactive state immediately
-    const updated = this.applications().map((app) => {
-      if (app.applicationId === applicationId) {
-        return {
-          ...app,
-          status: ApplicationStatus.ADMIN_APPROVED,
-          sanctionAmount: finalAmount,
-          timeline: [
-            ...app.timeline,
-            {
-              actionTaken: 'Govt Sanction Approved',
-              actionBy: 'Govt Admin',
-              actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
-              remarks: payload.remarks || '',
-              actionTime: now,
-            },
-          ],
-        };
-      }
-      return app;
-    });
+  //   const updated = this.applications().map((app) => {
+  //     if (app.applicationId === applicationId) {
+  //       return {
+  //         ...app,
+  //         status: ApplicationStatus.ADMIN_APPROVED,
+  //         timeline: [
+  //           ...app.timeline,
+  //           {
+  //             actionTaken: 'Govt Sanction Approved',
+  //             actionBy: 'Govt Admin',
+  //             actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
+  //             remarks: payload.remarks || '',
+  //             actionTime: now,
+  //           },
+  //         ],
+  //       };
+  //     }
+  //     return app;
+  //   });
 
-    this.saveApplications(updated);
-
-    // If connected to remote backend, forward to API
-
-    return of(true);
-  }
+  //   this.saveApplications(updated);
+  //   return of(true);
+  // }
 
   // 2. Govt Admin Rejects Scholarship Application
-  rejectApplication(applicationId: number, reason: string): Observable<boolean> {
-    const now = new Date().toISOString();
+  // rejectApplication(applicationId: number, reason: string): Observable<boolean> {
+  //   const now = new Date().toISOString();
 
-    const payload: RejectApplicationRequest = {
-      applicationId,
-      reason: reason || 'Application rejected by Govt Scholarship Officer after document review.',
-    };
+  //   const payload = {
+  //     applicationId,
+  //     statusAction: ApplicationStatus.ADMIN_REJECTED,
+  //     remarks: reason || 'Application rejected by Govt Scholarship Officer after document review.',
+  //   };
 
-    const updated = this.applications().map((app) => {
-      if (app.applicationId === applicationId) {
-        return {
-          ...app,
-          status: ApplicationStatus.ADMIN_REJECTED,
-          sanctionAmount: 0,
-          timeline: [
-            ...app.timeline,
-            {
-              actionTaken: 'Govt Admin Rejected',
-              actionBy: 'Govt Admin',
-              actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
-              remarks: payload.reason,
-              actionTime: now,
-            },
-          ],
-        };
-      }
-      return app;
-    });
+  //   const updated = this.applications().map((app) => {
+  //     if (app.applicationId === applicationId) {
+  //       return {
+  //         ...app,
+  //         status: ApplicationStatus.ADMIN_REJECTED,
+  //         timeline: [
+  //           ...app.timeline,
+  //           {
+  //             actionTaken: 'Govt Admin Rejected',
+  //             actionBy: 'Govt Admin',
+  //             actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
+  //             remarks: payload.remarks,
+  //             actionTime: now,
+  //           },
+  //         ],
+  //       };
+  //     }
+  //     return app;
+  //   });
 
-    this.saveApplications(updated);
+  //   this.saveApplications(updated);
 
-    return of(true);
-  }
+  //   return of(true);
+  // }
 
   // 3. Disburse Single Application via DBT
   disburseSingle(applicationId: number): Observable<boolean> {
@@ -1034,7 +1017,7 @@ export class GovtAdminStore {
     return of(true);
   }
 
-  // 5. Govt Verifies & Clears Institute Accreditation
+  // Govt Verifies & Clears Institute Accreditation
   verifyInstitute(profileId: number, remarks?: string): Observable<boolean> {
     const now = new Date().toISOString();
 
@@ -1063,7 +1046,7 @@ export class GovtAdminStore {
     return of(true);
   }
 
-  // 6. Revoke Institute Verification
+  // Revoke Institute Verification
   revokeInstitute(profileId: number, remarks?: string): Observable<boolean> {
     const payload: RevokeInstituteRequest = {
       profileId,
@@ -1087,54 +1070,116 @@ export class GovtAdminStore {
     return of(true);
   }
 
-  updateApplicationStatus(appId: number, targetStatus: ApplicationStatus, remarks: string): void {
-    const config = STATUS_ACTION_CONFIG[targetStatus];
-    if (!config) return;
+  applicationStatusUpdate(
+    applicationId: number,
+    targetStatus: ApplicationStatus,
+    remarks: string,
+  ): void {
+    const isApproval = targetStatus === ApplicationStatus.ADMIN_APPROVED;
+
+    const actionLabel = isApproval ? 'Approve' : 'Reject';
+    const now = new Date().toISOString();
 
     Notiflix.Confirm.show(
-      config.title,
-      config.message,
-      config.confirmText,
+      `${actionLabel} Application`,
+      `Are you sure you want to mark application #${applicationId} as ${targetStatus}?`,
+      actionLabel,
       'Cancel',
       () => {
-        Notiflix.Loading.pulse('Updating status...', {});
+        Notiflix.Loading.pulse('Updating status...');
 
-        const payload = {
+        const payload: ApplicationStatusUpdateRequest = {
           statusAction: targetStatus,
-          actionRemarks: remarks.trim(),
+          actionRemarks: remarks,
         };
 
-        this.apiService.updateApplicationStatus(appId, payload).subscribe({
+        const previousList = this.applications();
+        const updated = this.applications().map((app) => {
+          if (app.applicationId === applicationId) {
+            return {
+              ...app,
+              status: targetStatus,
+              timeline: [
+                ...app.timeline,
+                {
+                  actionTaken: 'Govt Sanction Approved',
+                  actionBy: 'Govt Admin',
+                  actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
+                  remarks: remarks,
+                  actionTime: now,
+                },
+              ],
+            };
+          }
+          return app;
+        });
+
+        return;
+        this.apiService.updateApplicationStatus(applicationId, payload).subscribe({
           next: (res) => {
             Notiflix.Loading.remove();
 
-            // Immutably update the signal
-            this.applications.update((list) =>
-              list.map((item) =>
-                item.applicationId === appId ? { ...item, status: targetStatus } : item,
-              ),
-            );
+            if (res.data) {
+              this.saveApplications(updated);
+            }
 
-            Notiflix.Report.success(
-              config.successSummary,
-              res?.message || `Application #${appId} has been successfully processed.`,
-              'Acknowledge',
+            Notiflix.Notify.success(
+              res.message || `Application #${applicationId} successfully updated.`,
             );
+            this.modalRemarks.set('');
           },
           error: (err) => {
             Notiflix.Loading.remove();
+            this.applications.set(previousList);
 
-            Notiflix.Report.failure(
-              'Action Failed',
-              err?.error?.message ||
-                `Could not complete the request for Application #${appId}. Please check network connection or verify authorization.`,
-              'Dismiss',
+            Notiflix.Notify.failure(
+              err?.error?.message || 'Failed to update application status. Changes reverted.',
             );
           },
         });
       },
       () => {},
-      { okButtonBackground: config.buttonColor },
+      {
+        okButtonBackground: isApproval ? '#059669' : '#dc2626',
+      },
+    );
+  }
+
+  handleVerifyInstitute(instituteId: number, instituteName: string): void {
+    Notiflix.Confirm.show(
+      'Accreditation Clearance',
+      `Are you sure you want to verify and approve "${instituteName}"?`,
+      'Verify & Approve',
+      'Cancel',
+      () => {
+        Notiflix.Loading.pulse('Verifying institute...');
+
+        const previousInstitutes = this.institutes();
+
+        this.institutes.update((list) => list.filter((inst) => inst.profileId !== instituteId));
+
+        this.apiService.verifyInstitute(instituteId).subscribe({
+          next: (res) => {
+            Notiflix.Loading.remove();
+            Notiflix.Notify.success(
+              res.message || `Institute "${instituteName}" verified successfully.`,
+            );
+          },
+          error: (err) => {
+            Notiflix.Loading.remove();
+
+            this.institutes.set(previousInstitutes);
+
+            Notiflix.Notify.failure(
+              err?.error?.message || `Failed to verify "${instituteName}". Changes reverted.`,
+            );
+          },
+        });
+      },
+      () => {},
+      {
+        okButtonBackground: '#059669',
+      },
     );
   }
 
