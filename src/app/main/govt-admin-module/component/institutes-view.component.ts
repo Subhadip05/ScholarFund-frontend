@@ -1,10 +1,8 @@
-import { Component, input, output, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, output, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
 import { InstituteDto } from '../../../../shared/types';
-import { Apiservice } from '../../../../shared/api/apiservice';
-import Notiflix from 'notiflix';
 import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
@@ -305,10 +303,10 @@ import { GovtAdminStore } from '../service/govt-admin-store';
     </div>
   `,
 })
-export class InstitutesViewComponent implements OnInit {
+export class InstitutesViewComponent {
   readonly service = inject(GovtAdminStore);
-  private apiService = inject(Apiservice);
-  readonly institutes = input.required<InstituteDto[]>();
+  
+  readonly institutes = this.service.institutes;
   readonly openInstitute = output<InstituteDto>();
   readonly viewCertificate = output<InstituteDto>();
 
@@ -316,25 +314,7 @@ export class InstitutesViewComponent implements OnInit {
   readonly searchQuery = signal<string>('');
   readonly typeFilter = signal<string>('ALL');
   readonly currentPage = signal<number>(1);
-  readonly pageSize = signal<number>(10);
-
-  ngOnInit(): void {
-    this.fetchUnverifiedInstitutes();
-  }
-
-  fetchUnverifiedInstitutes(): void {
-    Notiflix.Loading.pulse('Fetching applications...');
-    this.apiService.getUnverifiedInstitutes().subscribe({
-      next: (res) => {
-        console.log('Fetching unverified Institutes list response', res);
-        Notiflix.Loading.remove();
-      },
-      error: (err) => {
-        console.log(err);
-        Notiflix.Loading.remove();
-      },
-    });
-  }
+  readonly pageSize = signal<number>(10);  
 
   readonly pendingCount = computed(() => this.institutes().filter((i) => !i.isVerifyByGovt).length);
   readonly verifiedCount = computed(() => this.institutes().filter((i) => i.isVerifyByGovt).length);

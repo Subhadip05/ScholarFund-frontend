@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, model, output, signal } from '@angular/core';
+import { Component, inject, model, OnInit, output, signal } from '@angular/core';
 import { DocType, InstituteDto, MainTab, ScholarshipApplicationDto } from '../../../shared/types';
 import { formatCurrency } from '../../../shared/utils/formatters';
 import { GovtAdminStore } from '../govt-admin-module/service/govt-admin-store';
@@ -27,7 +27,7 @@ import { InstitutesViewComponent } from '../govt-admin-module/component/institut
   styleUrl: './government-dashboard.css',
   providers: [GovtAdminStore],
 })
-export class GovernmentDashboard {
+export class GovernmentDashboard implements OnInit {
   public service = inject(GovtAdminStore);
 
   readonly currentTab = model<MainTab>('APPLICATIONS');
@@ -43,6 +43,12 @@ export class GovernmentDashboard {
     inst: InstituteDto | null;
     type: DocType;
   }>();
+
+  ngOnInit(): void {
+    console.log('Govt dashboard ...');
+    this.service.fetchUnverifiedInstitutes();
+    this.service.fetchApplications();
+  }
 
   onSelectTab(tab: MainTab) {
     console.log('tab selected: ', tab);

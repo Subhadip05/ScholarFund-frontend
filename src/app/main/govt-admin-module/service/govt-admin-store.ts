@@ -3,7 +3,6 @@ import {
   InstituteDto,
   ScholarshipApplicationDto,
   ApplicationStatus,
-  STATUS_ACTION_CONFIG,
   RevokeInstituteRequest,
   VerifyInstituteRequest,
   ApplicationStatusUpdateRequest,
@@ -123,55 +122,6 @@ export class GovtAdminStore {
       contactNumber: '033 2241 1960',
       totalApplicationsCount: 34,
       approvedApplicationsCount: 29,
-    },
-    {
-      profileId: 105,
-      email: 'scholarship.cell@nitt.edu',
-      officerName: 'Dr. M. Sivasankaran',
-      officerPhoneNo: '+91 94432 10982',
-      isVerifyByGovt: false, // PENDING GOVT VERIFICATION!
-      instituteName: 'National Institute of Technology Tiruchirappalli',
-      collegeCode: 'NIT-TRY-TN-012',
-      universityAffiliation: 'Autonomous Institute of National Importance (Ministry of Education)',
-      principalName: 'Dr. G. Aghila',
-      address: 'Tanjore Main Road, National Highway 67, Tiruchirappalli, Tamil Nadu 620015',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/NIT-TRY-TN-012_cert.pdf',
-      registeredDate: '2026-08-16T12:00:00Z',
-      aisheCode: 'U-0467',
-      instituteType: 'CENTRAL_UNIVERSITY',
-      verificationRemarks: '',
-      district: 'Tiruchirappalli',
-      state: 'Tamil Nadu',
-      contactNumber: '0431 250 3000',
-      totalApplicationsCount: 19,
-      approvedApplicationsCount: 0,
-    },
-    {
-      profileId: 106,
-      email: 'admin.officer@stxavierskolkata.edu',
-      officerName: 'Fr. Dominic Savio SJ',
-      officerPhoneNo: '+91 98302 44321',
-      isVerifyByGovt: true,
-      instituteName: "St. Xavier's College (Autonomous), Kolkata",
-      collegeCode: 'SXC-KOL-WB-005',
-      universityAffiliation: 'University of Calcutta (Autonomous)',
-      principalName: 'Rev. Dr. Dominic Savio',
-      address: '30, Mother Teresa Sarani, Park Street, Kolkata, West Bengal 700016',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/SXC-KOL-WB-005_cert.pdf',
-      registeredDate: '2025-07-01T10:00:00Z',
-      aisheCode: 'C-11880',
-      instituteType: 'GOVT_AIDED',
-      verificationRemarks:
-        'NAAC A++ accreditation certificate checked against official repository.',
-      verifiedAt: '2025-07-05T15:30:00Z',
-      verifiedBy: 'Dr. Rameshwar V. Joshi, IAS',
-      district: 'Kolkata',
-      state: 'West Bengal',
-      contactNumber: '033 2255 1101',
-      totalApplicationsCount: 51,
-      approvedApplicationsCount: 46,
     },
     {
       profileId: 107,
@@ -307,120 +257,6 @@ export class GovtAdminStore {
       ],
     },
     {
-      applicationId: 2026003,
-      studentName: 'Subhasree Mondal',
-      instituteName: 'Presidency University',
-      courseName: 'M.Sc in Physics',
-      academicYear: '2025-2026',
-      lastQualificationMarks: 89.4,
-      lastQualificationCourse: 'B.Sc (Hons) in Physics',
-      lastQualificationExamRollNo: 'PU-UG-2022-0489',
-      passOutBoardName: 'Presidency University Autonomous',
-      annualIncome: 75000.0,
-      bankAccountNumber: '20491823901',
-      ifscCode: 'SBIN0000001',
-      bankName: 'State Bank of India',
-      branchName: 'Kolkata Main Branch',
-      status: ApplicationStatus.DISBURSED, // Money credited to student bank!
-      sanctionAmount: 60000,
-      disbursementDate: '2026-08-18T14:20:00Z',
-      utrNumber: 'DBT2026IN8849102XQ',
-      category: 'SC',
-      gender: 'Female',
-      studentEmail: 'mondal.subhasree99@gmail.com',
-      studentPhone: '+91 98741 23091',
-      district: 'South 24 Parganas',
-      state: 'West Bengal',
-      applicationDate: '2026-07-28T10:15:00Z',
-      instituteCollegeCode: 'PU-KOL-WB-002',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026003_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026003_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026003_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026003_admission_receipt.pdf',
-      timeline: [
-        {
-          actionTaken: 'Application Submitted',
-          actionBy: 'Subhasree Mondal',
-          actorRole: 'STUDENT',
-          remarks: 'Submitted with SDO Income Certificate and B.Sc Marksheet.',
-          actionTime: '2026-07-28T10:15:00Z',
-        },
-        {
-          actionTaken: 'Institute Verification Completed',
-          actionBy: 'Dr. Tanmoy Sengupta',
-          actorRole: 'INSTITUTE_NODAL_OFFICER',
-          remarks: 'Enrolment and tuition receipt verified.',
-          actionTime: '2026-08-01T12:00:00Z',
-        },
-        {
-          actionTaken: 'Govt Admin Approved',
-          actionBy: 'Dr. Rameshwar V. Joshi, IAS',
-          actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
-          remarks:
-            'Merit-cum-means eligibility criteria met. Sanctioned fixed one-time grant of ₹60,000.',
-          actionTime: '2026-08-10T11:30:00Z',
-        },
-        {
-          actionTaken: 'DBT Disbursal Executed via PFMS',
-          actionBy: 'PFMS Treasury Disbursal Engine',
-          actorRole: 'PFMS_TREASURY_GATEWAY',
-          remarks:
-            'Direct Benefit Transfer of ₹60,000 credited to SBI A/C 20491823901. UTR: DBT2026IN8849102XQ.',
-          actionTime: '2026-08-18T14:20:00Z',
-        },
-      ],
-    },
-    {
-      applicationId: 2026004,
-      studentName: 'Tariq Anwar',
-      instituteName: "St. Xavier's College (Autonomous), Kolkata",
-      courseName: 'B.Com (Hons) in Accounting and Finance',
-      academicYear: '2025-2026',
-      lastQualificationMarks: 91.8,
-      lastQualificationCourse: 'Class XII Commerce',
-      lastQualificationExamRollNo: 'ISC-2025-884019',
-      passOutBoardName: 'Council for the Indian School Certificate Examinations (CISCE)',
-      annualIncome: 110000.0,
-      bankAccountNumber: '50100488921034',
-      ifscCode: 'HDFC0000014',
-      bankName: 'HDFC Bank',
-      branchName: 'Park Street Branch, Kolkata',
-      status: ApplicationStatus.INSTITUTE_VERIFIED, // Pending Govt Admin approval!
-      sanctionAmount: 60000,
-      category: 'Minority',
-      gender: 'Male',
-      studentEmail: 'tariq.anwar.sxc@gmail.com',
-      studentPhone: '+91 99031 55678',
-      district: 'Kolkata',
-      state: 'West Bengal',
-      applicationDate: '2026-08-08T15:20:00Z',
-      instituteCollegeCode: 'SXC-KOL-WB-005',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026004_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026004_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026004_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026004_admission_receipt.pdf',
-      timeline: [
-        {
-          actionTaken: 'Application Submitted',
-          actionBy: 'Tariq Anwar',
-          actorRole: 'STUDENT',
-          remarks: 'Applied under Post-Matric Minority Higher Education Grant.',
-          actionTime: '2026-08-08T15:20:00Z',
-        },
-        {
-          actionTaken: 'Institute Verified',
-          actionBy: 'Fr. Dominic Savio SJ',
-          actorRole: 'INSTITUTE_NODAL_OFFICER',
-          remarks: 'Verified fee structure and attendance record. Recommended for sanction.',
-          actionTime: '2026-08-14T11:45:00Z',
-        },
-      ],
-    },
-    {
       applicationId: 2026005,
       studentName: 'Aniket Mukherjee',
       instituteName: 'Jadavpur University',
@@ -472,54 +308,6 @@ export class GovtAdminStore {
           actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
           remarks: 'Sanction authorized. Allocated to DBT Batch #2026-B8.',
           actionTime: '2026-08-15T15:10:00Z',
-        },
-      ],
-    },
-    {
-      applicationId: 2026006,
-      studentName: 'Sneha Roy Chowdhury',
-      instituteName: 'Presidency University',
-      courseName: 'B.A (Hons) in English Literature',
-      academicYear: '2025-2026',
-      lastQualificationMarks: 95.0,
-      lastQualificationCourse: 'Higher Secondary (10+2) Humanities',
-      lastQualificationExamRollNo: 'CBSE-2025-994812',
-      passOutBoardName: 'Central Board of Secondary Education (CBSE)',
-      annualIncome: 84000.0,
-      bankAccountNumber: '62490182374',
-      ifscCode: 'SBIN0001509',
-      bankName: 'State Bank of India',
-      branchName: 'College Street Branch, Kolkata',
-      status: ApplicationStatus.INSTITUTE_VERIFIED, // Pending Govt Admin approval!
-      sanctionAmount: 60000,
-      category: 'General',
-      gender: 'Female',
-      studentEmail: 'sneha.roy.lit@gmail.com',
-      studentPhone: '+91 98300 12984',
-      district: 'Kolkata',
-      state: 'West Bengal',
-      applicationDate: '2026-08-10T16:45:00Z',
-      instituteCollegeCode: 'PU-KOL-WB-002',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026006_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026006_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026006_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026006_admission_receipt.pdf',
-      timeline: [
-        {
-          actionTaken: 'Application Submitted',
-          actionBy: 'Sneha Roy Chowdhury',
-          actorRole: 'STUDENT',
-          remarks: 'Applied under Chief Minister Merit Scheme.',
-          actionTime: '2026-08-10T16:45:00Z',
-        },
-        {
-          actionTaken: 'Institute Verified',
-          actionBy: 'Dr. Tanmoy Sengupta',
-          actorRole: 'INSTITUTE_NODAL_OFFICER',
-          remarks: 'Merit marks 95% confirmed. Student in top 1 percentile.',
-          actionTime: '2026-08-15T11:00:00Z',
         },
       ],
     },
@@ -644,61 +432,6 @@ export class GovtAdminStore {
       ],
     },
     {
-      applicationId: 2026009,
-      studentName: 'Ritu Sen',
-      instituteName: 'Presidency University',
-      courseName: 'B.Sc (Hons) in Economics',
-      academicYear: '2025-2026',
-      lastQualificationMarks: 92.5,
-      lastQualificationCourse: 'Class XII Humanities & Economics',
-      lastQualificationExamRollNo: 'CBSE-2025-667182',
-      passOutBoardName: 'Central Board of Secondary Education (CBSE)',
-      annualIncome: 135000.0,
-      bankAccountNumber: '108849201948',
-      ifscCode: 'SBIN0000001',
-      bankName: 'State Bank of India',
-      branchName: 'Kolkata Main Branch',
-      status: ApplicationStatus.ADMIN_APPROVED, // Ready for DBT Disbursement!
-      sanctionAmount: 60000,
-      category: 'EWS',
-      gender: 'Female',
-      studentEmail: 'ritu.sen.econ@gmail.com',
-      studentPhone: '+91 98314 99182',
-      district: 'Howrah',
-      state: 'West Bengal',
-      applicationDate: '2026-08-06T10:00:00Z',
-      instituteCollegeCode: 'PU-KOL-WB-002',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026009_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026009_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026009_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026009_admission_receipt.pdf',
-      timeline: [
-        {
-          actionTaken: 'Application Submitted',
-          actionBy: 'Ritu Sen',
-          actorRole: 'STUDENT',
-          remarks: 'Applied under Economically Weaker Section scheme.',
-          actionTime: '2026-08-06T10:00:00Z',
-        },
-        {
-          actionTaken: 'Institute Verified',
-          actionBy: 'Dr. Tanmoy Sengupta',
-          actorRole: 'INSTITUTE_NODAL_OFFICER',
-          remarks: 'Verified EWS certificate and admission counterfoil.',
-          actionTime: '2026-08-12T14:00:00Z',
-        },
-        {
-          actionTaken: 'Govt Sanction Approved',
-          actionBy: 'Dr. Rameshwar V. Joshi, IAS',
-          actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
-          remarks: 'Sanctioned ₹30,000. Verified against National EWS database.',
-          actionTime: '2026-08-16T11:20:00Z',
-        },
-      ],
-    },
-    {
       applicationId: 2026010,
       studentName: 'Debabrata Das',
       instituteName: 'Heritage Institute of Technology',
@@ -736,54 +469,6 @@ export class GovtAdminStore {
           actorRole: 'STUDENT',
           remarks: 'Application submitted. Note: Institute Govt verification is still pending.',
           actionTime: '2026-08-17T09:00:00Z',
-        },
-      ],
-    },
-    {
-      applicationId: 2026011,
-      studentName: 'Farhana Khatun',
-      instituteName: "St. Xavier's College (Autonomous), Kolkata",
-      courseName: 'B.Sc (Hons) in Biotechnology',
-      academicYear: '2025-2026',
-      lastQualificationMarks: 93.8,
-      lastQualificationCourse: 'Class XII Science (PCB)',
-      lastQualificationExamRollNo: 'WBCHSE-2025-102948',
-      passOutBoardName: 'West Bengal Council of Higher Secondary Education (WBCHSE)',
-      annualIncome: 88000.0,
-      bankAccountNumber: '20938491029',
-      ifscCode: 'BARB0PARKST',
-      bankName: 'Bank of Baroda',
-      branchName: 'Park Street Branch',
-      status: ApplicationStatus.INSTITUTE_VERIFIED, // Pending Govt Admin approval!
-      sanctionAmount: 60000,
-      category: 'Minority',
-      gender: 'Female',
-      studentEmail: 'farhana.khatun.bio@gmail.com',
-      studentPhone: '+91 98319 88123',
-      district: 'Murshidabad',
-      state: 'West Bengal',
-      applicationDate: '2026-08-11T13:30:00Z',
-      instituteCollegeCode: 'SXC-KOL-WB-005',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026011_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026011_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026011_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026011_admission_receipt.pdf',
-      timeline: [
-        {
-          actionTaken: 'Application Submitted',
-          actionBy: 'Farhana Khatun',
-          actorRole: 'STUDENT',
-          remarks: 'Applied under Women in STEM Minority Scholarship.',
-          actionTime: '2026-08-11T13:30:00Z',
-        },
-        {
-          actionTaken: 'Institute Verified',
-          actionBy: 'Fr. Dominic Savio SJ',
-          actorRole: 'INSTITUTE_NODAL_OFFICER',
-          remarks: 'Laboratory admission fees and residential domicile authenticated.',
-          actionTime: '2026-08-16T15:00:00Z',
         },
       ],
     },
@@ -842,6 +527,54 @@ export class GovtAdminStore {
   readonly applications = signal<ScholarshipApplicationDto[]>(this.initialApplications);
   readonly institutes = signal<InstituteDto[]>(this.initialInstitutes);
   readonly modalRemarks = signal<string>('');
+
+  fetchUnverifiedInstitutes(): void {
+    Notiflix.Loading.pulse('Fetching applications...');
+    this.apiService.getUnverifiedInstitutes().subscribe({
+      next: (res) => {
+        console.log('Fetching unverified Institutes list response', res);
+        const apiData = res.data ?? [];
+
+        const apiIds = new Set(apiData.map((item: any) => item.profileId || item.instituteId));
+
+        const uniqueDemo = this.initialInstitutes.filter((demo) => !apiIds.has(demo.profileId));
+
+        this.institutes.set([...apiData, ...uniqueDemo]);
+        Notiflix.Loading.remove();
+      },
+      error: (err) => {
+        console.log(err);
+        this.institutes.set(this.initialInstitutes);
+        Notiflix.Loading.remove();
+      },
+    });
+  }
+
+  fetchApplications(statusFilter?: ApplicationStatus): void {
+    Notiflix.Loading.pulse('Fetching applications...');
+    this.apiService.getApplicationsList(statusFilter).subscribe({
+      next: (res) => {
+        console.log('Fetching application list response', res);
+        const apiData = res.data ?? [];
+
+        const apiIds = new Set(
+          apiData.map((item: any) => item.applicationId || item.applicationId),
+        );
+
+        const uniqueDemo = this.initialApplications.filter(
+          (demo) => !apiIds.has(demo.applicationId),
+        );
+
+        this.applications.set([...apiData, ...uniqueDemo]);
+        Notiflix.Loading.remove();
+      },
+      error: (err) => {
+        console.log(err);
+        this.applications.set(this.initialApplications);
+        Notiflix.Loading.remove();
+      },
+    });
+  }
 
   private saveApplications(apps: ScholarshipApplicationDto[]) {
     this.applications.set(apps);
@@ -1080,6 +813,13 @@ export class GovtAdminStore {
     const actionLabel = isApproval ? 'Approve' : 'Reject';
     const now = new Date().toISOString();
 
+    const payload: ApplicationStatusUpdateRequest = {
+      statusAction: targetStatus,
+      actionRemarks: remarks,
+    };
+
+    console.log(`Application Id: ${applicationId} and payload :`, payload);
+
     Notiflix.Confirm.show(
       `${actionLabel} Application`,
       `Are you sure you want to mark application #${applicationId} as ${targetStatus}?`,
@@ -1087,12 +827,6 @@ export class GovtAdminStore {
       'Cancel',
       () => {
         Notiflix.Loading.pulse('Updating status...');
-
-        const payload: ApplicationStatusUpdateRequest = {
-          statusAction: targetStatus,
-          actionRemarks: remarks,
-        };
-
         const previousList = this.applications();
         const updated = this.applications().map((app) => {
           if (app.applicationId === applicationId) {
@@ -1158,8 +892,11 @@ export class GovtAdminStore {
 
         this.institutes.update((list) => list.filter((inst) => inst.profileId !== instituteId));
 
+        return;
         this.apiService.verifyInstitute(instituteId).subscribe({
           next: (res) => {
+            console.log('Institute update response :', res);
+
             Notiflix.Loading.remove();
             Notiflix.Notify.success(
               res.message || `Institute "${instituteName}" verified successfully.`,

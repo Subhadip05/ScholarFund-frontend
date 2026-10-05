@@ -1,4 +1,4 @@
-import { Component, input, output, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, output, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
@@ -8,8 +8,6 @@ import {
   formatDate,
   getStatusConfig,
 } from '../../../../shared/utils/formatters';
-import { Apiservice } from '../../../../shared/api/apiservice';
-import Notiflix from 'notiflix';
 import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
@@ -425,10 +423,9 @@ import { GovtAdminStore } from '../service/govt-admin-store';
     </div>
   `,
 })
-export class ApplicationsViewComponent implements OnInit {
+export class ApplicationsViewComponent{
   readonly service = inject(GovtAdminStore);
-  private apiService = inject(Apiservice);
-  readonly applications = input.required<ScholarshipApplicationDto[]>();
+  readonly applications = this.service.applications;
   readonly openApplication = output<ScholarshipApplicationDto>();
   readonly viewDocument = output<{ app: ScholarshipApplicationDto; type: DocType }>();
 
@@ -445,24 +442,6 @@ export class ApplicationsViewComponent implements OnInit {
   readonly getStatusConfig = getStatusConfig;
   readonly formatCurrency = formatCurrency;
   readonly formatDate = formatDate;
-
-  ngOnInit(): void {
-    this.fetchApplications();
-  }
-
-  fetchApplications(statusFilter?: ApplicationStatus): void {
-    Notiflix.Loading.pulse('Fetching applications...');
-    this.apiService.getApplicationsList(statusFilter).subscribe({
-      next: (res) => {
-        console.log('Fetching application list response', res);
-        Notiflix.Loading.remove();
-      },
-      error: (err) => {
-        console.log(err);
-        Notiflix.Loading.remove();
-      },
-    });
-  }
 
   readonly distinctInstitutes = computed(() => {
     return Array.from(new Set(this.applications().map((a) => a.instituteName))).sort();

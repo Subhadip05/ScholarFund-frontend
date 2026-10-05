@@ -118,16 +118,16 @@
 
   <!-- Main View Tabs -->
   @if (currentTab() === 'APPLICATIONS') {
+    <!-- [applications]="service.applications()" -->
     <app-applications-view
-      [applications]="service.applications()"
       (openApplication)="selectedAppForDetail.set($event)"
       (viewDocument)="openDocViewer($event.app, null, $event.type)"
     ></app-applications-view>
   }
 
   @if (currentTab() === 'INSTITUTES') {
+    <!-- [institutes]="service.institutes()" -->
     <app-institutes-view
-      [institutes]="service.institutes()"
       (openInstitute)="selectedInstituteForDetail.set($event)"
       (viewCertificate)="openDocViewer(null, $event, 'AFFILIATION_CERTIFICATE')"
     ></app-institutes-view>
