@@ -530,9 +530,9 @@ export class GovtAdminStore {
 
   fetchUnverifiedInstitutes(): void {
     Notiflix.Loading.pulse('Fetching applications...');
-    this.apiService.getUnverifiedInstitutes().subscribe({
+    this.apiService.getAllInstitutes().subscribe({
       next: (res) => {
-        console.log('Fetching unverified Institutes list response', res);
+        console.log('Fetching all institutes list response', res);
         const apiData = res.data ?? [];
 
         const apiIds = new Set(apiData.map((item: any) => item.profileId || item.instituteId));
