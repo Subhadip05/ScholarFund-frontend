@@ -220,14 +220,15 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                   <i class="pi pi-check-circle"></i>
                   <span>Verify & Grant Clearance</span>
                 </button>
-              } @else {
+              } 
+              <!-- @else {
                 <button
                   (click)="revokeInstitute()"
                   class="px-3.5 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-lg transition-colors cursor-pointer"
                 >
                   Revoke Verification
                 </button>
-              }
+              } -->
             </div>
           </div>
         </div>
@@ -261,13 +262,13 @@ export class InstituteDetailModalComponent {
     this.onClose();
   }
 
-  revokeInstitute() {
-    const inst = this.institute();
-    if (!inst) return;
-    this.service.revokeInstitute(
-      inst.profileId,
-      'Verification revoked pending annual AISHE re-accreditation check.',
-    );
-    this.onClose();
-  }
+  // revokeInstitute() {
+  //   const inst = this.institute();
+  //   if (!inst) return;
+  //   this.service.revokeInstitute(
+  //     inst.profileId,
+  //     'Verification revoked pending annual AISHE re-accreditation check.',
+  //   );
+  //   this.onClose();
+  // }
 }

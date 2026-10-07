@@ -528,7 +528,7 @@ export class GovtAdminStore {
   readonly institutes = signal<InstituteDto[]>(this.initialInstitutes);
   readonly modalRemarks = signal<string>('');
 
-  fetchUnverifiedInstitutes(): void {
+  fetchAllInstitutes(): void {
     Notiflix.Loading.pulse('Fetching applications...');
     this.apiService.getAllInstitutes().subscribe({
       next: (res) => {
@@ -584,7 +584,6 @@ export class GovtAdminStore {
     this.institutes.set(insts);
   }
 
-  // Computed State Indicators
   readonly pendingApprovalsCount = computed(
     () =>
       this.applications().filter((a) => a.status === ApplicationStatus.INSTITUTE_VERIFIED).length,
@@ -607,76 +606,6 @@ export class GovtAdminStore {
       .filter((a) => a.status === ApplicationStatus.DISBURSED)
       .reduce((acc, a) => acc + (a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT), 0),
   );
-
-  // 1. Govt Admin Approves Scholarship Application (Fixed ₹60k Grant)
-  // approveApplication(applicationId: number, remarks?: string): Observable<boolean> {
-  //   const now = new Date().toISOString();
-
-  //   const payload = {
-  //     applicationId,
-  //     statusAction: ApplicationStatus.ADMIN_APPROVED,
-  //     remarks:
-  //       remarks || `Scholarship grant sanctioned for ₹60k. Queued for electronic DBT transfer.`,
-  //   };
-
-  //   const updated = this.applications().map((app) => {
-  //     if (app.applicationId === applicationId) {
-  //       return {
-  //         ...app,
-  //         status: ApplicationStatus.ADMIN_APPROVED,
-  //         timeline: [
-  //           ...app.timeline,
-  //           {
-  //             actionTaken: 'Govt Sanction Approved',
-  //             actionBy: 'Govt Admin',
-  //             actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
-  //             remarks: payload.remarks || '',
-  //             actionTime: now,
-  //           },
-  //         ],
-  //       };
-  //     }
-  //     return app;
-  //   });
-
-  //   this.saveApplications(updated);
-  //   return of(true);
-  // }
-
-  // 2. Govt Admin Rejects Scholarship Application
-  // rejectApplication(applicationId: number, reason: string): Observable<boolean> {
-  //   const now = new Date().toISOString();
-
-  //   const payload = {
-  //     applicationId,
-  //     statusAction: ApplicationStatus.ADMIN_REJECTED,
-  //     remarks: reason || 'Application rejected by Govt Scholarship Officer after document review.',
-  //   };
-
-  //   const updated = this.applications().map((app) => {
-  //     if (app.applicationId === applicationId) {
-  //       return {
-  //         ...app,
-  //         status: ApplicationStatus.ADMIN_REJECTED,
-  //         timeline: [
-  //           ...app.timeline,
-  //           {
-  //             actionTaken: 'Govt Admin Rejected',
-  //             actionBy: 'Govt Admin',
-  //             actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
-  //             remarks: payload.remarks,
-  //             actionTime: now,
-  //           },
-  //         ],
-  //       };
-  //     }
-  //     return app;
-  //   });
-
-  //   this.saveApplications(updated);
-
-  //   return of(true);
-  // }
 
   // 3. Disburse Single Application via DBT
   disburseSingle(applicationId: number): Observable<boolean> {
@@ -780,39 +709,66 @@ export class GovtAdminStore {
   }
 
   // Revoke Institute Verification
-  revokeInstitute(profileId: number, remarks?: string): Observable<boolean> {
-    const payload: RevokeInstituteRequest = {
-      profileId,
-      remarks: remarks || 'Verification revoked pending annual AISHE re-accreditation check.',
-    };
+  // revokeInstitute(profileId: number, remarks?: string): Observable<boolean> {
+  //   const payload: RevokeInstituteRequest = {
+  //     profileId,
+  //     remarks: remarks || 'Verification revoked pending annual AISHE re-accreditation check.',
+  //   };
 
-    const updated = this.institutes().map((inst) => {
-      if (inst.profileId === profileId) {
-        return {
-          ...inst,
-          isVerifyByGovt: false,
-          verificationRemarks: payload.remarks,
-        };
-      }
-      return inst;
-    });
+  //   const updated = this.institutes().map((inst) => {
+  //     if (inst.profileId === profileId) {
+  //       return {
+  //         ...inst,
+  //         isVerifyByGovt: false,
+  //         verificationRemarks: payload.remarks,
+  //       };
+  //     }
+  //     return inst;
+  //   });
 
-    this.saveInstitutes(updated);
-    //API Error revoking institute
+  //   this.saveInstitutes(updated);
+  //   //API Error revoking institute
 
-    return of(true);
-  }
+  //   return of(true);
+  // }
 
   applicationStatusUpdate(
     applicationId: number,
     targetStatus: ApplicationStatus,
     remarks: string,
   ): void {
-    const isApproval = targetStatus === ApplicationStatus.ADMIN_APPROVED;
+    const statusMeta: Record<
+      string,
+      { actionLabel: string; timelineAction: string; buttonColor: string; dialogTitle: string }
+    > = {
+      [ApplicationStatus.ADMIN_APPROVED]: {
+        actionLabel: 'Approve',
+        timelineAction: 'Govt Sanction Approved',
+        buttonColor: '#059669',
+        dialogTitle: 'Approve Sanction',
+      },
+      [ApplicationStatus.ADMIN_REJECTED]: {
+        actionLabel: 'Reject',
+        timelineAction: 'Govt Rejected',
+        buttonColor: '#dc2626',
+        dialogTitle: 'Reject Application',
+      },
+      [ApplicationStatus.DISBURSED]: {
+        actionLabel: 'Disburse Funds',
+        timelineAction: 'Direct Benefit Transfer (DBT) Executed',
+        buttonColor: '#7c3aed',
+        dialogTitle: 'Confirm DBT Disbursal',
+      },
+    };
 
-    const actionLabel = isApproval ? 'Approve' : 'Reject';
+    const meta = statusMeta[targetStatus] ?? {
+      actionLabel: 'Update',
+      timelineAction: `Status changed to ${targetStatus}`,
+      buttonColor: '#2563eb',
+      dialogTitle: 'Update Application',
+    };
+
     const now = new Date().toISOString();
-
     const payload: ApplicationStatusUpdateRequest = {
       statusAction: targetStatus,
       actionRemarks: remarks,
@@ -821,22 +777,22 @@ export class GovtAdminStore {
     console.log(`Application Id: ${applicationId} and payload :`, payload);
 
     Notiflix.Confirm.show(
-      `${actionLabel} Application`,
+      meta.dialogTitle,
       `Are you sure you want to mark application #${applicationId} as ${targetStatus}?`,
-      actionLabel,
+      meta.actionLabel,
       'Cancel',
       () => {
         Notiflix.Loading.pulse('Updating status...');
-        const previousList = this.applications();
+
         const updated = this.applications().map((app) => {
           if (app.applicationId === applicationId) {
             return {
               ...app,
               status: targetStatus,
               timeline: [
-                ...app.timeline,
+                ...(app.timeline || []),
                 {
-                  actionTaken: 'Govt Sanction Approved',
+                  actionTaken: meta.timelineAction,
                   actionBy: 'Govt Admin',
                   actorRole: 'GOVT_SCHOLARSHIP_OFFICER',
                   remarks: remarks,
@@ -848,7 +804,6 @@ export class GovtAdminStore {
           return app;
         });
 
-        return;
         this.apiService.updateApplicationStatus(applicationId, payload).subscribe({
           next: (res) => {
             Notiflix.Loading.remove();
@@ -858,23 +813,23 @@ export class GovtAdminStore {
             }
 
             Notiflix.Notify.success(
-              res.message || `Application #${applicationId} successfully updated.`,
+              res.message || `Application #${applicationId} marked as ${targetStatus}.`,
             );
             this.modalRemarks.set('');
           },
           error: (err) => {
             Notiflix.Loading.remove();
-            this.applications.set(previousList);
-
             Notiflix.Notify.failure(
               err?.error?.message || 'Failed to update application status. Changes reverted.',
             );
           },
         });
       },
-      () => {},
+      () => {
+        console.log('Cancel button clicked');
+      },
       {
-        okButtonBackground: isApproval ? '#059669' : '#dc2626',
+        okButtonBackground: meta.buttonColor,
       },
     );
   }

@@ -214,7 +214,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                 <th class="p-3.5">Bank A/C & IFSC</th>
                 <th class="p-3.5 text-center">Presigned Docs</th>
                 <th class="p-3.5">Status</th>
-                <th class="p-3.5 text-right">Govt Action</th>
+                <th class="p-3.5 text-center">Govt Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
@@ -369,7 +369,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                     </td>
 
                     <!-- Actions -->
-                    <td class="p-3.5 align-top text-right">
+                    <td class="p-3.5 align-top text-center">
                       <div class="flex items-center justify-end space-x-1.5">
                         @if (app.status === ApplicationStatus.INSTITUTE_VERIFIED) {
                           <button

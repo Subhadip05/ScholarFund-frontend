@@ -46,7 +46,7 @@ export class GovernmentDashboard implements OnInit {
 
   ngOnInit(): void {
     console.log('Govt dashboard ...');
-    this.service.fetchUnverifiedInstitutes();
+    this.service.fetchAllInstitutes();
     this.service.fetchApplications();
   }
 

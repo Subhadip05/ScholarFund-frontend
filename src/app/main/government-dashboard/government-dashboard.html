@@ -38,45 +38,7 @@
       </div>
     </div>
 
-    <!-- Overview Metric 2: Institute Verification Desk -->
-    <div
-      (click)="onSelectTab('INSTITUTES')"
-      [class]="
-        currentTab() === 'INSTITUTES'
-          ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-500/20'
-          : 'bg-white/80 border-slate-200 hover:border-slate-300 shadow-xs'
-      "
-      class="p-4 rounded-xl border transition-all cursor-pointer"
-    >
-      <div class="flex items-center justify-between">
-        <span class="text-xs font-bold text-slate-700 flex items-center">
-          <i class="pi pi-building-columns mr-1.5 text-amber-600 text-sm leading-none"></i>
-          2. Institute
-        </span>
-        @if (service.pendingInstitutesCount() > 0) {
-          <span
-            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-900 border border-rose-300 leading-none"
-          >
-            {{ service.pendingInstitutesCount() }} Need Clearance
-          </span>
-        } @else {
-          <span
-            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 leading-none"
-          >
-            100% Accredited
-          </span>
-        }
-      </div>
-      <div class="mt-2 flex items-baseline justify-between">
-        <div class="text-xl font-black text-slate-900 font-mono">
-          {{ service.institutes().length }}
-          <span class="text-xs font-normal text-slate-500">Registered</span>
-        </div>
-        <div class="text-xs text-slate-500">AISHE / UGC Verified</div>
-      </div>
-    </div>
-
-    <!-- Overview Metric 3: Money Disbursed Desk -->
+    <!-- Overview Metric 2: Money Disbursed Desk -->
     <div
       (click)="onSelectTab('DISBURSEMENTS')"
       [class]="
@@ -89,7 +51,7 @@
       <div class="flex items-center justify-between">
         <span class="text-xs font-bold text-slate-700 flex items-center">
           <i class="pi pi-send mr-1.5 text-purple-600 text-sm leading-none"></i>
-          3. Money Disbursed
+          2. Money Disbursed
         </span>
         @if (service.readyForDisburseCount() > 0) {
           <span
@@ -114,11 +76,48 @@
         </div>
       </div>
     </div>
+
+    <!-- Overview Metric 3: Institute Verification Desk -->
+    <div
+      (click)="onSelectTab('INSTITUTES')"
+      [class]="
+        currentTab() === 'INSTITUTES'
+          ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-500/20'
+          : 'bg-white/80 border-slate-200 hover:border-slate-300 shadow-xs'
+      "
+      class="p-4 rounded-xl border transition-all cursor-pointer"
+    >
+      <div class="flex items-center justify-between">
+        <span class="text-xs font-bold text-slate-700 flex items-center">
+          <i class="pi pi-building-columns mr-1.5 text-amber-600 text-sm leading-none"></i>
+          3. Institute
+        </span>
+        @if (service.pendingInstitutesCount() > 0) {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-900 border border-rose-300 leading-none"
+          >
+            {{ service.pendingInstitutesCount() }} Need Clearance
+          </span>
+        } @else {
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800 leading-none"
+          >
+            100% Accredited
+          </span>
+        }
+      </div>
+      <div class="mt-2 flex items-baseline justify-between">
+        <div class="text-xl font-black text-slate-900 font-mono">
+          {{ service.institutes().length }}
+          <span class="text-xs font-normal text-slate-500">Registered</span>
+        </div>
+        <div class="text-xs text-slate-500">AISHE / UGC Verified</div>
+      </div>
+    </div>
   </div>
 
   <!-- Main View Tabs -->
   @if (currentTab() === 'APPLICATIONS') {
-    <!-- [applications]="service.applications()" -->
     <app-applications-view
       (openApplication)="selectedAppForDetail.set($event)"
       (viewDocument)="openDocViewer($event.app, null, $event.type)"
@@ -126,7 +125,6 @@
   }
 
   @if (currentTab() === 'INSTITUTES') {
-    <!-- [institutes]="service.institutes()" -->
     <app-institutes-view
       (openInstitute)="selectedInstituteForDetail.set($event)"
       (viewCertificate)="openDocViewer(null, $event, 'AFFILIATION_CERTIFICATE')"

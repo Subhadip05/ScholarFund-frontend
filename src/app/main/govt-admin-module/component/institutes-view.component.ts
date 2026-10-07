@@ -143,7 +143,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                 <th class="p-3.5">Scholarship Officer & Contact</th>
                 <th class="p-3.5 text-center">Affiliation Doc</th>
                 <th class="p-3.5">Status</th>
-                <th class="p-3.5 text-right">Govt Action</th>
+                <th class="p-3.5 text-center">Govt Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
@@ -264,14 +264,15 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                             <i class="pi pi-check text-xs leading-none"></i>
                             <span>Verify & Approve</span>
                           </button>
-                        } @else {
+                        }
+                         <!-- @else {
                           <button
                             (click)="revokeInst(inst.profileId)"
                             class="px-2 py-1 text-rose-700 hover:bg-rose-50 rounded-md text-[11px] font-semibold transition-colors border border-rose-200 cursor-pointer"
                           >
                             Revoke
                           </button>
-                        }
+                        } -->
 
                         <button
                           (click)="onOpenInst(inst)"
@@ -372,12 +373,12 @@ export class InstitutesViewComponent {
     );
   }
 
-  revokeInst(id: number) {
-    this.service.revokeInstitute(
-      id,
-      'Verification revoked pending annual AISHE re-accreditation check.',
-    );
-  }
+  // revokeInst(id: number) {
+  //   this.service.revokeInstitute(
+  //     id,
+  //     'Verification revoked pending annual AISHE re-accreditation check.',
+  //   );
+  // }
 
   onOpenInst(inst: InstituteDto) {
     this.openInstitute.emit(inst);
