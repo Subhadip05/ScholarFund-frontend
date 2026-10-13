@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
 import { ApplicationStatus, ScholarshipApplicationDto } from '../../../../shared/types';
-import { FIXED_SCHOLARSHIP_AMOUNT, formatCurrency, formatDate } from '../../../../shared/utils/formatters';
+import {
+  FIXED_SCHOLARSHIP_AMOUNT,
+  formatCurrency,
+  formatDate,
+} from '../../../../shared/utils/formatters';
 import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
@@ -14,9 +18,13 @@ import { GovtAdminStore } from '../service/govt-admin-store';
     <div class="space-y-4">
       <!-- Quick Metrics Ribbon -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+        <div
+          class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between"
+        >
           <div>
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Awaiting Direct Disbursal</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Awaiting Direct Disbursal
+            </div>
             <div class="text-2xl font-black text-purple-950 font-mono mt-1">
               {{ formatCurrency(totalPendingAmount()) }}
             </div>
@@ -24,14 +32,20 @@ import { GovtAdminStore } from '../service/govt-admin-store';
               {{ readyForDisburseCount() }} Approved candidates in current payout cycle
             </div>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
+          <div
+            class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700"
+          >
             <i class="pi pi-clock text-xl leading-none"></i>
           </div>
         </div>
 
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between">
+        <div
+          class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between"
+        >
           <div>
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Disbursed to Date</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Total Disbursed to Date
+            </div>
             <div class="text-2xl font-black text-emerald-800 font-mono mt-1">
               {{ formatCurrency(totalDisbursedAmount()) }}
             </div>
@@ -39,14 +53,18 @@ import { GovtAdminStore } from '../service/govt-admin-store';
               {{ totalDisbursedCount() }} Student bank accounts credited successfully
             </div>
           </div>
-          <div class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+          <div
+            class="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700"
+          >
             <i class="pi pi-check-circle text-xl leading-none"></i>
           </div>
         </div>
       </div>
 
       <!-- Sub Tabs & Actions -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 bg-white px-4 pt-2 rounded-t-xl shadow-xs gap-3">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 bg-white px-4 pt-2 rounded-t-xl shadow-xs gap-3"
+      >
         <div class="flex space-x-2 sm:space-x-4 overflow-x-auto">
           <button
             (click)="handleSubTabChange('PENDING_DISBURSE')"
@@ -109,7 +127,9 @@ import { GovtAdminStore } from '../service/govt-admin-store';
       </div>
 
       <!-- Main Disbursal Table -->
-      <div class="bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-xs overflow-hidden">
+      <div
+        class="bg-white rounded-b-xl border border-t-0 border-slate-200 shadow-xs overflow-hidden"
+      >
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
@@ -133,7 +153,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                   <th class="p-3.5">PFMS UTR & Disbursed Date</th>
                 }
                 <th class="p-3.5">Status</th>
-                <th class="p-3.5 text-right">Direct Action</th>
+                <th class="p-3.5 text-center">Direct Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-200">
@@ -178,8 +198,12 @@ import { GovtAdminStore } from '../service/govt-admin-store';
 
                     <!-- Bank Name -->
                     <td class="p-3.5 align-top">
-                      <div class="font-semibold text-slate-900">{{ app.bankName || 'State Bank of India' }}</div>
-                      <div class="text-[10px] text-slate-500">{{ app.branchName || 'Main Institutional Branch' }}</div>
+                      <div class="font-semibold text-slate-900">
+                        {{ app.bankName || 'State Bank of India' }}
+                      </div>
+                      <div class="text-[10px] text-slate-500">
+                        {{ app.branchName || 'Main Institutional Branch' }}
+                      </div>
                     </td>
 
                     <!-- Account No & IFSC -->
@@ -211,11 +235,15 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                     <!-- Status -->
                     <td class="p-3.5 align-top">
                       @if (app.status === ApplicationStatus.ADMIN_APPROVED) {
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-300">
+                        <span
+                          class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-900 border border-amber-300"
+                        >
                           Ready for DBT
                         </span>
                       } @else {
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-300">
+                        <span
+                          class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-300"
+                        >
                           Disbursed
                         </span>
                       }
@@ -282,26 +310,29 @@ export class DisbursementViewComponent {
   readonly FIXED_SCHOLARSHIP_AMOUNT = FIXED_SCHOLARSHIP_AMOUNT;
 
   readonly approvedApps = computed(() =>
-    this.applications().filter((a) => a.status === ApplicationStatus.ADMIN_APPROVED)
+    this.applications().filter((a) => a.status === ApplicationStatus.ADMIN_APPROVED),
   );
 
   readonly disbursedApps = computed(() =>
-    this.applications().filter((a) => a.status === ApplicationStatus.DISBURSED)
+    this.applications().filter((a) => a.status === ApplicationStatus.DISBURSED),
   );
 
   readonly readyForDisburseCount = computed(() => this.approvedApps().length);
   readonly totalDisbursedCount = computed(() => this.disbursedApps().length);
 
   readonly totalPendingAmount = computed(() =>
-    this.approvedApps().reduce((acc, a) => acc + (a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT), 0)
+    this.approvedApps().reduce((acc, a) => acc + (a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT), 0),
   );
 
   readonly totalDisbursedAmount = computed(() =>
-    this.disbursedApps().reduce((acc, a) => acc + (a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT), 0)
+    this.disbursedApps().reduce(
+      (acc, a) => acc + (a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT),
+      0,
+    ),
   );
 
   readonly currentList = computed(() =>
-    this.subTab() === 'PENDING_DISBURSE' ? this.approvedApps() : this.disbursedApps()
+    this.subTab() === 'PENDING_DISBURSE' ? this.approvedApps() : this.disbursedApps(),
   );
 
   readonly filteredList = computed(() => {
@@ -314,11 +345,13 @@ export class DisbursementViewComponent {
         a.studentName.toLowerCase().includes(q) ||
         a.bankAccountNumber.includes(q) ||
         a.ifscCode.toLowerCase().includes(q) ||
-        (a.utrNumber && a.utrNumber.toLowerCase().includes(q))
+        (a.utrNumber && a.utrNumber.toLowerCase().includes(q)),
     );
   });
 
-  readonly totalPages = computed(() => Math.ceil(this.filteredList().length / this.pageSize()) || 1);
+  readonly totalPages = computed(
+    () => Math.ceil(this.filteredList().length / this.pageSize()) || 1,
+  );
 
   readonly paginatedList = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
@@ -347,7 +380,7 @@ export class DisbursementViewComponent {
 
   toggleSelect(id: number) {
     this.selectedIds.update((ids) =>
-      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]
+      ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id],
     );
   }
 
@@ -373,11 +406,12 @@ export class DisbursementViewComponent {
   }
 
   exportCSV() {
-    const headers = 'Application ID,Student Name,Institute,Bank Account,IFSC,Amount,Status,UTR Number,Disbursed Date\n';
+    const headers =
+      'Application ID,Student Name,Institute,Bank Account,IFSC,Amount,Status,UTR Number,Disbursed Date\n';
     const rows = this.filteredList()
       .map(
         (a) =>
-          `"${a.applicationId}","${a.studentName}","${a.instituteName}","${a.bankAccountNumber}","${a.ifscCode}","${a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT}","${a.status}","${a.utrNumber || 'N/A'}","${a.disbursementDate || 'N/A'}"`
+          `"${a.applicationId}","${a.studentName}","${a.instituteName}","${a.bankAccountNumber}","${a.ifscCode}","${a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT}","${a.status}","${a.utrNumber || 'N/A'}","${a.disbursementDate || 'N/A'}"`,
       )
       .join('\n');
     const blob = new Blob([headers + rows], { type: 'text/csv' });

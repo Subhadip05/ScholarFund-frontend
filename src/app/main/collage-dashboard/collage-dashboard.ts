@@ -341,14 +341,10 @@ export class CollageDashboard {
         bankAccountNumber: '918273645012',
         ifscCode: 'SBIN0003201',
         status: ApplicationStatus.SUBMITTED,
-        incomeCertificateUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
-        hsMarksheetUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
-        bankPassbookUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
-        admissionReceiptUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        incomeCertificateUrl: '',
+        hsMarksheetUrl: '',
+        bankPassbookUrl: '',
+        admissionReceiptUrl: '',
         timeline: [
           {
             actionTaken: 'Application Submitted',
@@ -373,14 +369,10 @@ export class CollageDashboard {
         bankAccountNumber: '501004392810',
         ifscCode: 'HDFC0001042',
         status: ApplicationStatus.INSTITUTE_VERIFIED,
-        incomeCertificateUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
-        hsMarksheetUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
-        bankPassbookUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
-        admissionReceiptUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        incomeCertificateUrl: '',
+        hsMarksheetUrl: '',
+        bankPassbookUrl: '',
+        admissionReceiptUrl: '',
         timeline: [
           {
             actionTaken: 'Application Submitted',
@@ -412,14 +404,10 @@ export class CollageDashboard {
         bankAccountNumber: '309812457811',
         ifscCode: 'SBIN0000093',
         status: ApplicationStatus.ADMIN_APPROVED,
-        incomeCertificateUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
-        hsMarksheetUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
-        bankPassbookUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
-        admissionReceiptUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        incomeCertificateUrl: '',
+        hsMarksheetUrl: '',
+        bankPassbookUrl: '',
+        admissionReceiptUrl: '',
         timeline: [
           {
             actionTaken: 'Application Submitted',
@@ -458,14 +446,10 @@ export class CollageDashboard {
         bankAccountNumber: '023410100049182',
         ifscCode: 'PUNB0023400',
         status: ApplicationStatus.INSTITUTE_REJECTED,
-        incomeCertificateUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
-        hsMarksheetUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
-        bankPassbookUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
-        admissionReceiptUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        incomeCertificateUrl: '',
+        hsMarksheetUrl: '',
+        bankPassbookUrl: '',
+        admissionReceiptUrl: '',
         timeline: [
           {
             actionTaken: 'Application Submitted',
@@ -497,14 +481,10 @@ export class CollageDashboard {
         bankAccountNumber: '409182736192',
         ifscCode: 'SBIN0001092',
         status: ApplicationStatus.SUBMITTED,
-        incomeCertificateUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
-        hsMarksheetUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
-        bankPassbookUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
-        admissionReceiptUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        incomeCertificateUrl: '',
+        hsMarksheetUrl: '',
+        bankPassbookUrl: '',
+        admissionReceiptUrl: '',
         timeline: [
           {
             actionTaken: 'Application Submitted',
@@ -529,14 +509,10 @@ export class CollageDashboard {
         bankAccountNumber: '9182736450788',
         ifscCode: 'SBIN0003201',
         status: ApplicationStatus.SUBMITTED,
-        incomeCertificateUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/income-certificate/dummy-income.pdf',
-        hsMarksheetUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/marksheet/dummy-hs.pdf',
-        bankPassbookUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/bank-passbook/dummy-passbook.pdf',
-        admissionReceiptUrl:
-          'https://scholarfund-documents-dev.s3.ap-south-1.amazonaws.com/admission-receipt/dummy-receipt.pdf',
+        incomeCertificateUrl: '',
+        hsMarksheetUrl: '',
+        bankPassbookUrl: '',
+        admissionReceiptUrl: '',
         timeline: [
           {
             actionTaken: 'Application Submitted',

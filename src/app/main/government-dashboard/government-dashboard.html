@@ -142,7 +142,7 @@
   <app-application-detail-modal
     [application]="selectedAppForDetail()"
     (close)="selectedAppForDetail.set(null)"
-    (viewDocument)="openDocViewer(selectedAppForDetail(), null, $event)"
+    (viewDocument)="openDocViewer(selectedAppForDetail(), null, $event.type)"
   ></app-application-detail-modal>
 
   <app-institute-detail-modal

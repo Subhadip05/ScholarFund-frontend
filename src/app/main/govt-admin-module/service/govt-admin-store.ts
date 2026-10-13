@@ -174,12 +174,10 @@ export class GovtAdminStore {
       state: 'West Bengal',
       applicationDate: '2026-08-05T09:30:00Z',
       instituteCollegeCode: 'JU-KOL-WB-004',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026001_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026001_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026001_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026001_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',
@@ -224,12 +222,10 @@ export class GovtAdminStore {
       state: 'West Bengal',
       applicationDate: '2026-08-02T11:00:00Z',
       instituteCollegeCode: 'IIT-KGP-WB-001',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026002_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026002_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026002_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026002_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',
@@ -281,12 +277,10 @@ export class GovtAdminStore {
       state: 'West Bengal',
       applicationDate: '2026-08-01T14:00:00Z',
       instituteCollegeCode: 'JU-KOL-WB-004',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026005_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026005_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026005_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026005_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',
@@ -338,12 +332,10 @@ export class GovtAdminStore {
       state: 'Jharkhand',
       applicationDate: '2026-07-25T11:00:00Z',
       instituteCollegeCode: 'IIT-KGP-WB-001',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026007_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026007_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026007_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026007_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',
@@ -400,12 +392,10 @@ export class GovtAdminStore {
       state: 'Rajasthan',
       applicationDate: '2026-08-04T12:00:00Z',
       instituteCollegeCode: 'JU-KOL-WB-004',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026008_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026008_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026008_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026008_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',
@@ -456,12 +446,10 @@ export class GovtAdminStore {
       state: 'West Bengal',
       applicationDate: '2026-08-17T09:00:00Z',
       instituteCollegeCode: 'HIT-KOL-WB-073',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026010_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026010_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026010_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026010_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',
@@ -497,12 +485,10 @@ export class GovtAdminStore {
       state: 'West Bengal',
       applicationDate: '2026-08-03T11:00:00Z',
       instituteCollegeCode: 'JU-KOL-WB-004',
-      incomeCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026012_income_cert.pdf',
-      hsMarksheetUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026012_hs_marksheet.pdf',
-      bankPassbookUrl: 'https://scholarfund-s3.gov.in/presigned/docs/app_2026012_bank_passbook.pdf',
-      admissionReceiptUrl:
-        'https://scholarfund-s3.gov.in/presigned/docs/app_2026012_admission_receipt.pdf',
+      incomeCertificateUrl: '',
+      hsMarksheetUrl: '',
+      bankPassbookUrl: '',
+      admissionReceiptUrl: '',
       timeline: [
         {
           actionTaken: 'Application Submitted',

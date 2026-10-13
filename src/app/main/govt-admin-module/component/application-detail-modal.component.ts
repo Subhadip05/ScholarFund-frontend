@@ -303,7 +303,6 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                     <i class="pi pi-info-circle mr-2 text-blue-600"></i>
                     Mandatory candidate documents for statutory verification.
                   </span>
-                  <span class="font-mono text-[11px] text-blue-700">AWS S3 Presigned URLs</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -332,7 +331,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       </p>
                     </div>
                     <button
-                      (click)="onViewDocument('INCOME')"
+                      (click)="onViewDocument(app, 'INCOME')"
                       class="mt-4 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <i class="pi pi-eye text-xs"></i>
@@ -365,7 +364,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       </p>
                     </div>
                     <button
-                      (click)="onViewDocument('MARKSHEET')"
+                      (click)="onViewDocument(app, 'MARKSHEET')"
                       class="mt-4 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <i class="pi pi-eye text-xs"></i>
@@ -396,7 +395,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       </p>
                     </div>
                     <button
-                      (click)="onViewDocument('BANK_PASSBOOK')"
+                      (click)="onViewDocument(app, 'BANK_PASSBOOK')"
                       class="mt-4 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <i class="pi pi-eye text-xs"></i>
@@ -427,7 +426,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       </p>
                     </div>
                     <button
-                      (click)="onViewDocument('ADMISSION_RECEIPT')"
+                      (click)="onViewDocument(app, 'ADMISSION_RECEIPT')"
                       class="mt-4 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
                     >
                       <i class="pi pi-eye text-xs"></i>
@@ -668,7 +667,8 @@ export class ApplicationDetailModalComponent {
   readonly service = inject(GovtAdminStore);
   readonly application = input<ScholarshipApplicationDto | null>(null);
   readonly close = output<void>();
-  readonly viewDocument = output<DocType>();
+  // readonly viewDocument = output<DocType>();
+  readonly viewDocument = output<{ app: ScholarshipApplicationDto; type: DocType }>();
 
   readonly activeTab = signal<'DETAILS' | 'DOCUMENTS' | 'TIMELINE'>('DETAILS');
   readonly showApproveForm = signal<boolean>(false);
@@ -697,8 +697,23 @@ export class ApplicationDetailModalComponent {
     this.close.emit();
   }
 
-  onViewDocument(type: DocType) {
-    this.viewDocument.emit(type);
+  onViewDocument(app: ScholarshipApplicationDto, type: DocType) {
+    const urlMap: Record<DocType, string | undefined> = {
+      INCOME: app?.incomeCertificateUrl,
+      MARKSHEET: app?.hsMarksheetUrl,
+      BANK_PASSBOOK: app?.bankPassbookUrl,
+      ADMISSION_RECEIPT: app?.admissionReceiptUrl,
+      AFFILIATION_CERTIFICATE: undefined,
+    };
+
+    const rawUrl = urlMap[type]?.trim();
+
+    if (rawUrl) {
+      window.open(rawUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    this.viewDocument.emit({ app, type });
   }
 
   onPresetRejectChange(e: Event) {

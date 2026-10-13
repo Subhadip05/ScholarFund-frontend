@@ -3,11 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '../../../../shared/pagination/pagination.component';
 import { ApplicationStatus, DocType, ScholarshipApplicationDto } from '../../../../shared/types';
-import {
-  formatCurrency,
-  formatDate,
-  getStatusConfig,
-} from '../../../../shared/utils/formatters';
+import { formatCurrency, formatDate, getStatusConfig } from '../../../../shared/utils/formatters';
 import { GovtAdminStore } from '../service/govt-admin-store';
 
 @Component({
@@ -212,7 +208,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                 <th class="p-3.5">Qualifying %</th>
                 <th class="p-3.5">Family Income</th>
                 <th class="p-3.5">Bank A/C & IFSC</th>
-                <th class="p-3.5 text-center">Presigned Docs</th>
+                <th class="p-3.5 text-center">Documents</th>
                 <th class="p-3.5">Status</th>
                 <th class="p-3.5 text-center">Govt Action</th>
               </tr>
@@ -327,7 +323,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       </div>
                     </td>
 
-                    <!-- Presigned Docs Buttons -->
+                    <!-- Docs Buttons -->
                     <td class="p-3.5 align-top text-center">
                       <div class="inline-flex items-center space-x-1">
                         <button
@@ -423,7 +419,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
     </div>
   `,
 })
-export class ApplicationsViewComponent{
+export class ApplicationsViewComponent {
   readonly service = inject(GovtAdminStore);
   readonly applications = this.service.applications;
   readonly openApplication = output<ScholarshipApplicationDto>();
@@ -607,6 +603,22 @@ export class ApplicationsViewComponent{
   }
 
   onInspectDoc(app: ScholarshipApplicationDto, type: DocType) {
+    const urlMap: Record<DocType, string | undefined> = {
+      INCOME: app.incomeCertificateUrl,
+      MARKSHEET: app.hsMarksheetUrl,
+      BANK_PASSBOOK: app.bankPassbookUrl,
+      ADMISSION_RECEIPT: app.admissionReceiptUrl,
+      AFFILIATION_CERTIFICATE: undefined, // institute url: affiliationCertificateUrl
+    };
+
+    const rawUrl = urlMap[type]?.trim();
+
+    if (rawUrl) {
+      window.open(rawUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Otherwise, demo template modal
     this.viewDocument.emit({ app, type });
   }
 }

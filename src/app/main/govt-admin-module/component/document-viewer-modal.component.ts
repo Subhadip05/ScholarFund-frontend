@@ -33,14 +33,6 @@ export type DocType =
                   <span class="text-xs font-bold text-white uppercase tracking-wide">{{
                     getDocTitle()
                   }}</span>
-                  <span
-                    class="px-1.5 py-0.2 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                  >
-                    S3 Presigned URL Active
-                  </span>
-                </div>
-                <div class="text-[11px] text-slate-400 font-mono mt-0.5 truncate max-w-[400px]">
-                  {{ getDocUrl() }}
                 </div>
               </div>
             </div>
@@ -85,7 +77,6 @@ export type DocType =
             </div>
           </div>
 
-          <!-- Document Rendering Canvas (Simulated High-Resolution Govt Certificate / Marksheet) -->
           <div
             class="flex-1 overflow-auto bg-slate-950 p-6 flex items-center justify-center min-h-[460px]"
           >
@@ -457,35 +448,13 @@ export class DocumentViewerModalComponent {
       case 'MARKSHEET':
         return 'Senior Secondary Qualifying Marksheet';
       case 'BANK_PASSBOOK':
-        return 'PFMS Bank Mandate & Passbook';
+        return 'Bank Mandate & Passbook';
       case 'ADMISSION_RECEIPT':
         return 'Institutional Admission Tuition Receipt';
       case 'AFFILIATION_CERTIFICATE':
         return 'UGC / AISHE Statutory Affiliation Certificate';
       default:
         return 'Government Support Document';
-    }
-  }
-
-  getDocUrl(): string {
-    const app = this.application();
-    const inst = this.institute();
-    switch (this.documentType()) {
-      case 'INCOME':
-        return app?.incomeCertificateUrl || 'https://scholarfund-s3.gov.in/presigned/income.pdf';
-      case 'MARKSHEET':
-        return app?.hsMarksheetUrl || 'https://scholarfund-s3.gov.in/presigned/marksheet.pdf';
-      case 'BANK_PASSBOOK':
-        return app?.bankPassbookUrl || 'https://scholarfund-s3.gov.in/presigned/passbook.pdf';
-      case 'ADMISSION_RECEIPT':
-        return app?.admissionReceiptUrl || 'https://scholarfund-s3.gov.in/presigned/receipt.pdf';
-      case 'AFFILIATION_CERTIFICATE':
-        return (
-          inst?.affiliationCertificateUrl ||
-          'https://scholarfund-s3.gov.in/presigned/affiliation.pdf'
-        );
-      default:
-        return 'https://scholarfund-s3.gov.in/presigned/doc.pdf';
     }
   }
 }
