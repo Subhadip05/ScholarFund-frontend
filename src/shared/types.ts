@@ -340,12 +340,3 @@ export interface ApplicationStatusUpdateRequest {
   statusAction: ApplicationStatus;
   actionRemarks?: string;
 }
-
-export interface VerifyInstituteRequest {
-  profileId: number;
-  remarks?: string;
-}
-export interface RevokeInstituteRequest {
-  profileId: number;
-  remarks?: string;
-}

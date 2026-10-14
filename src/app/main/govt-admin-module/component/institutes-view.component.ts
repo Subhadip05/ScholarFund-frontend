@@ -230,7 +230,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                     <!-- Affiliation Certificate -->
                     <td class="p-3.5 align-top text-center">
                       <button
-                        (click)="onViewCert(inst)"
+                        (click)="onViewCert(inst?.affiliationCertificateUrl)"
                         class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-md text-[11px] font-semibold transition-colors inline-flex items-center space-x-1 border border-slate-200 cursor-pointer"
                         title="View Official Affiliation Certificate"
                       >
@@ -258,21 +258,15 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       <div class="flex items-center justify-end space-x-1.5">
                         @if (!inst.isVerifyByGovt) {
                           <button
-                            (click)="verifyInst(inst.profileId)"
+                            (click)="
+                              service.handleVerifyInstitute(inst.profileId, inst.instituteName)
+                            "
                             class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-md text-[11px] font-bold shadow-xs transition-colors inline-flex items-center space-x-1 cursor-pointer"
                           >
                             <i class="pi pi-check text-xs leading-none"></i>
                             <span>Verify & Approve</span>
                           </button>
                         }
-                         <!-- @else {
-                          <button
-                            (click)="revokeInst(inst.profileId)"
-                            class="px-2 py-1 text-rose-700 hover:bg-rose-50 rounded-md text-[11px] font-semibold transition-colors border border-rose-200 cursor-pointer"
-                          >
-                            Revoke
-                          </button>
-                        } -->
 
                         <button
                           (click)="onOpenInst(inst)"
@@ -306,16 +300,16 @@ import { GovtAdminStore } from '../service/govt-admin-store';
 })
 export class InstitutesViewComponent {
   readonly service = inject(GovtAdminStore);
-  
+
   readonly institutes = this.service.institutes;
   readonly openInstitute = output<InstituteDto>();
-  readonly viewCertificate = output<InstituteDto>();
+  readonly viewCertificate = output<void>();
 
   readonly filterTab = signal<'ALL' | 'PENDING' | 'VERIFIED'>('ALL');
   readonly searchQuery = signal<string>('');
   readonly typeFilter = signal<string>('ALL');
   readonly currentPage = signal<number>(1);
-  readonly pageSize = signal<number>(10);  
+  readonly pageSize = signal<number>(10);
 
   readonly pendingCount = computed(() => this.institutes().filter((i) => !i.isVerifyByGovt).length);
   readonly verifiedCount = computed(() => this.institutes().filter((i) => i.isVerifyByGovt).length);
@@ -366,25 +360,15 @@ export class InstitutesViewComponent {
     this.currentPage.set(1);
   }
 
-  verifyInst(id: number) {
-    this.service.verifyInstitute(
-      id,
-      'AISHE credentials and statutory university affiliation verified by Directorate.',
-    );
-  }
-
-  // revokeInst(id: number) {
-  //   this.service.revokeInstitute(
-  //     id,
-  //     'Verification revoked pending annual AISHE re-accreditation check.',
-  //   );
-  // }
-
   onOpenInst(inst: InstituteDto) {
     this.openInstitute.emit(inst);
   }
 
-  onViewCert(inst: InstituteDto) {
-    this.viewCertificate.emit(inst);
+  onViewCert(certificateURL?: any) {
+    if (certificateURL) {
+      window.open(certificateURL, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    this.viewCertificate.emit();
   }
 }

@@ -3,8 +3,6 @@ import {
   InstituteDto,
   ScholarshipApplicationDto,
   ApplicationStatus,
-  RevokeInstituteRequest,
-  VerifyInstituteRequest,
   ApplicationStatusUpdateRequest,
 } from '../../../../shared/types';
 import {
@@ -35,8 +33,7 @@ export class GovtAdminStore {
       universityAffiliation: 'Autonomous Institute of National Importance (Ministry of Education)',
       principalName: 'Prof. V. K. Tewari',
       address: 'Kharagpur, Paschim Medinipur, West Bengal 721302',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/IIT-KGP-WB-001_cert.pdf',
+      affiliationCertificateUrl: '',
       registeredDate: '2025-06-10T10:00:00Z',
       aisheCode: 'U-0570',
       instituteType: 'CENTRAL_UNIVERSITY',
@@ -61,8 +58,7 @@ export class GovtAdminStore {
       universityAffiliation: 'State University (UGC Approved & NAAC A++ Grade)',
       principalName: 'Prof. Buddhadeb Sau',
       address: '188, Raja S.C. Mallick Road, Jadavpur, Kolkata, West Bengal 700032',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/JU-KOL-WB-004_cert.pdf',
+      affiliationCertificateUrl: '',
       registeredDate: '2025-06-12T11:20:00Z',
       aisheCode: 'U-0568',
       instituteType: 'GOVERNMENT',
@@ -86,8 +82,7 @@ export class GovtAdminStore {
       universityAffiliation: 'Maulana Abul Kalam Azad University of Technology (MAKAUT)',
       principalName: 'Dr. Basab Chaudhuri',
       address: '994, Chowbaga Road, Anandapur, East Kolkata Township, Kolkata, West Bengal 700107',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/HIT-KOL-WB-073_cert.pdf',
+      affiliationCertificateUrl: '',
       registeredDate: '2026-08-14T09:15:00Z',
       aisheCode: 'C-6240',
       instituteType: 'PRIVATE',
@@ -96,54 +91,6 @@ export class GovtAdminStore {
       state: 'West Bengal',
       contactNumber: '033 6627 0600',
       totalApplicationsCount: 28,
-      approvedApplicationsCount: 0,
-    },
-    {
-      profileId: 104,
-      email: 'nodal.officer@presiuniv.ac.in',
-      officerName: 'Dr. Tanmoy Sengupta',
-      officerPhoneNo: '+91 98319 90022',
-      isVerifyByGovt: true,
-      instituteName: 'Presidency University',
-      collegeCode: 'PU-KOL-WB-002',
-      universityAffiliation: 'State University of West Bengal (UGC Recognized)',
-      principalName: 'Prof. Anuradha Lohia',
-      address: '86/1, College Street, Bowbazar, Kolkata, West Bengal 700073',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/PU-KOL-WB-002_cert.pdf',
-      registeredDate: '2025-06-18T14:40:00Z',
-      aisheCode: 'U-0580',
-      instituteType: 'GOVERNMENT',
-      verificationRemarks: 'Heritage institution documentation authenticated.',
-      verifiedAt: '2025-06-20T11:00:00Z',
-      verifiedBy: 'Dr. Rameshwar V. Joshi, IAS',
-      district: 'Kolkata',
-      state: 'West Bengal',
-      contactNumber: '033 2241 1960',
-      totalApplicationsCount: 34,
-      approvedApplicationsCount: 29,
-    },
-    {
-      profileId: 107,
-      email: 'scholarship@technoindia.edu',
-      officerName: 'Dr. Snehasis Banerjee',
-      officerPhoneNo: '+91 98311 00293',
-      isVerifyByGovt: false, // PENDING GOVT VERIFICATION!
-      instituteName: 'Techno Main Salt Lake',
-      collegeCode: 'TMSL-KOL-WB-118',
-      universityAffiliation: 'Maulana Abul Kalam Azad University of Technology (MAKAUT)',
-      principalName: 'Dr. Meghnad Saha Institute',
-      address: 'EM-4/1, Sector V, Salt Lake, Kolkata, West Bengal 700091',
-      affiliationCertificateUrl:
-        'https://scholarfund-s3.gov.in/presigned/affiliations/TMSL-KOL-WB-118_cert.pdf',
-      registeredDate: '2026-08-18T08:30:00Z',
-      aisheCode: 'C-6235',
-      instituteType: 'PRIVATE',
-      verificationRemarks: '',
-      district: 'North 24 Parganas',
-      state: 'West Bengal',
-      contactNumber: '033 2357 5683',
-      totalApplicationsCount: 15,
       approvedApplicationsCount: 0,
     },
   ];
@@ -665,59 +612,6 @@ export class GovtAdminStore {
     return of(true);
   }
 
-  // Govt Verifies & Clears Institute Accreditation
-  verifyInstitute(profileId: number, remarks?: string): Observable<boolean> {
-    const now = new Date().toISOString();
-
-    const payload: VerifyInstituteRequest = {
-      profileId,
-      remarks:
-        remarks ||
-        'AISHE credentials and statutory university affiliation verified by Directorate.',
-    };
-
-    const updated = this.institutes().map((inst) => {
-      if (inst.profileId === profileId) {
-        return {
-          ...inst,
-          isVerifyByGovt: true,
-          verifiedAt: now,
-          verificationRemarks: payload.remarks,
-        };
-      }
-      return inst;
-    });
-
-    this.saveInstitutes(updated);
-    //API Error verifying institute
-
-    return of(true);
-  }
-
-  // Revoke Institute Verification
-  // revokeInstitute(profileId: number, remarks?: string): Observable<boolean> {
-  //   const payload: RevokeInstituteRequest = {
-  //     profileId,
-  //     remarks: remarks || 'Verification revoked pending annual AISHE re-accreditation check.',
-  //   };
-
-  //   const updated = this.institutes().map((inst) => {
-  //     if (inst.profileId === profileId) {
-  //       return {
-  //         ...inst,
-  //         isVerifyByGovt: false,
-  //         verificationRemarks: payload.remarks,
-  //       };
-  //     }
-  //     return inst;
-  //   });
-
-  //   this.saveInstitutes(updated);
-  //   //API Error revoking institute
-
-  //   return of(true);
-  // }
-
   applicationStatusUpdate(
     applicationId: number,
     targetStatus: ApplicationStatus,
@@ -821,19 +715,31 @@ export class GovtAdminStore {
   }
 
   handleVerifyInstitute(instituteId: number, instituteName: string): void {
+    console.log('Id:', instituteId);
+
     Notiflix.Confirm.show(
       'Accreditation Clearance',
-      `Are you sure you want to verify and approve "${instituteName}"?`,
+      `Are you sure you want to approve "${instituteName}"?`,
       'Verify & Approve',
       'Cancel',
       () => {
         Notiflix.Loading.pulse('Verifying institute...');
+        const now = new Date().toISOString();
 
         const previousInstitutes = this.institutes();
+        const updated = this.institutes().map((inst) => {
+          if (inst.profileId === instituteId) {
+            return {
+              ...inst,
+              isVerifyByGovt: true,
+              verifiedAt: now,
+              verificationRemarks: 'Verified by Govt Admin',
+            };
+          }
+          return inst;
+        });
 
-        this.institutes.update((list) => list.filter((inst) => inst.profileId !== instituteId));
-
-        return;
+        // return;
         this.apiService.verifyInstitute(instituteId).subscribe({
           next: (res) => {
             console.log('Institute update response :', res);
@@ -842,6 +748,7 @@ export class GovtAdminStore {
             Notiflix.Notify.success(
               res.message || `Institute "${instituteName}" verified successfully.`,
             );
+            this.saveInstitutes(updated);
           },
           error: (err) => {
             Notiflix.Loading.remove();
@@ -854,7 +761,9 @@ export class GovtAdminStore {
           },
         });
       },
-      () => {},
+      () => {
+        console.log('Cancel clicked');
+      },
       {
         okButtonBackground: '#059669',
       },

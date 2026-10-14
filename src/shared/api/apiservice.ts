@@ -109,12 +109,6 @@ export class Apiservice {
     });
   }
 
-  // getUnverifiedInstitutes(): Observable<ApiResponse<InstituteProfileResponse[]>> {
-  //   return this.client.get<ApiResponse<InstituteProfileResponse[]>>(
-  //     `${baseUrl}/admin/institutes/unverified-list`,
-  //   );
-  // }
-
   getAllInstitutes(): Observable<ApiResponse<InstituteProfileResponse[]>> {
     return this.client.get<ApiResponse<InstituteProfileResponse[]>>(
       `${baseUrl}/admin/institutes-list`,
@@ -123,7 +117,7 @@ export class Apiservice {
 
   verifyInstitute(instituteId: number): Observable<ApiResponse<string | null>> {
     return this.client.put<ApiResponse<string | null>>(
-      `${baseUrl}/verify-institute/${instituteId}`,
+      `${baseUrl}/admin/verify-institute/${instituteId}`,
       {},
     );
   }

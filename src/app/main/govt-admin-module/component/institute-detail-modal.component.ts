@@ -168,13 +168,10 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                   <h4 class="font-bold text-slate-900 text-sm">
                     Statutory Affiliation Certificate
                   </h4>
-                  <p class="text-slate-500 text-[11px] font-mono mt-0.5 truncate max-w-[320px]">
-                    {{ inst.affiliationCertificateUrl }}
-                  </p>
                 </div>
               </div>
               <button
-                (click)="onViewCertificate()"
+                (click)="onViewCertificate(inst?.affiliationCertificateUrl)"
                 class="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg font-semibold border border-blue-200 transition-colors flex items-center space-x-1.5 cursor-pointer"
               >
                 <i class="pi pi-eye text-xs"></i>
@@ -183,7 +180,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
             </div>
 
             <!-- Verification History if available -->
-            @if (inst.verifiedAt) {
+            <!-- @if (inst.verifiedAt) {
               <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-950">
                 <div class="font-bold flex items-center">
                   <i class="pi pi-check-circle mr-1.5 text-emerald-600"></i>
@@ -197,7 +194,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                   <p class="mt-1 italic text-slate-700">"{{ inst.verificationRemarks }}"</p>
                 }
               </div>
-            }
+            } -->
           </div>
 
           <!-- Modal Action Bar -->
@@ -220,15 +217,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                   <i class="pi pi-check-circle"></i>
                   <span>Verify & Grant Clearance</span>
                 </button>
-              } 
-              <!-- @else {
-                <button
-                  (click)="revokeInstitute()"
-                  class="px-3.5 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50 border border-rose-200 rounded-lg transition-colors cursor-pointer"
-                >
-                  Revoke Verification
-                </button>
-              } -->
+              }
             </div>
           </div>
         </div>
@@ -248,27 +237,18 @@ export class InstituteDetailModalComponent {
     this.close.emit();
   }
 
-  onViewCertificate() {
+  onViewCertificate(url?: string) {
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return;
+    }
     this.viewCertificate.emit();
   }
 
   verifyInstitute() {
     const inst = this.institute();
     if (!inst) return;
-    this.service.verifyInstitute(
-      inst.profileId,
-      'AISHE credentials and statutory university affiliation verified by Directorate.',
-    );
+    this.service.handleVerifyInstitute(inst.profileId, inst.instituteName);
     this.onClose();
   }
-
-  // revokeInstitute() {
-  //   const inst = this.institute();
-  //   if (!inst) return;
-  //   this.service.revokeInstitute(
-  //     inst.profileId,
-  //     'Verification revoked pending annual AISHE re-accreditation check.',
-  //   );
-  //   this.onClose();
-  // }
 }
