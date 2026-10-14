@@ -194,14 +194,14 @@ import { GovtAdminStore } from '../service/govt-admin-store';
           <table class="w-full text-left text-xs border-collapse">
             <thead>
               <tr class="bg-slate-900 text-white font-semibold">
-                <th class="p-3.5 text-center w-10">
+                <!-- <th class="p-3.5 text-center w-10">
                   <input
                     type="checkbox"
                     [checked]="isAllSelected()"
                     (change)="handleSelectAll($event)"
                     class="rounded border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
-                </th>
+                </th> -->
                 <th class="p-3.5">App ID & Date</th>
                 <th class="p-3.5">Student & Category</th>
                 <th class="p-3.5">Enrolled College & Course</th>
@@ -230,14 +230,14 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                     class="transition-colors"
                   >
                     <!-- Checkbox -->
-                    <td class="p-3.5 text-center align-top">
+                    <!-- <td class="p-3.5 text-center align-top">
                       <input
                         type="checkbox"
                         [checked]="isSelected(app.applicationId)"
                         (change)="toggleSelect(app.applicationId)"
                         class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
-                    </td>
+                    </td> -->
 
                     <!-- ID & Date -->
                     <td class="p-3.5 align-top">
@@ -587,15 +587,14 @@ export class ApplicationsViewComponent {
       ApplicationStatus.ADMIN_APPROVED,
       'Direct one-time scholarship sanction granted by Directorate.',
     );
-    // this.service.approveApplication(
-    //   id,
-    //   FIXED_SCHOLARSHIP_AMOUNT,
-    //   'Direct one-time scholarship sanction granted by Directorate.',
-    // );
   }
 
   disburseSingle(id: number) {
-    this.service.disburseSingle(id);
+    this.service.applicationStatusUpdate(
+      id,
+      ApplicationStatus.DISBURSED,
+      'Direct one-time scholarship DBT transfer done by Govt Admin.',
+    );
   }
 
   onOpenApp(app: ScholarshipApplicationDto) {

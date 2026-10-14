@@ -134,7 +134,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
           <table class="w-full text-left text-xs border-collapse">
             <thead>
               <tr class="bg-slate-900 text-white font-semibold">
-                @if (subTab() === 'PENDING_DISBURSE') {
+                <!-- @if (subTab() === 'PENDING_DISBURSE') {
                   <th class="p-3.5 text-center w-10">
                     <input
                       type="checkbox"
@@ -143,7 +143,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                       class="rounded border-slate-700 text-purple-600 focus:ring-purple-500 cursor-pointer"
                     />
                   </th>
-                }
+                } -->
                 <th class="p-3.5">App ID</th>
                 <th class="p-3.5">Beneficiary Student & College</th>
                 <th class="p-3.5">Bank Name & Branch</th>
@@ -167,7 +167,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
               } @else {
                 @for (app of paginatedList(); track app.applicationId) {
                   <tr class="hover:bg-purple-50/30 transition-colors">
-                    @if (subTab() === 'PENDING_DISBURSE') {
+                    <!-- @if (subTab() === 'PENDING_DISBURSE') {
                       <td class="p-3.5 text-center align-top">
                         <input
                           type="checkbox"
@@ -176,7 +176,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                           class="rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
                         />
                       </td>
-                    }
+                    } -->
 
                     <!-- App ID -->
                     <td class="p-3.5 align-top font-mono font-bold text-slate-900">
@@ -394,7 +394,11 @@ export class DisbursementViewComponent {
   }
 
   disburseSingle(id: number) {
-    this.service.disburseSingle(id);
+    this.service.applicationStatusUpdate(
+      id,
+      ApplicationStatus.DISBURSED,
+      'Direct one-time scholarship DBT transfer done by Govt Admin.',
+    );
   }
 
   triggerBatchDisburseAll() {

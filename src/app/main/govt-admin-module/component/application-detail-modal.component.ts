@@ -284,7 +284,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                         >
                         <span
                           ><strong>Disbursed On:</strong>
-                          {{ formatDate(app.disbursementDate) }}</span
+                          {{ formatDate(app.timeline[3]?.actionTime) }}</span
                         >
                       </div>
                     </div>
@@ -746,7 +746,11 @@ export class ApplicationDetailModalComponent {
   }
 
   disburseSingle(id: number) {
-    this.service.disburseSingle(id);
+    this.service.applicationStatusUpdate(
+      id,
+      ApplicationStatus.DISBURSED,
+      'Direct one-time scholarship DBT transfer done by Govt Admin.',
+    );
     this.onClose();
   }
 }

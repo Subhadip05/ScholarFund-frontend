@@ -230,7 +230,7 @@ import { GovtAdminStore } from '../service/govt-admin-store';
                     <!-- Affiliation Certificate -->
                     <td class="p-3.5 align-top text-center">
                       <button
-                        (click)="onViewCert(inst?.affiliationCertificateUrl)"
+                        (click)="onViewCert(inst)"
                         class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-md text-[11px] font-semibold transition-colors inline-flex items-center space-x-1 border border-slate-200 cursor-pointer"
                         title="View Official Affiliation Certificate"
                       >
@@ -303,7 +303,8 @@ export class InstitutesViewComponent {
 
   readonly institutes = this.service.institutes;
   readonly openInstitute = output<InstituteDto>();
-  readonly viewCertificate = output<void>();
+  // readonly viewCertificate = output<void>();
+  readonly viewCertificate = output<InstituteDto>();
 
   readonly filterTab = signal<'ALL' | 'PENDING' | 'VERIFIED'>('ALL');
   readonly searchQuery = signal<string>('');
@@ -364,11 +365,13 @@ export class InstitutesViewComponent {
     this.openInstitute.emit(inst);
   }
 
-  onViewCert(certificateURL?: any) {
-    if (certificateURL) {
-      window.open(certificateURL, '_blank', 'noopener,noreferrer');
+  onViewCert(inst: InstituteDto): void {
+    const certUrl = inst.affiliationCertificateUrl?.trim();
+
+    if (certUrl) {
+      window.open(certUrl, '_blank', 'noopener,noreferrer');
       return;
     }
-    this.viewCertificate.emit();
+    this.viewCertificate.emit(inst);
   }
 }

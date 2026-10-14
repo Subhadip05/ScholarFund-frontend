@@ -540,44 +540,6 @@ export class GovtAdminStore {
       .reduce((acc, a) => acc + (a.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT), 0),
   );
 
-  // 3. Disburse Single Application via DBT
-  disburseSingle(applicationId: number): Observable<boolean> {
-    const targetApp = this.applications().find((a) => a.applicationId === applicationId);
-    if (!targetApp) return of(false);
-
-    const utr = generateUTR();
-    const now = new Date().toISOString();
-    const amount = targetApp.sanctionAmount || FIXED_SCHOLARSHIP_AMOUNT;
-
-    const updated = this.applications().map((app) => {
-      if (app.applicationId === applicationId) {
-        return {
-          ...app,
-          status: ApplicationStatus.DISBURSED,
-          disbursementDate: now,
-          utrNumber: utr,
-          timeline: [
-            ...app.timeline,
-            {
-              actionTaken: 'DBT Disbursal Executed via PFMS',
-              actionBy: 'PFMS Treasury Disbursal Gateway',
-              actorRole: 'PFMS_TREASURY_GATEWAY',
-              remarks: `Electronic DBT Transfer of ${formatCurrency(amount)} successful. Bank Ref UTR: ${utr}. Credited to A/C: ${app.bankAccountNumber}.`,
-              actionTime: now,
-            },
-          ],
-        };
-      }
-      return app;
-    });
-
-    this.saveApplications(updated);
-
-    //API Error disbursing application
-
-    return of(true);
-  }
-
   // 4. Batch Disburse Applications
   disburseBatch(disbursedIds: number[]): Observable<boolean> {
     const now = new Date().toISOString();
@@ -684,9 +646,11 @@ export class GovtAdminStore {
           return app;
         });
 
+        //APi Hit
         this.apiService.updateApplicationStatus(applicationId, payload).subscribe({
           next: (res) => {
             Notiflix.Loading.remove();
+            console.log('Application status update response:', res);
 
             if (res.data) {
               this.saveApplications(updated);
