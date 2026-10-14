@@ -3,29 +3,77 @@
 
   <!-- Left Side: Stepper timeline -->
   <div class="lg:col-span-1 space-y-6">
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-      <h3 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-        <i class="pi pi-sliders-h text-indigo-600 text-lg"></i>
-        <span>Verification Pipeline</span>
-      </h3>
-      <div
-        class="relative pl-6 space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-slate-200"
-      >
-        <div *ngFor="let step of portalService.studentTimeline" class="relative">
-          <div
-            [ngClass]="{
-              'bg-blue-600 border-blue-600 ring-4 ring-blue-50': step.status === 'completed',
-              'bg-amber-500 border-amber-500 animate-pulse ring-4 ring-amber-50':
-                step.status === 'pending',
-              'bg-white border-slate-300': step.status !== 'completed' && step.status !== 'pending',
-            }"
-            class="absolute -left-[21px] top-1 w-[12px] h-[12px] rounded-full border-2"
-          ></div>
-          <div>
-            <h4 class="text-xs font-bold text-slate-800">{{ step.label }}</h4>
-            <p class="text-[11px] text-slate-500 mt-0.5">{{ step.date }}</p>
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+          <i class="pi pi-history text-indigo-600 text-base"></i>
+          <span>Scholarship Tracking</span>
+        </h3>
+        <span class="text-[11px] font-medium text-slate-400">
+          {{ applicationDetails()?.timeline?.length || 0 }} Updates
+        </span>
+      </div>
+
+      <div class="relative space-y-6">
+        @for (step of applicationDetails()?.timeline; track $index; let isLast = $last) {
+          @let meta = getTimelineMeta(step.actionTaken);
+
+          <div class="relative flex items-start gap-3.5 group">
+            @if (!isLast) {
+              <div
+                class="absolute left-4 top-8 -bottom-6 w-0.5 bg-slate-200 group-hover:bg-indigo-100 transition-colors"
+              ></div>
+            }
+
+            <!-- Icon -->
+            <div
+              [class]="meta.nodeBg"
+              class="relative z-10 w-8 h-8 rounded-full border flex items-center justify-center ring-4 transition-transform group-hover:scale-105 shrink-0"
+            >
+              <i [class]="meta.icon + ' ' + meta.iconColor" class="text-xs"></i>
+            </div>
+
+            <!-- Content Details -->
+            <div class="flex-1 min-w-0 pt-0.5">
+              <div class="flex items-center justify-between gap-2 flex-wrap">
+                <h4 class="text-xs font-semibold text-slate-900 truncate">
+                  {{ step.actionTaken }}
+                </h4>
+                <span
+                  [class]="meta.badgeClass"
+                  class="px-2 py-0.5 rounded-full text-[10px] font-bold border tracking-wide uppercase shrink-0"
+                >
+                  {{ step.actorRole }}
+                </span>
+              </div>
+
+              <div class="flex items-center gap-1.5 text-[11px] text-slate-500 mt-1">
+                <span
+                  class="font-medium text-slate-700 truncate max-w-[130px]"
+                  [title]="step.actionBy"
+                >
+                  {{ step.actionBy }}
+                </span>
+                <span>•</span>
+                <span class="font-mono text-[10px]">
+                  {{ step.actionTime | date: 'dd MMM yyyy, hh:mm a' }}
+                </span>
+              </div>
+
+              @if (step.remarks) {
+                <div
+                  class="mt-2 text-xs bg-slate-50 border border-slate-200/70 rounded-lg p-2.5 text-slate-700 leading-relaxed font-sans"
+                >
+                  {{ step.remarks }}
+                </div>
+              }
+            </div>
           </div>
-        </div>
+        } @empty {
+          <div class="text-center py-8 text-xs text-slate-400">
+            No action history available yet.
+          </div>
+        }
       </div>
     </div>
   </div>
@@ -209,7 +257,7 @@
                   Ministry of Education (MoE)
                 </span>
                 <h4 class="text-sm font-bold text-slate-900 pt-1.5">
-                  Central Sector Scheme of Scholarship for College Students                  
+                  Central Sector Scheme of Scholarship for College Students
                 </h4>
                 <div class="flex flex-wrap gap-4 text-xs text-slate-500 pt-2">
                   <span>Income Limit: Under ₹2,00,000 / Yr</span>

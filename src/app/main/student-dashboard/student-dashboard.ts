@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { PortalService } from '../../../shared/portal.service';
 import { Apiservice } from '../../../shared/api/apiservice';
-import { StudentProfileResponse } from '../../../shared/types';
+import { ApplicationResponse, StudentProfileResponse } from '../../../shared/types';
 import { Router } from '@angular/router';
 
 import {
@@ -45,6 +45,7 @@ export class StudentDashboard implements OnInit {
 
   isProfileSaved = signal<boolean>(false);
   studentDetails: StudentProfileResponse | null = null;
+  readonly applicationDetails = signal<ApplicationResponse | null>(null);
   userMetadata: any = null;
 
   studentDetailsForm!: FormGroup;
@@ -108,6 +109,10 @@ export class StudentDashboard implements OnInit {
         this.studentDetails = res.data;
         this.isProfileSaved.set(true);
         console.log('Student Profile response:', this.studentDetails);
+
+        if (this.studentDetails?.isApplicationSubmitted) {
+          this.fetchApplicationsByStudent(this.studentDetails?.profileId);
+        }
         setTimeout(() => {
           Notiflix.Loading.remove();
         }, 1500);
@@ -118,6 +123,19 @@ export class StudentDashboard implements OnInit {
         setTimeout(() => {
           Notiflix.Loading.remove();
         }, 1500);
+      },
+    });
+  }
+
+  fetchApplicationsByStudent(studentProfileId: any): void {
+    this.apiService.getApplicationsByStudentId(studentProfileId).subscribe({
+      next: (res) => {
+        this.applicationDetails.set(res.data[0]);
+        console.log('Fetching applications details for this student:', this.applicationDetails());
+      },
+      error: (err) => {
+        console.log(err);
+        this.applicationDetails.set(null);
       },
     });
   }
@@ -147,7 +165,7 @@ export class StudentDashboard implements OnInit {
       return;
     }
 
-    const docData = this.documents[docKey]; 
+    const docData = this.documents[docKey];
     Notiflix.Loading.pulse(`Uploading ${docData.label}...`, {});
 
     this.apiService.uploadDocument(file, docData.folder).subscribe({
@@ -256,5 +274,53 @@ export class StudentDashboard implements OnInit {
 
   applyForScheme() {
     this.router.navigate(['/application-form']);
+  }
+
+  getTimelineMeta(actionTaken: string = '') {
+    const action = actionTaken.toUpperCase();
+
+    if (action.includes('DISBURSED')) {
+      return {
+        icon: 'pi pi-check-circle',
+        iconColor: 'text-emerald-600',
+        nodeBg: 'bg-emerald-50 border-emerald-500 ring-emerald-100',
+        badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        badgeLabel: 'Disbursed',
+      };
+    }
+    if (action.includes('ADMIN_APPROVED')) {
+      return {
+        icon: 'pi pi-verified',
+        iconColor: 'text-indigo-600',
+        nodeBg: 'bg-indigo-50 border-indigo-500 ring-indigo-100',
+        badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        badgeLabel: 'Admin Approved',
+      };
+    }
+    if (action.includes('INSTITUTE_VERIFIED')) {
+      return {
+        icon: 'pi pi-building',
+        iconColor: 'text-blue-600',
+        nodeBg: 'bg-blue-50 border-blue-500 ring-blue-100',
+        badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+        badgeLabel: 'College Verified',
+      };
+    }
+    if (action.includes('REJECTED')) {
+      return {
+        icon: 'pi pi-times-circle',
+        iconColor: 'text-rose-600',
+        nodeBg: 'bg-rose-50 border-rose-500 ring-rose-100',
+        badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
+        badgeLabel: 'Rejected',
+      };
+    }
+    return {
+      icon: 'pi pi-file-edit',
+      iconColor: 'text-slate-600',
+      nodeBg: 'bg-slate-50 border-slate-400 ring-slate-100',
+      badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+      badgeLabel: 'Submitted',
+    };
   }
 }

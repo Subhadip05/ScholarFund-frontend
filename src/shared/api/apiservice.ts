@@ -87,6 +87,14 @@ export class Apiservice {
     );
   }
 
+  getApplicationsByStudentId(
+    studentProfileId: number,
+  ): Observable<ApiResponse<ApplicationResponse[]>> {
+    return this.client.get<ApiResponse<ApplicationResponse[]>>(
+      `${baseUrl}/applications/student/${studentProfileId}`,
+    );
+  }
+
   updateApplicationStatus(
     applicationId: number,
     request: ApplicationStatusUpdateRequest,

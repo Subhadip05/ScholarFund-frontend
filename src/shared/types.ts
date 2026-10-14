@@ -16,12 +16,6 @@ export interface ScholarshipScheme {
   category: string[];
 }
 
-export interface TimelineItem {
-  label: string;
-  status: string;
-  date: string;
-}
-
 export interface CollegeApplication {
   id: string;
   name: string;

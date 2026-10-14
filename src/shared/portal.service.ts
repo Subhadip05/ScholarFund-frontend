@@ -1,8 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import {
   ModalType,
-  UserRole,
-  TimelineItem,
+  UserRole
 } from './types';
 import { Authservice } from './auth/authservice';
 import Notiflix from 'notiflix';
@@ -18,14 +17,6 @@ export class PortalService {
 
   userRole: UserRole = null;
   userMetadata: any = null;
-
-  studentTimeline: TimelineItem[] = [
-    { label: 'Student Register/Login', status: 'completed', date: 'July 10, 2026' },
-    { label: 'Scholarship Apply', status: 'pending', date: 'In Progress' },
-    { label: 'Institute Verification', status: 'upcoming', date: 'Awaiting Application' },
-    { label: 'Government Approved Scholarship', status: 'upcoming', date: 'Awaiting Verification' },
-    { label: 'Money Distribute By Govt.', status: 'upcoming', date: 'Awaiting Approval' },
-  ];
 
   constructor() {
     this.userRole = sessionStorage.getItem('user_role') as UserRole;
