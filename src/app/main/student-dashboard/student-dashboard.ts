@@ -270,6 +270,24 @@ export class StudentDashboard implements OnInit {
 
   downloadApplicationForm() {
     console.log('Downloading application clicked');
+    const appId = this.applicationDetails()?.applicationId;
+
+    if (!appId) {
+      console.warn('Application details not loaded yet.');
+      return;
+    }
+
+    this.apiService.downloadApplicationPdf(appId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Scholarship_Application_${this.applicationDetails()?.studentName}.pdf`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Download failed:', err),
+    });
   }
 
   applyForScheme() {

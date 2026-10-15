@@ -129,4 +129,10 @@ export class Apiservice {
       {},
     );
   }
+
+  downloadApplicationPdf(applicationId: number): Observable<Blob> {
+    return this.client.get(`${baseUrl}/applications/${applicationId}/download-pdf`, {
+      responseType: 'blob',
+    });
+  }
 }
