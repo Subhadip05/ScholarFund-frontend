@@ -60,10 +60,17 @@ export class Authservice {
   }
 
   logout() {
-    sessionStorage.removeItem('access_token');
-    sessionStorage.removeItem('refresh_token');
-    sessionStorage.removeItem('user_role');
-    sessionStorage.removeItem('user_metadata');
+    localStorage.clear();
+    sessionStorage.clear();
     this.router.navigate(['/']);
+  }
+
+  getUserRole(): string {
+    try {
+      const raw = sessionStorage.getItem('user_metadata');
+      return raw ? (JSON.parse(raw).role || '').toUpperCase() : '';
+    } catch {
+      return '';
+    }
   }
 }

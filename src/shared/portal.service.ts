@@ -15,11 +15,9 @@ export class PortalService {
   mobileMenuOpen = false;
   activeModal = signal<ModalType>(null);
 
-  userRole: UserRole = null;
   userMetadata: any = null;
 
   constructor() {
-    this.userRole = sessionStorage.getItem('user_role') as UserRole;
     const savedMetadata = sessionStorage.getItem('user_metadata');
 
     if (savedMetadata) {
@@ -29,6 +27,11 @@ export class PortalService {
         console.error('Error parsing user metadata from sessionStorage', e);
       }
     }
+  }
+
+  get userRole(): UserRole {
+    const role = this.userMetadata?.role;
+    return role ? (role.toUpperCase() as UserRole) : null;
   }
 
   openModal(type: ModalType) {
@@ -46,7 +49,6 @@ export class PortalService {
   logout() {
     Notiflix.Loading.pulse('Loading...', {});
     this.authservice.logout();
-    this.userRole = null;
     this.userMetadata = null;
     Notiflix.Loading.remove();
   }

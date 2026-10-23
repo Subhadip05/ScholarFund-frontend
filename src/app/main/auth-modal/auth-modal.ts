@@ -1,11 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PortalService } from '../../../shared/portal.service';
 import { Router } from '@angular/router';
 import Notiflix from 'notiflix';
@@ -200,15 +195,13 @@ export class AuthModal {
         console.log('Student login response :', res);
         this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
 
-        this.portalService.userRole = 'student';
-
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
           phoneNo: res.data?.phoneNo,
+          role: res.data?.role,
         };
 
-        sessionStorage.setItem('user_role', 'student');
         sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();
@@ -298,15 +291,13 @@ export class AuthModal {
         console.log('Student otp verify response :', res);
         this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
 
-        this.portalService.userRole = 'student';
-
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
           phoneNo: res.data?.phoneNo,
+          role: res.data?.role,
         };
 
-        sessionStorage.setItem('user_role', 'student');
         sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();
@@ -470,15 +461,13 @@ export class AuthModal {
         console.log('College login response :', res);
         this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
 
-        this.portalService.userRole = 'college-admin';
-
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
           phoneNo: res.data?.phoneNo,
+          role: res.data?.role,
         };
 
-        sessionStorage.setItem('user_role', 'college-admin');
         sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();
@@ -519,13 +508,12 @@ export class AuthModal {
         console.log('Admin login response :', res);
         this._authService.saveTokens(res.data.accessToken, res.data.refreshToken);
 
-        this.portalService.userRole = 'GOVT';
         this.portalService.userMetadata = {
           name: res.data?.fullName,
           email: res.data?.email,
+          role: res.data?.role,
         };
 
-        sessionStorage.setItem('user_role', 'GOVT');
         sessionStorage.setItem('user_metadata', JSON.stringify(this.portalService.userMetadata));
 
         this.closeModal();

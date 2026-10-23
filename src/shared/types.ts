@@ -1,6 +1,6 @@
 export type ModalType =
   'student-login' | 'register' | 'college-login' | 'govt-login' | 'eligibility-checker' | null;
-export type UserRole = 'student' | 'college-admin' | 'GOVT' | null;
+export type UserRole = 'STUDENT' | 'COLLEGE' | 'GOVT' | null;
 
 export type MainTab = 'APPLICATIONS' | 'INSTITUTES' | 'DISBURSEMENTS';
 export type DocType =

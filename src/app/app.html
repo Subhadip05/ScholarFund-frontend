@@ -19,9 +19,9 @@
             <span
               class="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold text-[11px] uppercase tracking-wider border border-blue-500/30"
             >
-              @if (portalService.userRole === 'student') {
+              @if (portalService.userRole === 'STUDENT') {
                 Student Workspace
-              } @else if (portalService.userRole === 'college-admin') {
+              } @else if (portalService.userRole === 'COLLEGE') {
                 Institutional Nodal Desk
               } @else {
                 National Directorate
@@ -35,10 +35,10 @@
             </h1>
 
             <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-              @if (portalService.userRole === 'student') {
+              @if (portalService.userRole === 'STUDENT') {
                 Verify your profile details, apply for new national scholarships, and monitor your
                 disbursement status in real-time.
-              } @else if (portalService.userRole === 'college-admin') {
+              } @else if (portalService.userRole === 'COLLEGE') {
                 Administering registrations complete. Audit student credentials and issue
                 verification status reports.
               } @else if (portalService.userRole === 'GOVT') {
