@@ -4,6 +4,11 @@ import { Authservice } from './authservice';
 import { catchError, switchMap, throwError } from 'rxjs';
 
 export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
+  // Skip interceptor for direct AWS S3 presigned URL requests
+  if (req.url.includes('amazonaws.com')) {
+    return next(req);
+  }
+
   const authService = inject(Authservice);
 
   // 1. Helper function: Attaches the token if it exists
@@ -16,7 +21,7 @@ export const refreshTokenInterceptor: HttpInterceptorFn = (req, next) => {
   return next(attachToken(req, authService.getAccessToken())).pipe(
     catchError((error: HttpErrorResponse) => {
       // 3. If it's NOT a 401 error (or we don't have a refresh token), just fail normally
-      if (error.status !== 401 || !authService.getRefreshToken()) {
+      if ((error.status !== 401 && error.status !== 403) || !authService.getRefreshToken()) {
         return throwError(() => error);
       }
 

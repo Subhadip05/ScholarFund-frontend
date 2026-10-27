@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import {
   ApiResponse,
   ApplicationResponse,
@@ -10,10 +10,11 @@ import {
   DocumentUploadResponse,
   InstituteProfileDto,
   InstituteProfileResponse,
+  PresignedUploadData,
   StudentProfileDto,
   StudentProfileResponse,
 } from '../types';
-import { Observable } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 
 export const baseUrl = environment.baseUrl;
 
@@ -38,15 +39,55 @@ export class Apiservice {
     );
   }
 
-  uploadDocument(file: File, folder: string): Observable<ApiResponse<DocumentUploadResponse>> {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('folder', folder);
+  // uploadDocument(file: File, folder: string): Observable<ApiResponse<DocumentUploadResponse>> {
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+  //   formData.append('folder', folder);
 
-    return this.client.post<ApiResponse<DocumentUploadResponse>>(
-      `${baseUrl}/documents/upload`,
-      formData,
-    );
+  //   return this.client.post<ApiResponse<DocumentUploadResponse>>(
+  //     `${baseUrl}/documents/upload`,
+  //     formData,
+  //   );
+  // }
+
+  uploadDocument(file: File, folder: string): Observable<ApiResponse<DocumentUploadResponse>> {
+    const fileType = file.type || 'application/octet-stream';
+
+    // Fetch Presigned URL
+    return this.client
+      .get<ApiResponse<PresignedUploadData>>(`${baseUrl}/documents/presigned-upload-url`, {
+        params: {
+          fileName: file.name,
+          folder: folder,
+        },
+      })
+      .pipe(
+        switchMap((presignedRes) => {
+          const { uploadUrl, s3Key } = presignedRes.data;
+
+          // Direct PUT of the raw file binary to AWS S3
+          return this.client
+            .put(uploadUrl, file, {
+              headers: new HttpHeaders({
+                'Content-Type': fileType,
+              }),
+            })
+            .pipe(
+              switchMap(() => {
+                // Confirm metadata with key save with in db
+                return this.client.post<ApiResponse<DocumentUploadResponse>>(
+                  `${baseUrl}/documents/confirm-upload`,
+                  {
+                    fileName: file.name,
+                    s3Key: s3Key,
+                    contentType: fileType,
+                    fileSize: file.size,
+                  },
+                );
+              }),
+            );
+        }),
+      );
   }
 
   getVerifiedInstitutes() {

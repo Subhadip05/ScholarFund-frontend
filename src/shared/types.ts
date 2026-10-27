@@ -126,6 +126,10 @@ export interface DocumentUploadResponse {
   documentId: number;
   documentUrl: string;
 }
+export interface PresignedUploadData {
+  uploadUrl: string;
+  s3Key: string;
+}
 
 export interface ApplicationSubmitRequest {
   instituteId: number;
