@@ -147,24 +147,26 @@
           {{ studentLoginOtpError }}
         </div>
 
-        <div class="flex items-center justify-between text-[11px] font-bold pt-1">
-          <label class="flex items-center gap-2 text-slate-600 cursor-pointer">
-            <input
-              type="checkbox"
-              checked
-              class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-50 focus:ring-offset-0 transition-colors"
-            />
-            <span>Remember session</span>
-          </label>
-          <a href="#" class="text-blue-600 hover:underline no-underline">Trouble logging in?</a>
-        </div>
+        @if (studentLoginOtpSent) {
+          <div class="flex items-center justify-between text-[11px] font-bold pt-1">
+            <label class="flex items-center gap-2 text-slate-600 cursor-pointer">
+              <input
+                type="checkbox"
+                checked
+                class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-50 focus:ring-offset-0 transition-colors"
+              />
+              <span>Remember session</span>
+            </label>
+            <a href="#" class="text-blue-600 hover:underline no-underline">Trouble logging in?</a>
+          </div>
 
-        <button
-          type="submit"
-          class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer mt-4 border-0"
-        >
-          Authenticate and Enter Portal
-        </button>
+          <button
+            type="submit"
+            class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white rounded-xl font-extrabold text-xs tracking-wider uppercase shadow-lg shadow-blue-500/10 hover:shadow-xl hover:shadow-blue-500/20 active:scale-[0.98] transition-all cursor-pointer mt-4 border-0"
+          >
+            Authenticate and Enter Portal
+          </button>
+        }
 
         <div
           class="text-center text-[11px] font-bold text-slate-400 pt-3 border-t border-slate-100"

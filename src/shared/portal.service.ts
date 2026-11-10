@@ -5,11 +5,13 @@ import {
 } from './types';
 import { Authservice } from './auth/authservice';
 import Notiflix from 'notiflix';
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
 export class PortalService {
   private authservice = inject(Authservice);
+  private router = inject(Router);
 
   isScrolled = false;
   mobileMenuOpen = false;
@@ -51,6 +53,11 @@ export class PortalService {
     this.authservice.logout();
     this.userMetadata = null;
     Notiflix.Loading.remove();
+
+    queueMicrotask(() => {
+    this.userMetadata = null; // or '-1' / your default unauthenticated state
+    this.router.navigate(['/home']);
+  });
   }
 
   // Helper scroll
