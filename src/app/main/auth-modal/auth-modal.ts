@@ -284,9 +284,14 @@ export class AuthModal {
       return;
     }
 
-    console.log('Student Register form value :', formValues);
+    const otpVerifyPayload: VerifyOtpDto = {
+      email: formValues.email,
+      otpCode: formValues.otpCode,
+      role: 'STUDENT',
+    };
+    console.log('Student Submit Register form value :', otpVerifyPayload);
 
-    this._authService.verifyOtpAndLogin(formValues).subscribe({
+    this._authService.verifyOtpAndLogin(otpVerifyPayload).subscribe({
       next: (res) => {
         console.log('Student otp verify response :', res);
         this._authService.saveTokens(res.data?.accessToken, res.data?.refreshToken);
